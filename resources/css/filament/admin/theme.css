@@ -1,0 +1,21 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../packages/mipress/core/src/Filament/**/*';
+
+/* Sidebar right border */
+.fi-sidebar {
+    border-right: 1px solid var(--color-gray-200);
+}
+
+.dark .fi-sidebar {
+    border-right-color: rgb(255 255 255 / 0.1);
+}
+
+/* Smaller navigation icons */
+.fi-nav-item-icon,
+.fi-nav-group-icon {
+    width: 1rem;
+    height: 1rem;
+}

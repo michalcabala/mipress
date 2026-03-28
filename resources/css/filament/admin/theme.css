@@ -4,8 +4,9 @@
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../packages/mipress/core/src/Filament/**/*';
 
-/* Sidebar right border */
+/* Sidebar background + right border (matches topbar) */
 .fi-sidebar {
+    @apply bg-white dark:bg-gray-900;
     border-right: 1px solid var(--color-gray-200);
 }
 

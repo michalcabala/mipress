@@ -4,8 +4,88 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "95557ad0e9c23f8064e164aa3c83859c",
+    "content-hash": "0214a16b6fd8cdfb17d1df2984525544",
     "packages": [
+        {
+            "name": "awcodes/mason",
+            "version": "v3.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/awcodes/mason.git",
+                "reference": "3bda91a31994857800394d47d64662f0e2d8bf73"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/awcodes/mason/zipball/3bda91a31994857800394d47d64662f0e2d8bf73",
+                "reference": "3bda91a31994857800394d47d64662f0e2d8bf73",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.0|^4.3",
+                "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+                "pestphp/pest-plugin-livewire": "^3.0|^4.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "rector/rector": "^2.0",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Awcodes\\Mason\\MasonServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/helpers.php"
+                ],
+                "psr-4": {
+                    "Awcodes\\Mason\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adam Weston",
+                    "email": "awcodes1@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple block based drag and drop page / document builder field for Filament.",
+            "homepage": "https://github.com/awcodes/mason",
+            "keywords": [
+                "awcodes",
+                "filamentphp",
+                "laravel",
+                "mason"
+            ],
+            "support": {
+                "issues": "https://github.com/awcodes/mason/issues",
+                "source": "https://github.com/awcodes/mason"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/awcodes",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-02-05T17:53:32+00:00"
+        },
         {
             "name": "blade-ui-kit/blade-heroicons",
             "version": "2.7.0",
@@ -3244,12 +3324,14 @@
             "dist": {
                 "type": "path",
                 "url": "./packages/mipress/core",
-                "reference": "1c85d08a7c15cb615d675661e569eb7d3d8bb55c"
+                "reference": "4fc3cf3b5e958c53f5be614a7431f56a5668f026"
             },
             "require": {
+                "awcodes/mason": "^3.0",
                 "filament/filament": "^5.0",
                 "php": "^8.3",
-                "spatie/laravel-permission": "^7.0"
+                "spatie/laravel-permission": "^7.0",
+                "spatie/laravel-sluggable": "^3.0"
             },
             "type": "library",
             "extra": {
@@ -3261,8 +3343,7 @@
             },
             "autoload": {
                 "psr-4": {
-                    "MiPress\\Core\\": "src/",
-                    "MiPress\\Core\\Database\\Seeders\\": "database/seeders/"
+                    "MiPress\\Core\\": "src/"
                 }
             },
             "autoload-dev": {
@@ -5193,6 +5274,65 @@
                 }
             ],
             "time": "2026-03-17T22:57:08+00:00"
+        },
+        {
+            "name": "spatie/laravel-sluggable",
+            "version": "3.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-sluggable.git",
+                "reference": "3624a2d7d8c8475d8561c53faf63f1af583ef76c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-sluggable/zipball/3624a2d7d8c8475d8561c53faf63f1af583ef76c",
+                "reference": "3624a2d7d8c8475d8561c53faf63f1af583ef76c",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
+                "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
+                "pestphp/pest": "^2.0|^3.7|^4.0",
+                "spatie/laravel-translatable": "^5.0|^6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\Sluggable\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Generate slugs when saving Eloquent models",
+            "homepage": "https://github.com/spatie/laravel-sluggable",
+            "keywords": [
+                "laravel-sluggable",
+                "spatie"
+            ],
+            "support": {
+                "source": "https://github.com/spatie/laravel-sluggable/tree/3.8.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/spatie",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-23T07:42:02+00:00"
         },
         {
             "name": "spatie/shiki-php",

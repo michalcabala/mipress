@@ -1,8 +1,10 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/awcodes/mason/resources/css/plugin.css';
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../packages/mipress/core/src/Filament/**/*';
+@source '../../../../vendor/awcodes/mason/resources/**/*.blade.php';
 
 /* Sidebar background + right border (matches topbar) */
 .fi-sidebar {

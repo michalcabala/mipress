@@ -75,6 +75,13 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 - Run `php artisan test` after implementing each feature.
 - Use Laravel model factories for test data.
 
+## Laravel Boost
+
+- **Always use Laravel Boost** (`mcp_laravel-boost_search-docs`) to verify API before writing any Filament, Livewire, or Laravel code.
+- Pass relevant `packages` array to scope results (e.g. `["filament/filament"]`, `["awcodes/mason"]`).
+- Use multiple broad queries per search call.
+- Do not skip this step — always search docs before implementing.
+
 ## Git & Commits
 
 - Write all commit messages in **English**.

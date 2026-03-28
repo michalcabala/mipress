@@ -8,7 +8,7 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 
 - **PHP 8.3+** with strict types, readonly properties, enums, named arguments, and PHP 8 attributes where Laravel 13 supports them
 - **Laravel 13** — use current L13 conventions (e.g. `#[Table]`, `#[Fillable]` attributes are optional but preferred for new code)
-- **Filament 5** — admin panel at `/mp-cp`, panel ID `admin`
+- **Filament 5** — admin panel at `/mpcp`, panel ID `admin`
 - **Livewire 3** — for interactive frontend components
 - **Blade** — templating engine, no Inertia/Vue/React
 - **Tailwind CSS 4** — for frontend styling
@@ -35,7 +35,6 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 
 ## Coding Conventions
 
-- Always declare `declare(strict_types=1);` at the top of every PHP file.
 - Use typed properties, return types, and parameter types everywhere — no mixed types unless truly necessary.
 - Prefer `readonly` properties and constructor promotion where possible.
 - Use enums instead of string/int constants.

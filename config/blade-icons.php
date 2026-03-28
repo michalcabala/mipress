@@ -25,6 +25,11 @@ return [
             'prefix' => 'far',
         ],
 
+        'fas' => [
+            'path' => 'resources/svg/fa/solid',
+            'prefix' => 'fas',
+        ],
+
         'fab' => [
             'path' => 'resources/svg/fa/brands',
             'prefix' => 'fab',

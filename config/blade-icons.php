@@ -15,6 +15,21 @@ return [
 
     'sets' => [
 
+        'fal' => [
+            'path' => 'resources/svg/fa/light',
+            'prefix' => 'fal',
+        ],
+
+        'far' => [
+            'path' => 'resources/svg/fa/regular',
+            'prefix' => 'far',
+        ],
+
+        'fab' => [
+            'path' => 'resources/svg/fa/brands',
+            'prefix' => 'fab',
+        ],
+
         // 'default' => [
         //
         //     /*

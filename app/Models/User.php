@@ -18,7 +18,10 @@ use MiPress\Core\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
+
+    /** @var array<int, string> */
+    protected $with = ['roles'];
 
     /**
      * Get the attributes that should be cast.

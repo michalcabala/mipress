@@ -16,5 +16,5 @@
 /* Smaller sidebar navigation icons (override fi-size-lg = size-6) */
 .fi-sidebar-item-btn > .fi-icon,
 .fi-sidebar-group-btn > .fi-icon {
-    @apply size-4;
+    @apply size-5;
 }

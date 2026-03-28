@@ -13,9 +13,8 @@
     border-right-color: rgb(255 255 255 / 0.1);
 }
 
-/* Smaller navigation icons */
-.fi-nav-item-icon,
-.fi-nav-group-icon {
-    width: 1rem;
-    height: 1rem;
+/* Smaller sidebar navigation icons (override fi-size-lg = size-6) */
+.fi-sidebar-item-btn > .fi-icon,
+.fi-sidebar-group-btn > .fi-icon {
+    @apply size-4;
 }

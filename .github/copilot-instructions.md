@@ -105,6 +105,7 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 
 ## What NOT To Do
 
+- Do NOT delete any data in the database.
 - Do NOT use `dd()` or `dump()` in committed code — use `Log::debug()` for debugging.
 - Do NOT use raw SQL queries — always use Eloquent or Query Builder.
 - Do NOT install packages without confirming with the developer first.

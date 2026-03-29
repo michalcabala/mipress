@@ -45,6 +45,7 @@ class MiPressDemoSeeder extends Seeder
                 'route' => '/{slug}',
                 'dated' => false,
                 'slugs' => true,
+                'hierarchical' => true,
                 'sort_direction' => 'asc',
                 'sort_order' => 1,
             ]
@@ -59,6 +60,7 @@ class MiPressDemoSeeder extends Seeder
                 'route' => '/clanky/{slug}',
                 'dated' => true,
                 'slugs' => true,
+                'hierarchical' => false,
                 'sort_direction' => 'desc',
                 'sort_order' => 2,
             ]

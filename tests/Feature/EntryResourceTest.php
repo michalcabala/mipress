@@ -38,6 +38,7 @@ beforeEach(function () {
         'route' => '/{slug}',
         'slugs' => true,
         'dated' => false,
+        'hierarchical' => true,
     ]);
 });
 
@@ -176,6 +177,43 @@ describe('create page', function () {
             ->and($entry->title)->toBe('Nová stránka')
             ->and($entry->collection_id)->toBe($this->collection->id)
             ->and($entry->blueprint_id)->toBe($this->blueprint->id);
+    });
+
+    it('can create a child entry in hierarchical collection', function () {
+        $parent = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Nadřazená stránka',
+            'slug' => 'nadrzena-stranka',
+        ]);
+
+        Livewire::withQueryParams(['collection' => 'pages'])
+            ->test(CreateEntry::class)
+            ->fillForm([
+                'title' => 'Podstránka',
+                'slug' => 'podstranka',
+                'parent_id' => $parent->id,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $entry = Entry::query()->where('slug', 'podstranka')->first();
+
+        expect($entry)->not->toBeNull()
+            ->and($entry->parent_id)->toBe($parent->id);
+    });
+
+    it('hides parent field for non-hierarchical collection', function () {
+        Collection::factory()->create([
+            'name' => 'Příspěvky',
+            'handle' => 'articles',
+            'blueprint_id' => $this->blueprint->id,
+            'hierarchical' => false,
+        ]);
+
+        $this->get(EntryResource::getUrl('create', ['collection' => 'articles']))
+            ->assertSuccessful()
+            ->assertDontSee('Nadřazená položka');
     });
 
     it('validates required title', function () {

@@ -66,6 +66,7 @@ describe('create page', function () {
                 'icon' => 'fal-box',
                 'dated' => false,
                 'slugs' => true,
+                'hierarchical' => true,
                 'route' => '/products/{slug}',
                 'sort_direction' => 'asc',
                 'sort_order' => 10,
@@ -80,7 +81,8 @@ describe('create page', function () {
             ->and($collection->blueprint_id)->toBe($blueprint->id)
             ->and($collection->route)->toBe('/products/{slug}')
             ->and($collection->dated)->toBeFalse()
-            ->and($collection->slugs)->toBeTrue();
+            ->and($collection->slugs)->toBeTrue()
+            ->and($collection->hierarchical)->toBeTrue();
     });
 
     it('validates required fields', function () {
@@ -125,6 +127,7 @@ describe('edit page', function () {
             'handle' => 'pages',
             'dated' => true,
             'slugs' => true,
+            'hierarchical' => true,
             'route' => '/{slug}',
         ]);
 
@@ -134,6 +137,7 @@ describe('edit page', function () {
                 'handle' => 'pages',
                 'dated' => true,
                 'slugs' => true,
+                'hierarchical' => true,
                 'route' => '/{slug}',
             ]);
     });

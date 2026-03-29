@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Filament\Notifications\DatabaseNotification as FilamentDatabaseNotification;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\EntryStatus;
@@ -14,6 +17,7 @@ use MiPress\Core\Filament\Resources\EntryResource\Pages\ListEntries;
 use MiPress\Core\Models\Blueprint;
 use MiPress\Core\Models\Collection;
 use MiPress\Core\Models\Entry;
+use MiPress\Core\Policies\EntryPolicy;
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
@@ -48,6 +52,12 @@ describe('list page', function () {
     it('can render with collection filter', function () {
         $this->get(EntryResource::getUrl('index', ['collection' => 'pages']))
             ->assertSuccessful();
+    });
+
+    it('uses path-based collection URL on index', function () {
+        $url = EntryResource::getUrl('index', ['collection' => 'pages']);
+
+        expect($url)->toEndWith('/mpcp/entries/pages');
     });
 
     it('can list entries for a collection', function () {
@@ -92,6 +102,36 @@ describe('list page', function () {
             ->assertCanSeeTableRecords([$pagesEntry])
             ->assertCanNotSeeTableRecords([$articlesEntry]);
     });
+
+    it('shows in-review badge in navigation for users who can publish', function () {
+        Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::InReview,
+        ]);
+
+        $items = EntryResource::getNavigationItems();
+        $pagesItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Stránky');
+
+        expect($pagesItem)->not->toBeNull()
+            ->and($pagesItem->getBadge())->toBe('1');
+    });
+
+    it('does not show in-review badge in navigation for contributor', function () {
+        Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::InReview,
+        ]);
+
+        $contributor = User::factory()->create();
+        $contributor->assignRole(UserRole::Contributor->value);
+        $this->actingAs($contributor);
+
+        $items = EntryResource::getNavigationItems();
+        $pagesItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Stránky');
+
+        expect($pagesItem)->not->toBeNull()
+            ->and($pagesItem->getBadge())->toBeNull();
+    });
 });
 
 // --- Create Page ---
@@ -100,6 +140,24 @@ describe('create page', function () {
     it('can render', function () {
         $this->get(EntryResource::getUrl('create', ['collection' => 'pages']))
             ->assertSuccessful();
+    });
+
+    it('shows publish and draft create actions for superadmin', function () {
+        $this->get(EntryResource::getUrl('create', ['collection' => 'pages']))
+            ->assertSee('Publikovat')
+            ->assertSee('Uložit koncept');
+    });
+
+    it('shows review and draft create actions for contributor', function () {
+        $contributor = User::factory()->create();
+        $contributor->assignRole(UserRole::Contributor->value);
+        $this->actingAs($contributor);
+
+        $this->get(EntryResource::getUrl('create', ['collection' => 'pages']))
+            ->assertSuccessful()
+            ->assertSee('Odeslat ke schválení')
+            ->assertSee('Uložit koncept')
+            ->assertDontSee('Publikovat');
     });
 
     it('can create an entry', function () {
@@ -290,6 +348,28 @@ describe('soft delete', function () {
 // --- Status Workflow ---
 
 describe('status workflow', function () {
+    it('sends database notification to approvers when contributor submits for review', function () {
+        Notification::fake();
+
+        $editor = User::factory()->create();
+        $editor->assignRole(UserRole::Editor->value);
+
+        $contributor = User::factory()->create();
+        $contributor->assignRole(UserRole::Contributor->value);
+        $this->actingAs($contributor);
+
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'author_id' => $contributor->id,
+            'status' => EntryStatus::Draft,
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->callAction('submitForReview');
+
+        Notification::assertSentTo($editor, FilamentDatabaseNotification::class);
+    });
+
     it('creates entries as draft by default', function () {
         $entry = Entry::factory()->create();
 
@@ -324,6 +404,228 @@ describe('status workflow', function () {
 
         expect(Entry::draft()->count())->toBe(3);
     });
+
+    it('sets scheduled status when publishing with future publish date', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Draft,
+            'published_at' => now()->addHour(),
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->callAction('publishEntry');
+
+        $entry->refresh();
+
+        expect($entry->status)->toBe(EntryStatus::Scheduled)
+            ->and($entry->published_at)->not->toBeNull();
+    });
+
+    it('publishes scheduled entry via command when time is due', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Scheduled,
+            'published_at' => now()->subMinute(),
+        ]);
+
+        $this->artisan('entries:publish-scheduled')
+            ->assertSuccessful();
+
+        $entry->refresh();
+
+        expect($entry->status)->toBe(EntryStatus::Published);
+    });
+
+    it('publishes immediately when publish date is empty', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Draft,
+            'published_at' => null,
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->callAction('publishEntry');
+
+        $entry->refresh();
+
+        expect($entry->status)->toBe(EntryStatus::Published)
+            ->and($entry->published_at)->not->toBeNull();
+    });
+
+    it('keeps backdated publish date when publishing', function () {
+        $pastDate = now()->subDays(2)->startOfHour();
+
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Draft,
+            'published_at' => $pastDate,
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->callAction('publishEntry');
+
+        $entry->refresh();
+
+        expect($entry->status)->toBe(EntryStatus::Published)
+            ->and($entry->published_at?->format('Y-m-d H:i:s'))->toBe($pastDate->format('Y-m-d H:i:s'));
+    });
+
+    it('clears rejection note when saved as draft', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Rejected,
+            'review_note' => 'Nutné doplnit zdroje.',
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->callAction('saveDraft');
+
+        $entry->refresh();
+
+        expect($entry->status)->toBe(EntryStatus::Draft)
+            ->and($entry->review_note)->toBeNull();
+    });
+});
+
+// --- Preview ---
+
+describe('preview', function () {
+    it('renders valid signed preview for unpublished entry', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Draft,
+            'slug' => 'draft-preview',
+            'title' => 'Náhled článku',
+        ]);
+
+        $url = URL::temporarySignedRoute('preview.entry', now()->addHour(), ['entry' => $entry->id]);
+
+        $this->get($url)
+            ->assertSuccessful()
+            ->assertSee('Náhled obsahu (nepublikovaná verze)');
+    });
+
+    it('returns 403 for expired preview URL', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Draft,
+            'slug' => 'expired-preview',
+        ]);
+
+        $url = URL::temporarySignedRoute('preview.entry', now()->subMinute(), ['entry' => $entry->id]);
+
+        $this->get($url)
+            ->assertForbidden();
+    });
+
+    it('redirects published entry preview to live URL', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Published,
+            'slug' => 'live-article',
+            'published_at' => now()->subMinute(),
+        ]);
+
+        $url = URL::temporarySignedRoute('preview.entry', now()->addHour(), ['entry' => $entry->id]);
+
+        $this->get($url)
+            ->assertRedirect('/live-article');
+    });
+});
+
+// --- Header Action Matrix ---
+
+describe('header action matrix', function () {
+    it('shows expected header actions by role and status', function (
+        string $role,
+        EntryStatus $status,
+        bool $asAuthor,
+        array $expectedVisible,
+        array $expectedHidden,
+    ) {
+        $user = User::factory()->create();
+        $user->assignRole($role);
+        $this->actingAs($user);
+
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'author_id' => $asAuthor ? $user->id : $this->admin->id,
+            'status' => $status,
+            'slug' => 'workflow-matrix-'.str()->random(8),
+            'published_at' => $status === EntryStatus::Scheduled
+                ? now()->addHour()
+                : ($status === EntryStatus::Published ? now()->subMinute() : null),
+        ]);
+
+        $response = $this->get(EntryResource::getUrl('edit', ['record' => $entry]));
+
+        $response->assertSuccessful();
+
+        foreach ($expectedVisible as $label) {
+            $response->assertSee($label);
+        }
+
+        foreach ($expectedHidden as $label) {
+            $response->assertDontSee($label);
+        }
+    })->with([
+        'contributor draft own' => [
+            UserRole::Contributor->value,
+            EntryStatus::Draft,
+            true,
+            ['Náhled', 'Odeslat ke schválení', 'Uložit koncept'],
+            ['Publikovat', 'Schválit a publikovat', 'Zamítnout', 'Zrušit publikaci'],
+        ],
+        'editor draft own' => [
+            UserRole::Editor->value,
+            EntryStatus::Draft,
+            true,
+            ['Náhled', 'Publikovat', 'Uložit koncept'],
+            ['Odeslat ke schválení', 'Schválit a publikovat', 'Zamítnout'],
+        ],
+        'contributor in_review own' => [
+            UserRole::Contributor->value,
+            EntryStatus::InReview,
+            true,
+            ['Náhled'],
+            ['Schválit a publikovat', 'Zamítnout', 'Uložit koncept', 'Publikovat'],
+        ],
+        'editor in_review own' => [
+            UserRole::Editor->value,
+            EntryStatus::InReview,
+            true,
+            ['Náhled', 'Schválit a publikovat', 'Zamítnout', 'Uložit koncept'],
+            ['Odeslat ke schválení', 'Upravit a znovu odeslat'],
+        ],
+        'editor published own' => [
+            UserRole::Editor->value,
+            EntryStatus::Published,
+            true,
+            ['Zobrazit na webu', 'Aktualizovat', 'Zrušit publikaci'],
+            ['Náhled', 'Publikovat ihned', 'Zrušit plánování'],
+        ],
+        'editor scheduled own' => [
+            UserRole::Editor->value,
+            EntryStatus::Scheduled,
+            true,
+            ['Náhled', 'Aktualizovat', 'Zrušit plánování', 'Publikovat ihned'],
+            ['Zobrazit na webu', 'Zrušit publikaci'],
+        ],
+        'contributor rejected own' => [
+            UserRole::Contributor->value,
+            EntryStatus::Rejected,
+            true,
+            ['Náhled', 'Upravit a znovu odeslat', 'Uložit koncept'],
+            ['Publikovat', 'Schválit a publikovat', 'Zamítnout'],
+        ],
+        'editor rejected own' => [
+            UserRole::Editor->value,
+            EntryStatus::Rejected,
+            true,
+            ['Náhled', 'Publikovat', 'Uložit koncept'],
+            ['Upravit a znovu odeslat', 'Schválit a publikovat'],
+        ],
+    ]);
 });
 
 // --- Authorization ---
@@ -379,6 +681,35 @@ describe('authorization', function () {
 
         $this->get(EntryResource::getUrl('edit', ['record' => $ownEntry]))
             ->assertSuccessful();
+    });
+
+    it('contributor can edit own published entry', function () {
+        $contributor = User::factory()->create();
+        $contributor->assignRole(UserRole::Contributor->value);
+        $this->actingAs($contributor);
+
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'author_id' => $contributor->id,
+            'status' => EntryStatus::Published,
+        ]);
+
+        $this->get(EntryResource::getUrl('edit', ['record' => $entry]))
+            ->assertSuccessful();
+    });
+
+    it('requires publish permission for unpublishing published entries', function () {
+        $user = User::factory()->create();
+        $user->givePermissionTo(['entry.view', 'entry.update', 'entry.delete']);
+
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::Published,
+        ]);
+
+        $policy = app(EntryPolicy::class);
+
+        expect($policy->delete($user, $entry))->toBeFalse();
     });
 
     it('admin sees all entries', function () {

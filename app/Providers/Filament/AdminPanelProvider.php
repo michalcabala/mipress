@@ -45,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->spa()
             ->unsavedChangesAlerts()
+            ->databaseNotifications()
             ->databaseTransactions()
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()

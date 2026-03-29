@@ -62,7 +62,8 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 - Use Filament's built-in form components — do NOT create custom components unless absolutely necessary.
 - Use `Section`, `Grid`, and `Tabs` for form layout.
 - Use Curator's `CuratorPicker` for all image/file fields, never `FileUpload`.
-- Use Mason's `Mason` field for all structured content, never `RichEditor`.
+- Use Mason's `Mason` field for the primary Entry content blocks — never use `RichEditor` or any WYSIWYG for free-form content editing.
+- Blueprint custom field definitions may use `RichEditor` when the user selects the `richtext` field type — this is intentional for simple inline fields inside Blueprint-driven forms.
 - Translatable fields use custom `TranslatableField::make()` helper that wraps content in Filament Tabs with locale flags.
 - Labels and navigation in Czech: Sekce (Collection), Šablona (Template), Třídění (Taxonomy), Štítek (Term), Položka (Entry).
 
@@ -110,4 +111,4 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 - Do NOT create separate CSS/JS files — styles go into Tailwind classes, scripts into Blade/Livewire.
 - Do NOT use `env()` outside of config files.
 - Do NOT use Filament Shield — we use Spatie Permission directly with UserRole enum.
-- Do NOT use RichEditor or any WYSIWYG — all content uses Mason.
+- Do NOT use RichEditor or WYSIWYG for the main Entry content — that must use Mason. In Blueprint field definitions, `RichEditor` is allowed when the field type is `richtext`.

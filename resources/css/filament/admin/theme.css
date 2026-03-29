@@ -5,6 +5,7 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../packages/mipress/core/src/Filament/**/*';
+@source '../../../../packages/mipress/core/resources/views/**/*';
 @source '../../../../vendor/awcodes/mason/resources/**/*.blade.php';
 @source '../../../../vendor/awcodes/filament-curator/resources/**/*.blade.php';
 

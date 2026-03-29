@@ -3617,7 +3617,7 @@
             "dist": {
                 "type": "path",
                 "url": "./packages/mipress/core",
-                "reference": "78543c683c43ff985b4f31bdf19d1e4c951f20ad"
+                "reference": "b9bc1f5a174719ff65887595a3eab95ab3ec657c"
             },
             "require": {
                 "awcodes/mason": "^3.0",
@@ -3637,7 +3637,10 @@
             "autoload": {
                 "psr-4": {
                     "MiPress\\Core\\": "src/"
-                }
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
             },
             "autoload-dev": {
                 "psr-4": {

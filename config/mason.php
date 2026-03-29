@@ -8,10 +8,10 @@ return [
         'views_path' => 'mason',
     ],
     'preview' => [
-        'layout' => 'mason::iframe-preview', // Set to your layout view path, e.g., 'layouts.preview'
+        'layout' => 'layouts.mason-preview',
     ],
     'entry' => [
-        'layout' => 'mason::iframe-entry', // Set to your layout view path, e.g., 'layouts.entry'
+        'layout' => 'layouts.mason-entry',
     ],
     'routes' => [
         'middleware' => ['web', 'auth'],

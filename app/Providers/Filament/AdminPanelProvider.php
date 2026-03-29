@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Awcodes\Curator\CuratorPlugin;
+use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -32,6 +33,12 @@ class AdminPanelProvider extends PanelProvider
             ->path('mpcp')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
+            ->passwordReset()
+            ->profile()
+            ->emailVerification()
+            ->multiFactorAuthentication([
+                EmailAuthentication::make(),
+            ])
             ->colors([
                 'primary' => Color::Blue,
             ])

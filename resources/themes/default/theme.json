@@ -2,5 +2,7 @@
     "name": "Default",
     "slug": "default",
     "version": "1.0.0",
-    "author": "miPress"
+    "author": "miPress",
+    "description": "Editorial default theme with light, dark and system mode support.",
+    "screenshot": "assets/images/theme-preview.svg"
 }

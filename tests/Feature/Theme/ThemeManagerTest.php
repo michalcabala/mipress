@@ -250,13 +250,13 @@ describe('theme_asset helper', function () {
 
     it('returns correct asset URL for the default theme', function () {
         expect(theme_asset('css/theme.css'))
-            ->toBe(asset('themes/default/css/theme.css'));
+            ->toBe('/theme-files/default/assets/css/theme.css');
     });
 
     it('includes the active theme slug in the asset URL', function () {
         Setting::create(['key' => 'theme.active', 'value' => 'my-theme']);
 
         expect(theme_asset('css/theme.css'))
-            ->toContain('themes/my-theme/css/theme.css');
+            ->toBe('/theme-files/my-theme/assets/css/theme.css');
     });
 });

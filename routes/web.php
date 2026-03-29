@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use MiPress\Core\Http\Controllers\EntryController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [EntryController::class, 'home'])
+    ->name('home');

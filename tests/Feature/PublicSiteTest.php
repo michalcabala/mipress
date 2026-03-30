@@ -28,7 +28,7 @@ test('the homepage renders the configured published entry', function () {
         'published_at' => now(),
     ]);
 
-    Setting::putValue('site.homepage_entry_id', (string) $entry->getKey());
+    Setting::putValue('site.homepage_page_id', (string) $entry->getKey());
 
     $this->get('/')
         ->assertOk()

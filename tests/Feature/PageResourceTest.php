@@ -6,12 +6,10 @@ use App\Models\User;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
-use MiPress\Core\Filament\Resources\EntryResource;
 use MiPress\Core\Filament\Resources\PageResource;
 use MiPress\Core\Filament\Resources\PageResource\Pages\CreatePage;
 use MiPress\Core\Models\Blueprint;
-use MiPress\Core\Models\Collection;
-use MiPress\Core\Models\Entry;
+use MiPress\Core\Models\Page;
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
@@ -24,16 +22,6 @@ beforeEach(function () {
         'handle' => 'page',
         'fields' => [],
     ]);
-
-    $this->pagesCollection = Collection::factory()->create([
-        'name' => 'Stránky',
-        'handle' => 'pages',
-        'blueprint_id' => $this->blueprint->id,
-        'route' => '/{slug}',
-        'slugs' => true,
-        'dated' => false,
-        'hierarchical' => true,
-    ]);
 });
 
 it('renders the dedicated page resource index', function () {
@@ -41,28 +29,18 @@ it('renders the dedicated page resource index', function () {
         ->assertSuccessful();
 });
 
-it('redirects legacy entry pages index URL to page resource', function () {
-    $this->get(EntryResource::getUrl('index', ['collection' => 'pages']))
-        ->assertRedirect(PageResource::getUrl('index'));
-});
-
-it('redirects legacy entry pages create URL to page resource', function () {
-    $this->get(EntryResource::getUrl('create', ['collection' => 'pages']))
-        ->assertRedirect(PageResource::getUrl('create'));
-});
-
-it('creates page in fixed pages collection', function () {
+it('creates a standalone page in the pages table', function () {
     Livewire::test(CreatePage::class)
         ->fillForm([
             'title' => 'Nová stránka',
             'slug' => 'nova-stranka',
         ])
-        ->call('create')
+        ->call('createAsDraft')
         ->assertHasNoFormErrors();
 
-    $entry = Entry::query()->where('slug', 'nova-stranka')->first();
+    $page = Page::query()->where('slug', 'nova-stranka')->first();
 
-    expect($entry)->not->toBeNull()
-        ->and($entry->collection_id)->toBe($this->pagesCollection->id)
-        ->and($entry->blueprint_id)->toBe($this->blueprint->id);
+    expect($page)->not->toBeNull()
+        ->and($page->title)->toBe('Nová stránka')
+        ->and($page->blueprint_id)->toBe($this->blueprint->id);
 });

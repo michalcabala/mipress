@@ -5,6 +5,7 @@ declare(strict_types=1);
 use MiPress\Core\Enums\EntryStatus;
 use MiPress\Core\Models\Collection;
 use MiPress\Core\Models\Entry;
+use MiPress\Core\Models\Page;
 use MiPress\Core\Models\Setting;
 
 test('the homepage falls back to the default theme landing page when no homepage entry is configured', function () {
@@ -14,21 +15,14 @@ test('the homepage falls back to the default theme landing page when no homepage
 });
 
 test('the homepage renders the configured published entry', function () {
-    $collection = Collection::factory()->create([
-        'route' => '/{slug}',
-        'slugs' => true,
-    ]);
-
-    $entry = Entry::factory()->create([
-        'collection_id' => $collection->id,
-        'blueprint_id' => $collection->blueprint_id,
+    $page = Page::factory()->create([
         'title' => 'Domovská stránka',
         'slug' => 'domovska-stranka',
         'status' => EntryStatus::Published,
         'published_at' => now(),
     ]);
 
-    Setting::putValue('site.homepage_page_id', (string) $entry->getKey());
+    Setting::putValue('site.homepage_page_id', (string) $page->getKey());
 
     $this->get('/')
         ->assertOk()

@@ -59,7 +59,7 @@
                     @else
                         <div class="mp-page-hero__panel">
                             <p class="mp-eyebrow">Editorial focus</p>
-                            <h2>{{ $collection->name }}</h2>
+                            <h2>{{ $collection->name ?? $entry->title }}</h2>
                             <p>
                                 Šablona článku je připravená pro výrazný perex, obrázek, Mason obsah
                                 i související doporučení z téže kolekce.

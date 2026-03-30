@@ -105,21 +105,31 @@ describe('list page', function () {
     });
 
     it('shows in-review badge in navigation for users who can publish', function () {
+        $blogCollection = Collection::factory()->create([
+            'name' => 'Blog',
+            'handle' => 'blog-badge-test',
+        ]);
+
         Entry::factory()->create([
-            'collection_id' => $this->collection->id,
+            'collection_id' => $blogCollection->id,
             'status' => EntryStatus::InReview,
         ]);
 
         $items = EntryResource::getNavigationItems();
-        $pagesItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Stránky');
+        $blogItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Blog');
 
-        expect($pagesItem)->not->toBeNull()
-            ->and($pagesItem->getBadge())->toBe('1');
+        expect($blogItem)->not->toBeNull()
+            ->and($blogItem->getBadge())->toBe('1');
     });
 
     it('does not show in-review badge in navigation for contributor', function () {
+        $blogCollection = Collection::factory()->create([
+            'name' => 'Blog',
+            'handle' => 'blog-badge-test',
+        ]);
+
         Entry::factory()->create([
-            'collection_id' => $this->collection->id,
+            'collection_id' => $blogCollection->id,
             'status' => EntryStatus::InReview,
         ]);
 
@@ -128,10 +138,10 @@ describe('list page', function () {
         $this->actingAs($contributor);
 
         $items = EntryResource::getNavigationItems();
-        $pagesItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Stránky');
+        $blogItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Blog');
 
-        expect($pagesItem)->not->toBeNull()
-            ->and($pagesItem->getBadge())->toBeNull();
+        expect($blogItem)->not->toBeNull()
+            ->and($blogItem->getBadge())->toBeNull();
     });
 });
 

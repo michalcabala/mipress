@@ -6,6 +6,7 @@ use App\Models\User;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
+use MiPress\Core\Filament\Resources\EntryResource;
 use MiPress\Core\Filament\Resources\PageResource;
 use MiPress\Core\Filament\Resources\PageResource\Pages\CreatePage;
 use MiPress\Core\Models\Blueprint;
@@ -38,6 +39,16 @@ beforeEach(function () {
 it('renders the dedicated page resource index', function () {
     $this->get(PageResource::getUrl('index'))
         ->assertSuccessful();
+});
+
+it('redirects legacy entry pages index URL to page resource', function () {
+    $this->get(EntryResource::getUrl('index', ['collection' => 'pages']))
+        ->assertRedirect(PageResource::getUrl('index'));
+});
+
+it('redirects legacy entry pages create URL to page resource', function () {
+    $this->get(EntryResource::getUrl('create', ['collection' => 'pages']))
+        ->assertRedirect(PageResource::getUrl('create'));
 });
 
 it('creates page in fixed pages collection', function () {

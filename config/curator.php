@@ -10,17 +10,18 @@ use Awcodes\Curator\Resources\Media\Pages\EditMedia;
 use Awcodes\Curator\Resources\Media\Pages\ListMedia;
 use Awcodes\Curator\Resources\Media\Schemas\MediaForm;
 use Awcodes\Curator\Resources\Media\Tables\MediaTable;
+use MiPress\Core\Services\MediaPathGenerator;
 
 return [
     'curation_formats' => PreviewableExtensions::toArray(),
     'default_disk' => env('CURATOR_DEFAULT_DISK', 'public'),
-    'default_directory' => null,
+    'default_directory' => 'media',
     'default_visibility' => 'public',
     'features' => [
         'curations' => true,
         'file_swap' => true,
         'directory_restriction' => false,
-        'preserve_file_names' => false,
+        'preserve_file_names' => true,
         'tenancy' => [
             'enabled' => false,
             'relationship_name' => null,
@@ -28,7 +29,7 @@ return [
     ],
     'glide_token' => env('CURATOR_GLIDE_TOKEN'),
     'model' => Media::class,
-    'path_generator' => null,
+    'path_generator' => MediaPathGenerator::class,
     'resource' => [
         'label' => 'Media',
         'plural_label' => 'Media',

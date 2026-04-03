@@ -7,14 +7,28 @@ namespace MiPress\Forms\Models;
 class FormField
 {
     public const TYPE_TEXT = 'text';
+
     public const TYPE_EMAIL = 'email';
+
     public const TYPE_PHONE = 'phone';
+
     public const TYPE_TEXTAREA = 'textarea';
+
     public const TYPE_SELECT = 'select';
+
     public const TYPE_CHECKBOX = 'checkbox';
+
     public const TYPE_RADIO = 'radio';
+
     public const TYPE_FILE = 'file';
+
     public const TYPE_HIDDEN = 'hidden';
+
+    public const SPAM_HONEYPOT = 'honeypot';
+
+    public const SPAM_RECAPTCHA = 'recaptcha';
+
+    public const SPAM_BOTH = 'both';
 
     /**
      * @return array<string, string>
@@ -31,6 +45,18 @@ class FormField
             self::TYPE_RADIO => 'Radio',
             self::TYPE_FILE => 'Soubor',
             self::TYPE_HIDDEN => 'Hidden',
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function spamModes(): array
+    {
+        return [
+            self::SPAM_HONEYPOT => 'Honeypot',
+            self::SPAM_RECAPTCHA => 'reCAPTCHA v3',
+            self::SPAM_BOTH => 'Honeypot + reCAPTCHA v3',
         ];
     }
 

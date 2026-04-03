@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace MiPress\Forms\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Form extends Model
 {
@@ -49,6 +51,36 @@ class Form extends Model
     public function submissions(): HasMany
     {
         return $this->hasMany(FormSubmission::class);
+    }
+
+    public function attachments(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            FormSubmissionAttachment::class,
+            FormSubmission::class,
+            'form_id',
+            'submission_id',
+            'id',
+            'id',
+        );
+    }
+
+    /**
+     * @return array<int, int>
+     */
+    public function recipientIds(): array
+    {
+        return collect($this->recipients ?? [])
+            ->map(static fn (mixed $value): int => (int) $value)
+            ->filter(static fn (int $value): bool => $value > 0)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    public function recipientsQuery()
+    {
+        return User::query()->whereKey($this->recipientIds());
     }
 
     public function getRouteKeyName(): string

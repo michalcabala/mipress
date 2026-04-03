@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\RateLimiter;
 use MiPress\Forms\Models\Form;
+use MiPress\Forms\Models\FormField;
 
 class SpamProtection
 {
@@ -17,10 +18,13 @@ class SpamProtection
             return true;
         }
 
-        $mode = (string) ($form->spam_protection ?? 'honeypot');
+        $mode = (string) ($form->spam_protection ?? FormField::SPAM_HONEYPOT);
 
-        $honeypotSpam = in_array($mode, ['honeypot', 'both'], true) && $this->isHoneypotSpam($request);
-        $recaptchaSpam = in_array($mode, ['recaptcha', 'both'], true) && $this->isRecaptchaSpam($request, $form);
+        $honeypotSpam = in_array($mode, [FormField::SPAM_HONEYPOT, FormField::SPAM_BOTH], true)
+            && $this->isHoneypotSpam($request);
+
+        $recaptchaSpam = in_array($mode, [FormField::SPAM_RECAPTCHA, FormField::SPAM_BOTH], true)
+            && $this->isRecaptchaSpam($request, $form);
 
         return $honeypotSpam || $recaptchaSpam;
     }
@@ -78,6 +82,17 @@ class SpamProtection
             return true;
         }
 
-        return ! ((bool) ($payload['success'] ?? false));
+        if (! ((bool) ($payload['success'] ?? false))) {
+            return true;
+        }
+
+        $score = (float) ($payload['score'] ?? 0.0);
+        $action = (string) ($payload['action'] ?? '');
+
+        if ($score < 0.5) {
+            return true;
+        }
+
+        return ! in_array($action, ['', 'form_submit'], true);
     }
 }

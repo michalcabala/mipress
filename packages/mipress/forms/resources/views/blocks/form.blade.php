@@ -1,18 +1,26 @@
 @php
     /** @var string|null $formHandle */
     $resolvedForm = null;
+    $requiresRecaptcha = false;
 
     if (filled($formHandle ?? null)) {
         $resolvedForm = \MiPress\Forms\Models\Form::query()
             ->where('handle', $formHandle)
             ->where('is_active', true)
             ->first();
+
+        $requiresRecaptcha = in_array($resolvedForm?->spam_protection, ['recaptcha', 'both'], true)
+            && filled($resolvedForm?->recaptcha_site_key);
     }
 @endphp
 
 @if (! $resolvedForm)
     <p>Formular neni dostupny.</p>
 @else
+    @if ($errors->has('form'))
+        <p>{{ $errors->first('form') }}</p>
+    @endif
+
     <form method="POST" action="{{ route('mipress.form.submit', ['form' => $resolvedForm->handle]) }}" enctype="multipart/form-data">
         @csrf
 
@@ -82,10 +90,29 @@
             </div>
         @endforeach
 
+        @if ($requiresRecaptcha)
+            <input type="hidden" id="mipress-forms-recaptcha-token-{{ $resolvedForm->handle }}" name="g-recaptcha-response" value="">
+        @endif
+
         @if (session('mipress_form_success'))
             <p>{{ session('mipress_form_success') }}</p>
         @endif
 
         <button type="submit">Odeslat</button>
     </form>
+
+    @if ($requiresRecaptcha)
+        <script src="https://www.google.com/recaptcha/api.js?render={{ $resolvedForm->recaptcha_site_key }}"></script>
+        <script>
+            grecaptcha.ready(function () {
+                grecaptcha.execute('{{ $resolvedForm->recaptcha_site_key }}', { action: 'form_submit' }).then(function (token) {
+                    const input = document.getElementById('mipress-forms-recaptcha-token-{{ $resolvedForm->handle }}');
+
+                    if (input) {
+                        input.value = token;
+                    }
+                });
+            });
+        </script>
+    @endif
 @endif

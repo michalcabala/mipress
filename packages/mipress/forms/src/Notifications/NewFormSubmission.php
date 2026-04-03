@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MiPress\Forms\Notifications;
 
+use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -34,7 +35,7 @@ class NewFormSubmission extends Notification implements ShouldQueue
             ->title('Nove odeslani formulare')
             ->body('Formular: '.$this->submission->form?->title)
             ->actions([
-                \Filament\Notifications\Actions\Action::make('open')
+                Action::make('open')
                     ->label('Otevrit')
                     ->url(FormSubmissionResource::getUrl('view', ['record' => $this->submission]))
                     ->markAsRead(),

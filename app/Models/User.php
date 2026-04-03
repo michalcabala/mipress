@@ -16,7 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use MiPress\Core\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'form_notification_preference'])]
+#[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser, HasEmailAuthentication, MustVerifyEmail
 {

@@ -27,47 +27,49 @@ class FormSubmissionController extends Controller
 {
     public function submit(
         SubmitFormRequest $request,
-        Form $form,
+        string $form,
         FormRenderer $renderer,
         SpamProtection $spamProtection,
     ): RedirectResponse {
-        abort_unless($form->is_active, 404);
+        $resolvedForm = $renderer->resolveForm($form);
 
-        if ($spamProtection->check($request, $form)) {
+        abort_unless($resolvedForm->is_active, 404);
+
+        if ($spamProtection->check($request, $resolvedForm)) {
             return back()->withErrors(['form' => 'Formular nebylo mozne odeslat.']);
         }
 
-        $validated = validator($request->all(), $renderer->rules($form))->validate();
+        $validated = validator($request->all(), $renderer->rules($resolvedForm))->validate();
 
         $submissionData = collect($validated)
             ->reject(static fn (mixed $value): bool => $value instanceof UploadedFile)
             ->toArray();
 
         $submission = FormSubmission::query()->create([
-            'form_id' => $form->getKey(),
+            'form_id' => $resolvedForm->getKey(),
             'data' => $submissionData,
             'ip_address' => $request->ip(),
             'user_agent' => (string) $request->userAgent(),
         ]);
 
-        $this->storeAttachments($form, $submission, $validated);
+        $this->storeAttachments($resolvedForm, $submission, $validated);
 
-        $recipientUsers = $form->recipientsQuery()->get();
+        $recipientUsers = $resolvedForm->recipientsQuery()->get();
 
         if ($recipientUsers->isNotEmpty()) {
-            Mail::to($recipientUsers)->queue(new FormSubmissionNotification($form, $submission));
+            Mail::to($recipientUsers)->queue(new FormSubmissionNotification($resolvedForm, $submission));
             Notification::send($recipientUsers, new NewFormSubmission($submission));
         }
 
-        if ((bool) $form->auto_reply_enabled) {
+        if ((bool) $resolvedForm->auto_reply_enabled) {
             $email = $validated['email'] ?? null;
 
             if (is_string($email) && $email !== '') {
-                Mail::to($email)->queue(new FormAutoReply($form, $submission));
+                Mail::to($email)->queue(new FormAutoReply($resolvedForm, $submission));
             }
         }
 
-        return back()->with('mipress_form_success', $form->success_message);
+        return back()->with('mipress_form_success', $resolvedForm->success_message);
     }
 
     public function downloadAttachment(
@@ -75,7 +77,7 @@ class FormSubmissionController extends Controller
         FormSubmission $submission,
         FormSubmissionAttachment $attachment,
     ): Response {
-        abort_unless($attachment->submission_id === $submission->getKey(), 404);
+        abort_unless((int) $attachment->submission_id === (int) $submission->getKey(), 404);
 
         $user = Auth::user();
         abort_unless($user !== null, 403);

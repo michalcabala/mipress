@@ -22,6 +22,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MiPress\Core\Filament\MiPressPlugin;
+use MiPress\Forms\Filament\FormsPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -51,6 +52,7 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->breadcrumbs(false)
             ->plugin(MiPressPlugin::make())
+            ->plugin(FormsPlugin::make())
             ->plugin(
                 CuratorPlugin::make()
                     ->label('Médium')

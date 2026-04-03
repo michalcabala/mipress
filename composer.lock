@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a065283345333148831b2581aa54f9e",
+    "content-hash": "918010964a6b514be5c26e6d56d35cea",
     "packages": [
         {
             "name": "awcodes/filament-curator",
@@ -609,6 +609,77 @@
                 }
             ],
             "time": "2026-03-20T21:10:52+00:00"
+        },
+        {
+            "name": "codewithdennis/filament-select-tree",
+            "version": "v4.0.18",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CodeWithDennis/filament-select-tree.git",
+                "reference": "609e407e1ab87bf8af418af53a79859350fa7949"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CodeWithDennis/filament-select-tree/zipball/609e407e1ab87bf8af418af53a79859350fa7949",
+                "reference": "609e407e1ab87bf8af418af53a79859350fa7949",
+                "shasum": ""
+            },
+            "require": {
+                "filament/forms": "^4.0|^5.0",
+                "illuminate/contracts": "^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "nunomaduro/collision": "^7.9||^8.0",
+                "orchestra/testbench": "^8.0|^9.0|^10.0|^11.0",
+                "pestphp/pest": "^2.0|^3.7|^4.4",
+                "pestphp/pest-plugin-arch": "^2.0|^3.0|^4.0",
+                "pestphp/pest-plugin-laravel": "^2.0|^3.1|^4.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "CodeWithDennis\\FilamentSelectTree\\FilamentSelectTreeServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CodeWithDennis\\FilamentSelectTree\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "CodeWithDennis",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The multi-level select field enables you to make single selections from a predefined list of options that are organized into multiple levels or depths.",
+            "homepage": "https://github.com/codewithdennis/filament-select-tree",
+            "keywords": [
+                "CodeWithDennis",
+                "filament",
+                "filament-select-tree",
+                "laravel",
+                "tree"
+            ],
+            "support": {
+                "issues": "https://github.com/codewithdennis/filament-select-tree/issues",
+                "source": "https://github.com/codewithdennis/filament-select-tree"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/CodeWithDennis",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-07T16:33:30+00:00"
         },
         {
             "name": "danharrin/date-format-converter",
@@ -3618,10 +3689,11 @@
             "dist": {
                 "type": "path",
                 "url": "./packages/mipress/core",
-                "reference": "401d45199687c45d57cf5c84fb2799ffdc56bd8e"
+                "reference": "46d9c9d4d022986d00f950887e39d7a7d9ca2cf3"
             },
             "require": {
                 "awcodes/mason": "^3.0",
+                "codewithdennis/filament-select-tree": "4.x",
                 "filament/filament": "^5.0",
                 "php": "^8.3",
                 "spatie/laravel-permission": "^7.0",

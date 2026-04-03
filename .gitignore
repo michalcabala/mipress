@@ -16,8 +16,6 @@
 /packages/*
 !/packages/mipress/
 /packages/mipress/*
-!/packages/mipress/forms/
-!/packages/mipress/forms/**
 /public/build
 /public/hot
 /public/storage

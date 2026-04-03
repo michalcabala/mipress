@@ -17,6 +17,8 @@ use MiPress\Core\Filament\Resources\EntryResource\Pages\ListEntries;
 use MiPress\Core\Models\Blueprint;
 use MiPress\Core\Models\Collection;
 use MiPress\Core\Models\Entry;
+use MiPress\Core\Models\Taxonomy;
+use MiPress\Core\Models\Term;
 use MiPress\Core\Policies\EntryPolicy;
 
 beforeEach(function () {
@@ -102,6 +104,77 @@ describe('list page', function () {
         Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
             ->assertCanSeeTableRecords([$pagesEntry])
             ->assertCanNotSeeTableRecords([$articlesEntry]);
+    });
+
+    it('shows dynamic taxonomy columns and filters for selected collection', function () {
+        $taxonomy = Taxonomy::create([
+            'title' => 'Kategorie',
+            'handle' => 'kategorie',
+            'is_hierarchical' => false,
+            'collection_id' => $this->collection->id,
+        ]);
+
+        $term = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Novinky',
+            'slug' => 'novinky',
+        ]);
+
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        $entry->terms()->attach($term->id);
+
+        Livewire::test(ListEntries::class, ['collection' => 'pages'])
+            ->assertTableColumnExists('taxonomy_'.$taxonomy->id)
+            ->assertTableFilterExists('taxonomy_'.$taxonomy->id)
+            ->assertCanSeeTableRecords([$entry]);
+    });
+
+    it('can filter entries by dynamic taxonomy filter', function () {
+        $taxonomy = Taxonomy::create([
+            'title' => 'Štítky',
+            'handle' => 'stitky',
+            'is_hierarchical' => false,
+            'collection_id' => $this->collection->id,
+        ]);
+
+        $devTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Vývoj',
+            'slug' => 'vyvoj',
+        ]);
+
+        $designTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Design',
+            'slug' => 'design',
+        ]);
+
+        $devEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Vývojový článek',
+        ]);
+
+        $designEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Design článek',
+        ]);
+
+        $devEntry->terms()->attach($devTerm->id);
+        $designEntry->terms()->attach($designTerm->id);
+
+        Livewire::test(ListEntries::class, ['collection' => 'pages'])
+            ->assertCanSeeTableRecords([$devEntry, $designEntry])
+            ->filterTable('taxonomy_'.$taxonomy->id, [
+                'term_ids_'.$taxonomy->id => [$devTerm->id],
+            ])
+            ->assertCanSeeTableRecords([$devEntry])
+            ->assertCanNotSeeTableRecords([$designEntry]);
     });
 
     it('shows in-review badge in navigation for users who can publish', function () {
@@ -211,6 +284,44 @@ describe('create page', function () {
 
         expect($entry)->not->toBeNull()
             ->and($entry->parent_id)->toBe($parent->id);
+    });
+
+    it('saves selected hierarchical taxonomy term on create', function () {
+        $taxonomy = Taxonomy::create([
+            'title' => 'Rubriky',
+            'handle' => 'rubriky-test-create',
+            'is_hierarchical' => true,
+            'collection_id' => $this->collection->id,
+        ]);
+
+        $parentTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Nadřazená rubrika',
+            'slug' => 'nadrzena-rubrika',
+            'parent_id' => null,
+        ]);
+
+        $childTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Podrubrika',
+            'slug' => 'podrubrika',
+            'parent_id' => $parentTerm->id,
+        ]);
+
+        Livewire::withQueryParams(['collection' => 'pages'])
+            ->test(CreateEntry::class)
+            ->fillForm([
+                'title' => 'Stránka s rubrikou',
+                'slug' => 'stranka-s-rubrikou',
+                'taxonomy__'.$taxonomy->id => [$childTerm->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $entry = Entry::query()->where('slug', 'stranka-s-rubrikou')->first();
+
+        expect($entry)->not->toBeNull();
+        expect($entry->terms()->pluck('terms.id')->all())->toContain($childTerm->id);
     });
 
     it('hides parent field for non-hierarchical collection', function () {
@@ -365,6 +476,44 @@ describe('edit page', function () {
             ->assertHasNoFormErrors();
 
         expect($entry->fresh()->title)->toBe('Upravená stránka');
+    });
+
+    it('saves selected hierarchical taxonomy term on edit', function () {
+        $taxonomy = Taxonomy::create([
+            'title' => 'Rubriky',
+            'handle' => 'rubriky-test-edit',
+            'is_hierarchical' => true,
+            'collection_id' => $this->collection->id,
+        ]);
+
+        $parentTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Nadřazená rubrika 2',
+            'slug' => 'nadrzena-rubrika-2',
+            'parent_id' => null,
+        ]);
+
+        $childTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Podrubrika 2',
+            'slug' => 'podrubrika-2',
+            'parent_id' => $parentTerm->id,
+        ]);
+
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Draft,
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getKey()])
+            ->fillForm([
+                'taxonomy__'.$taxonomy->id => [$childTerm->id],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($entry->fresh()->terms()->pluck('terms.id')->all())->toContain($childTerm->id);
     });
 });
 

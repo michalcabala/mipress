@@ -30,7 +30,7 @@
                         class="w-full h-full object-contain"
                     />
                 </div>
-                <div>
+                <div class="flex flex-col justify-between">
                     <dl class="px-3 pb-3 md:py-3">
                         <div class="flex gap-2">
                             <dt class="font-bold">{{ trans('curator::views.curation.key') }}: </dt>
@@ -49,6 +49,16 @@
                             <dd x-text="state?.ext"></dd>
                         </div>
                     </dl>
+                    <div class="px-3 pb-3">
+                        <button
+                            type="button"
+                            x-on:click="state = null"
+                            class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                        >
+                            <x-filament::icon icon="heroicon-m-pencil-square" class="h-4 w-4" />
+                            {{ trans('curator::views.curation.edit') }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

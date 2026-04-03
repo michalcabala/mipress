@@ -74,6 +74,7 @@ return [
         'rotate' => 'Rotate',
         'rotate_deg' => 'deg',
         'preset' => 'Preset',
+        'edit' => 'Edit Crop',
     ],
     'attach_curator_media' => [
         'modal' => [

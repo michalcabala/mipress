@@ -65,5 +65,6 @@ return [
         'quality' => 'Kvalita',
         'rotate' => 'Otočit',
         'rotate_deg' => 'stupně',
+        'edit' => 'Upravit ořez',
     ],
 ];

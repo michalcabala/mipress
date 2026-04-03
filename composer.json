@@ -15,6 +15,7 @@
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
         "mipress/core": "@dev",
+        "mipress/forms": "@dev",
         "spatie/laravel-permission": "^7.2",
         "spatie/laravel-sluggable": "^3.8"
     },
@@ -97,6 +98,13 @@
         {
             "type": "path",
             "url": "./packages/mipress/core",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "./packages/mipress/forms",
             "options": {
                 "symlink": true
             }

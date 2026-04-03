@@ -1,0 +1,25 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "mipress/forms",
+    "description": "Form builder module for miPress CMS",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "mipress/core": "@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "MiPress\\Forms\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "MiPress\\Forms\\FormsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

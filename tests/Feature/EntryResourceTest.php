@@ -731,7 +731,7 @@ describe('authorization', function () {
             ->assertSuccessful();
     });
 
-    it('contributor can edit own published entry', function () {
+    it('contributor cannot edit own published entry', function () {
         $contributor = User::factory()->create();
         $contributor->assignRole(UserRole::Contributor->value);
         $this->actingAs($contributor);
@@ -743,7 +743,7 @@ describe('authorization', function () {
         ]);
 
         $this->get(EntryResource::getUrl('edit', ['record' => $entry]))
-            ->assertSuccessful();
+            ->assertForbidden();
     });
 
     it('requires publish permission for unpublishing published entries', function () {

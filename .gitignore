@@ -13,9 +13,9 @@
 /.zed
 /auth.json
 /node_modules
-/packages
-!/packages/
+/packages/*
 !/packages/mipress/
+/packages/mipress/*
 !/packages/mipress/forms/
 !/packages/mipress/forms/**
 /public/build

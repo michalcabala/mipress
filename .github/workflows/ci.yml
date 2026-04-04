@@ -76,7 +76,7 @@ jobs:
         run: vendor/bin/pint --test
 
       - name: Run production smoke tests
-        run: php artisan test --compact --filter=ProductionSmokeTest
+        run: composer test:smoke
 
   test:
     runs-on: ubuntu-latest
@@ -145,4 +145,4 @@ jobs:
         run: php artisan migrate --no-interaction --force
 
       - name: Run tests
-        run: php artisan test --compact
+        run: composer test:ci

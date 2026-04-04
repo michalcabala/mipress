@@ -10,6 +10,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -50,6 +53,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Checkout package repositories
+        run: |
+          mkdir -p packages/mipress
+          if [ ! -d packages/mipress/core ]; then
+            git clone --depth 1 https://github.com/michalcabala/mipress-core.git packages/mipress/core
+          fi
+          if [ ! -d packages/mipress/forms ]; then
+            git clone --depth 1 https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
+          fi
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -123,6 +136,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Checkout package repositories
+        run: |
+          mkdir -p packages/mipress
+          if [ ! -d packages/mipress/core ]; then
+            git clone --depth 1 https://github.com/michalcabala/mipress-core.git packages/mipress/core
+          fi
+          if [ ! -d packages/mipress/forms ]; then
+            git clone --depth 1 https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
+          fi
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

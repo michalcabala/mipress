@@ -24,6 +24,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MiPress\Core\Filament\MiPressPlugin;
+use MiPress\Core\Services\GlobalSetManager;
 use MiPress\Forms\Filament\FormsPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -32,7 +33,9 @@ class AdminPanelProvider extends PanelProvider
     {
         FilamentView::registerRenderHook(
             PanelsRenderHook::USER_MENU_BEFORE,
-            fn (): string => view('mipress::filament.site-menu')->render(),
+            fn (): string => view('mipress::filament.site-menu', [
+                'siteName' => app(GlobalSetManager::class)->get('general', 'site_name', config('app.name')),
+            ])->render(),
         );
     }
 

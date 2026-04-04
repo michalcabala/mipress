@@ -65,6 +65,7 @@
             "@php artisan test --compact --filter=ProductionSmokeTest"
         ],
         "test:ci": [
+            "Composer\\Config::disableProcessTimeout",
             "@php artisan test --compact"
         ],
         "post-autoload-dump": [

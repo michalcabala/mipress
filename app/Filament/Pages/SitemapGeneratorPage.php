@@ -11,6 +11,7 @@ use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
 use MuhammadNawlo\FilamentSitemapGenerator\Models\SitemapSetting;
 use MuhammadNawlo\FilamentSitemapGenerator\Widgets\SitemapPreviewWidget;
@@ -22,7 +23,14 @@ class SitemapGeneratorPage extends \MuhammadNawlo\FilamentSitemapGenerator\Pages
 {
     protected static ?string $cluster = SeoCluster::class;
 
-    protected static ?string $navigationLabel = 'Sitemap';
+    protected static ?string $navigationLabel = 'Správa sitemapy';
+
+    protected static ?int $navigationSort = 20;
+
+    public static function getNavigationIcon(): string|\BackedEnum|Htmlable|null
+    {
+        return 'fal-sitemap';
+    }
 
     public function content(Schema $schema): Schema
     {

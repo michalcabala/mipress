@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Filament\Clusters\SeoCluster;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
 use MuhammadNawlo\FilamentSitemapGenerator\Models\SitemapSetting;
 
@@ -12,9 +13,13 @@ class SitemapSettingsPage extends \MuhammadNawlo\FilamentSitemapGenerator\Pages\
 {
     protected static ?string $cluster = SeoCluster::class;
 
-    public static function shouldRegisterNavigation(): bool
+    protected static ?string $navigationLabel = 'Nastavení sitemapy';
+
+    protected static ?int $navigationSort = 21;
+
+    public static function getNavigationIcon(): string|\BackedEnum|Htmlable|null
     {
-        return false;
+        return 'fal-sliders';
     }
 
     public static function canAccess(): bool

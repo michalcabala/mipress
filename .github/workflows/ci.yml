@@ -57,12 +57,11 @@ jobs:
       - name: Checkout package repositories
         run: |
           mkdir -p packages/mipress
-          if [ ! -d packages/mipress/core ]; then
-            git clone --depth 1 https://github.com/michalcabala/mipress-core.git packages/mipress/core
-          fi
-          if [ ! -d packages/mipress/forms ]; then
-            git clone --depth 1 https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
-          fi
+          rm -rf packages/mipress/core packages/mipress/forms
+          git clone --depth 1 https://github.com/michalcabala/mipress-core.git packages/mipress/core
+          git clone --depth 1 https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
+          test -f packages/mipress/core/composer.json
+          test -f packages/mipress/forms/composer.json
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -140,12 +139,11 @@ jobs:
       - name: Checkout package repositories
         run: |
           mkdir -p packages/mipress
-          if [ ! -d packages/mipress/core ]; then
-            git clone --depth 1 https://github.com/michalcabala/mipress-core.git packages/mipress/core
-          fi
-          if [ ! -d packages/mipress/forms ]; then
-            git clone --depth 1 https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
-          fi
+          rm -rf packages/mipress/core packages/mipress/forms
+          git clone --depth 1 https://github.com/michalcabala/mipress-core.git packages/mipress/core
+          git clone --depth 1 https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
+          test -f packages/mipress/core/composer.json
+          test -f packages/mipress/forms/composer.json
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

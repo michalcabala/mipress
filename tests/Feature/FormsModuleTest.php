@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
+use MiPress\Forms\Filament\Pages\FormNotificationSettings;
+use MiPress\Forms\Filament\Resources\FormResource;
+use MiPress\Forms\Filament\Resources\FormSubmissionResource;
 use MiPress\Forms\Mail\FormAutoReply;
 use MiPress\Forms\Mail\FormSubmissionNotification;
 use MiPress\Forms\Models\Form;
@@ -215,5 +218,41 @@ describe('attachment authorization', function () {
                 'attachment' => $attachment,
             ]))
             ->assertNotFound();
+    });
+});
+
+describe('admin authorization', function () {
+    it('forbids contributor from forms resources and settings page', function () {
+        $contributor = User::factory()->create();
+        $contributor->assignRole(UserRole::Contributor->value);
+
+        $this->actingAs($contributor)
+            ->get(FormResource::getUrl())
+            ->assertForbidden();
+
+        $this->actingAs($contributor)
+            ->get(FormSubmissionResource::getUrl())
+            ->assertForbidden();
+
+        $this->actingAs($contributor)
+            ->get(FormNotificationSettings::getUrl())
+            ->assertForbidden();
+    });
+
+    it('allows editor to access forms resources and settings page', function () {
+        $editor = User::factory()->create();
+        $editor->assignRole(UserRole::Editor->value);
+
+        $this->actingAs($editor)
+            ->get(FormResource::getUrl())
+            ->assertSuccessful();
+
+        $this->actingAs($editor)
+            ->get(FormSubmissionResource::getUrl())
+            ->assertSuccessful();
+
+        $this->actingAs($editor)
+            ->get(FormNotificationSettings::getUrl())
+            ->assertSuccessful();
     });
 });

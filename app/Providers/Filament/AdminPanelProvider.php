@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Awcodes\Curator\CuratorPlugin;
+use Awcodes\Botly\BotlyPlugin;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -66,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
+            ->plugin(BotlyPlugin::make())
             ->plugin(
                 CuratorPlugin::make()
                     ->label('Médium')

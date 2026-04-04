@@ -1,0 +1,12 @@
+---
+deployment:
+  tasks:
+    - /bin/bash -lc 'set -e; if [ ! -f .env ] && [ -f .env.example ]; then cp .env.example .env; fi'
+    - /bin/bash -lc 'set -e; composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist'
+    - /bin/bash -lc 'set -e; if command -v npm >/dev/null 2>&1; then npm ci; npm run build; else echo "npm not found, skipping frontend build"; fi'
+    - /bin/bash -lc 'set -e; php artisan key:generate --no-interaction --force || true'
+    - /bin/bash -lc 'set -e; PRETEND_OUTPUT="$(php artisan migrate --pretend --no-interaction 2>&1)"; echo "$PRETEND_OUTPUT"; if echo "$PRETEND_OUTPUT" | grep -Eiq "drop[[:space:]]+table|truncate[[:space:]]+table|drop[[:space:]]+column"; then echo "Potentially destructive migration detected, aborting deployment."; exit 1; fi'
+    - /bin/bash -lc 'set -e; php artisan migrate --force --no-interaction'
+    - /bin/bash -lc 'set -e; php artisan optimize:clear'
+    - /bin/bash -lc 'set -e; php artisan config:cache; php artisan route:cache; php artisan view:cache'
+    - /bin/bash -lc 'set -e; php artisan queue:restart || true'

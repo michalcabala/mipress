@@ -2,7 +2,12 @@
 
 namespace App\Providers;
 
+use Awcodes\Botly\Models\Botly;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use MiPress\Core\Policies\BotlyPolicy;
+use MiPress\Core\Policies\SitemapSettingPolicy;
+use MuhammadNawlo\FilamentSitemapGenerator\Models\SitemapSetting;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::policy(Botly::class, BotlyPolicy::class);
+        Gate::policy(SitemapSetting::class, SitemapSettingPolicy::class);
     }
 }

@@ -2,7 +2,8 @@
 
 namespace App\Providers\Filament;
 
-use Awcodes\Botly\BotlyPlugin;
+use App\Filament\Plugins\BotlyPlugin;
+use App\Filament\Plugins\FilamentSitemapGeneratorPlugin;
 use Awcodes\Curator\CuratorPlugin;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -27,7 +28,6 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MiPress\Core\Filament\MiPressPlugin;
 use MiPress\Core\Services\GlobalSetManager;
 use MiPress\Forms\Filament\FormsPlugin;
-use MuhammadNawlo\FilamentSitemapGenerator\FilamentSitemapGeneratorPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {

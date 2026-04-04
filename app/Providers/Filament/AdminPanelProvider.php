@@ -2,8 +2,8 @@
 
 namespace App\Providers\Filament;
 
-use Awcodes\Curator\CuratorPlugin;
 use Awcodes\Botly\BotlyPlugin;
+use Awcodes\Curator\CuratorPlugin;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -27,6 +27,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MiPress\Core\Filament\MiPressPlugin;
 use MiPress\Core\Services\GlobalSetManager;
 use MiPress\Forms\Filament\FormsPlugin;
+use MuhammadNawlo\FilamentSitemapGenerator\FilamentSitemapGeneratorPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -67,7 +68,14 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
-            ->plugin(BotlyPlugin::make())
+            ->plugin(
+                BotlyPlugin::make()
+                    ->navigationIcon('fal-user-robot')
+                    ->navigationGroup('Nastavení')
+                    ->navigationLabel('Správa robots.txt')
+                    ->title('Správa robots.txt')
+            )
+            ->plugin(FilamentSitemapGeneratorPlugin::make())
             ->plugin(
                 CuratorPlugin::make()
                     ->label('Médium')

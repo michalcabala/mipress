@@ -54,13 +54,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Clone local path package repositories
-        run: |
-          set -euo pipefail
-          mkdir -p packages/mipress
-          rm -rf packages/mipress/core packages/mipress/forms
-          git clone --depth 1 --branch main https://github.com/michalcabala/mipress-core.git packages/mipress/core
-          git clone --depth 1 --branch main https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
+      - name: Checkout mipress-core package
+        uses: actions/checkout@v4
+        with:
+          repository: michalcabala/mipress-core
+          ref: main
+          token: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+          path: packages/mipress/core
+
+      - name: Checkout mipress-forms package
+        uses: actions/checkout@v4
+        with:
+          repository: michalcabala/mipress-forms
+          ref: main
+          token: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+          path: packages/mipress/forms
 
       - name: Verify path package repositories
         run: |
@@ -140,13 +148,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Clone local path package repositories
-        run: |
-          set -euo pipefail
-          mkdir -p packages/mipress
-          rm -rf packages/mipress/core packages/mipress/forms
-          git clone --depth 1 --branch main https://github.com/michalcabala/mipress-core.git packages/mipress/core
-          git clone --depth 1 --branch main https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
+      - name: Checkout mipress-core package
+        uses: actions/checkout@v4
+        with:
+          repository: michalcabala/mipress-core
+          ref: main
+          token: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+          path: packages/mipress/core
+
+      - name: Checkout mipress-forms package
+        uses: actions/checkout@v4
+        with:
+          repository: michalcabala/mipress-forms
+          ref: main
+          token: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
+          path: packages/mipress/forms
 
       - name: Verify path package repositories
         run: |

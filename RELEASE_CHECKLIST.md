@@ -1,5 +1,14 @@
 # miPress Release Checklist (v1)
 
+## 0. Release gates (GitHub)
+
+- [ ] Branch protection je aktivni pro `main`.
+- [ ] Mergovani vyzaduje pull request (zakazat direct push).
+- [ ] Required status checks obsahuji:
+  - [ ] `smoke`
+  - [ ] `test`
+- [ ] Mergovani je povoleno pouze pri zelene CI.
+
 ## 1. Pre-release (lokal/staging)
 
 - [ ] Vsechny zmeny jsou v commitech a pushnute na remote.
@@ -9,7 +18,8 @@
   - [ ] Otevreni klicovych sekci (Polozky, Stranky, Formulare, SEO).
   - [ ] Vytvoreni a ulozeni testovaciho obsahu.
 - [ ] Testy projektu:
-  - [ ] `php artisan test --compact`
+  - [ ] `composer test:smoke`
+  - [ ] `composer test:ci`
 - [ ] Frontend build:
   - [ ] `npm run build`
 - [ ] Migrace bez destruktivnich kroku:

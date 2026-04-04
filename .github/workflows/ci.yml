@@ -54,12 +54,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout package repositories
+      - name: Checkout mipress-core package
+        uses: actions/checkout@v4
+        with:
+          repository: michalcabala/mipress-core
+          path: packages/mipress/core
+
+      - name: Checkout mipress-forms package
+        uses: actions/checkout@v4
+        with:
+          repository: michalcabala/mipress-forms
+          path: packages/mipress/forms
+
+      - name: Verify path package repositories
         run: |
-          mkdir -p packages/mipress
-          rm -rf packages/mipress/core packages/mipress/forms
-          git clone --depth 1 https://github.com/michalcabala/mipress-core.git packages/mipress/core
-          git clone --depth 1 https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
           test -f packages/mipress/core/composer.json
           test -f packages/mipress/forms/composer.json
 
@@ -136,12 +144,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout package repositories
+      - name: Checkout mipress-core package
+        uses: actions/checkout@v4
+        with:
+          repository: michalcabala/mipress-core
+          path: packages/mipress/core
+
+      - name: Checkout mipress-forms package
+        uses: actions/checkout@v4
+        with:
+          repository: michalcabala/mipress-forms
+          path: packages/mipress/forms
+
+      - name: Verify path package repositories
         run: |
-          mkdir -p packages/mipress
-          rm -rf packages/mipress/core packages/mipress/forms
-          git clone --depth 1 https://github.com/michalcabala/mipress-core.git packages/mipress/core
-          git clone --depth 1 https://github.com/michalcabala/mipress-forms.git packages/mipress/forms
           test -f packages/mipress/core/composer.json
           test -f packages/mipress/forms/composer.json
 

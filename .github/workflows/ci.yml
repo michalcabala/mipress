@@ -54,27 +54,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Checkout mipress-core package
-        uses: actions/checkout@v4
-        with:
-          repository: michalcabala/mipress-core
-          ref: main
-          token: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
-          path: packages/mipress/core
-
-      - name: Checkout mipress-forms package
-        uses: actions/checkout@v4
-        with:
-          repository: michalcabala/mipress-forms
-          ref: main
-          token: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
-          path: packages/mipress/forms
-
-      - name: Verify path package repositories
-        run: |
-          test -f packages/mipress/core/composer.json
-          test -f packages/mipress/forms/composer.json
-
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -147,27 +126,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Checkout mipress-core package
-        uses: actions/checkout@v4
-        with:
-          repository: michalcabala/mipress-core
-          ref: main
-          token: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
-          path: packages/mipress/core
-
-      - name: Checkout mipress-forms package
-        uses: actions/checkout@v4
-        with:
-          repository: michalcabala/mipress-forms
-          ref: main
-          token: ${{ secrets.PACKAGES_READ_TOKEN || github.token }}
-          path: packages/mipress/forms
-
-      - name: Verify path package repositories
-        run: |
-          test -f packages/mipress/core/composer.json
-          test -f packages/mipress/forms/composer.json
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a2c028caf42954d466354d8fa0ee69e6",
+    "content-hash": "e2fc3ed09508de8f6324630bd02dc722",
     "packages": [
         {
             "name": "awcodes/botly",
@@ -3764,11 +3764,11 @@
         },
         {
             "name": "mipress/core",
-            "version": "dev-main",
-            "dist": {
-                "type": "path",
-                "url": "./packages/mipress/core",
-                "reference": "cef47ca4f402de7561a6dd40bf23fab4e2e2cd54"
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michalcabala/mipress-core.git",
+                "reference": "f77ccec3b5fa28c4d1ebbccebbf6238a348610be"
             },
             "require": {
                 "awcodes/mason": "^3.0",
@@ -3803,18 +3803,15 @@
                 "MIT"
             ],
             "description": "MiPress CMS core package.",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "time": "2026-04-04T17:34:52+00:00"
         },
         {
             "name": "mipress/forms",
-            "version": "dev-main",
-            "dist": {
-                "type": "path",
-                "url": "./packages/mipress/forms",
-                "reference": "ff9d4a201decfe3472523ab2ed4284774f6cf49e"
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michalcabala/mipress-forms.git",
+                "reference": "26bfb8a6bdfa0b92e6a4bf5efcddfc0a8cc77403"
             },
             "require": {
                 "mipress/core": "@dev",
@@ -3837,10 +3834,7 @@
                 "MIT"
             ],
             "description": "Form builder module for miPress CMS",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "time": "2026-04-04T17:34:55+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -12965,11 +12959,8 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "mipress/core": 20,
-        "mipress/forms": 20
-    },
+    "minimum-stability": "stable",
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

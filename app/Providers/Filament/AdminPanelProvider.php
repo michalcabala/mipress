@@ -71,8 +71,6 @@ class AdminPanelProvider extends PanelProvider
             ->plugin(
                 BotlyPlugin::make()
                     ->navigationIcon('fal-user-robot')
-                    ->navigationGroup('Nastavení')
-                    ->navigationLabel('Správa robots.txt')
                     ->title('Správa robots.txt')
             )
             ->plugin(FilamentSitemapGeneratorPlugin::make())
@@ -84,6 +82,7 @@ class AdminPanelProvider extends PanelProvider
                     ->navigationSort(99)
                     ->navigationIcon('fal-photo-film-music')
             )
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

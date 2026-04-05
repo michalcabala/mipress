@@ -29,14 +29,22 @@ class SocialFeedManager
         }
 
         $store = config('social-feeds.cache.store');
+        $cacheStore = Cache::store($store);
 
-        return Cache::store($store)->remember(
-            $feed->cacheKey(),
-            $feed->cache_ttl,
-            function () use ($feed) {
-                return $this->fetchAndPersist($feed);
-            }
-        );
+        $cached = $cacheStore->get($feed->cacheKey());
+
+        if ($cached instanceof Collection) {
+            return $cached;
+        }
+
+        // Cache miss or corrupted entry (e.g. __PHP_Incomplete_Class)
+        $cacheStore->forget($feed->cacheKey());
+
+        $data = $this->fetchAndPersist($feed);
+
+        $cacheStore->put($feed->cacheKey(), $data, $feed->cache_ttl);
+
+        return $data;
     }
 
     public function refreshFeed(SocialFeed $feed): Collection

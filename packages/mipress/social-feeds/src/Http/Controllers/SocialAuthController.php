@@ -4,6 +4,7 @@ namespace MiPress\SocialFeeds\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -150,36 +151,16 @@ class SocialAuthController extends Controller
                 ->with('warning', 'Žádné spravované stránky nenalezeny. Uložen uživatelský účet.');
         }
 
-        $count = 0;
-        foreach ($pages as $page) {
-            SocialAccount::updateOrCreate(
-                [
-                    'platform' => $enum,
-                    'platform_account_id' => $page['id'],
-                ],
-                [
-                    'name' => $page['name'],
-                    'username' => $page['category'] ?? null,
-                    'access_token' => Crypt::encryptString($page['access_token']),
-                    'refresh_token' => null,
-                    'token_expires_at' => null, // Page tokens don't expire when using long-lived user token
-                    'avatar_url' => $page['picture']['data']['url'] ?? null,
-                    'meta' => [
-                        'page_id' => $page['id'],
-                        'category' => $page['category'] ?? null,
-                        'link' => $page['link'] ?? null,
-                        'user_id' => $socialiteUser->getId(),
-                        'user_name' => $socialiteUser->getName(),
-                    ],
-                    'connected_by' => auth()->id(),
-                ]
-            );
-            $count++;
-        }
+        // Store pages in cache for selection page
+        $cacheKey = 'social-feeds:facebook-pages:'.auth()->id();
+        Cache::put($cacheKey, [
+            'pages' => $pages,
+            'user_id' => $socialiteUser->getId(),
+            'user_name' => $socialiteUser->getName(),
+            'connected_by' => auth()->id(),
+        ], now()->addMinutes(15));
 
-        return redirect()
-            ->route('filament.admin.resources.social-accounts.index')
-            ->with('success', "Úspěšně propojeno {$count} ".($count === 1 ? 'stránka' : 'stránek')." z {$enum->label()}.");
+        return redirect('/mpcp/select-facebook-pages');
     }
 
     private function resolveProviderClass(SocialPlatform $platform): string

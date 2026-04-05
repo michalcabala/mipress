@@ -4,6 +4,7 @@ namespace MiPress\SocialFeeds;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use MiPress\SocialFeeds\Filament\Pages\SelectFacebookPages;
 use MiPress\SocialFeeds\Filament\Resources\SocialAccountResource;
 use MiPress\SocialFeeds\Filament\Resources\SocialFeedResource;
 
@@ -24,6 +25,10 @@ class SocialFeedsPlugin implements Plugin
         $panel->resources([
             SocialAccountResource::class,
             SocialFeedResource::class,
+        ]);
+
+        $panel->pages([
+            SelectFacebookPages::class,
         ]);
     }
 

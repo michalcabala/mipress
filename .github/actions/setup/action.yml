@@ -38,6 +38,10 @@ runs:
         cp .env.example .env
         php artisan key:generate --no-interaction --force
       shell: bash
+      env:
+        CACHE_STORE: array
+        SESSION_DRIVER: array
+        QUEUE_CONNECTION: sync
 
     - name: Run migrations
       run: php artisan migrate --no-interaction --force

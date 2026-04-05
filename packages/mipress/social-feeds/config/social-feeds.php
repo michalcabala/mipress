@@ -9,6 +9,7 @@ return [
     'providers' => [
         'facebook' => [
             'enabled' => env('SOCIAL_FACEBOOK_ENABLED', false),
+            'stateless' => env('SOCIAL_FACEBOOK_STATELESS', false),
             'client_id' => env('FACEBOOK_CLIENT_ID'),
             'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
             'graph_version' => env('FACEBOOK_GRAPH_VERSION', 'v23.0'),

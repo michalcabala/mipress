@@ -5,10 +5,12 @@ namespace MiPress\SocialFeeds\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use MiPress\SocialFeeds\Enums\SocialPlatform;
 use MiPress\SocialFeeds\Models\SocialAccount;
 use MiPress\SocialFeeds\Providers\FacebookProvider;
+use Throwable;
 
 class SocialAuthController extends Controller
 {
@@ -23,7 +25,13 @@ class SocialAuthController extends Controller
         $providerClass = $this->resolveProviderClass($enum);
         $scopes = app($providerClass)->requiredScopes();
 
-        return Socialite::driver($platform)
+        $driver = Socialite::driver($platform);
+
+        if ((bool) config("social-feeds.providers.{$platform}.stateless", false)) {
+            $driver = $driver->stateless();
+        }
+
+        return $driver
             ->scopes($scopes)
             ->redirect();
     }
@@ -37,11 +45,29 @@ class SocialAuthController extends Controller
         }
 
         try {
-            $socialiteUser = Socialite::driver($platform)->user();
-        } catch (\Exception $e) {
+            $driver = Socialite::driver($platform);
+
+            if ((bool) config("social-feeds.providers.{$platform}.stateless", false)) {
+                $driver = $driver->stateless();
+            }
+
+            $socialiteUser = $driver->user();
+        } catch (Throwable $e) {
+            Log::error('Social OAuth callback failed.', [
+                'platform' => $platform,
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+                'request_url' => $request->fullUrl(),
+                'request_query' => $request->query(),
+            ]);
+
+            $errorMessage = str($e->getMessage())->contains('state')
+                ? 'Neplatný OAuth stav. Zkuste zapnout SOCIAL_FACEBOOK_STATELESS=true nebo zkontrolujte session/cookies.'
+                : $e->getMessage();
+
             return redirect()
                 ->route('filament.admin.resources.social-accounts.index')
-                ->with('error', "Připojení k {$enum->label()} selhalo: {$e->getMessage()}");
+                ->with('error', "Připojení k {$enum->label()} selhalo: {$errorMessage}");
         }
 
         SocialAccount::updateOrCreate(

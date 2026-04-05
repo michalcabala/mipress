@@ -13,7 +13,7 @@ return [
             'client_id' => env('FACEBOOK_CLIENT_ID'),
             'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
             'graph_version' => env('FACEBOOK_GRAPH_VERSION', 'v23.0'),
-            'scopes' => array_filter(explode(',', env('FACEBOOK_SCOPES', 'public_profile'))),
+            'scopes' => array_filter(explode(',', env('FACEBOOK_SCOPES', 'public_profile,email'))),
         ],
         'instagram' => [
             'enabled' => env('SOCIAL_INSTAGRAM_ENABLED', false),

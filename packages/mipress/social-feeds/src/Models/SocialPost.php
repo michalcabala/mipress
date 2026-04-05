@@ -37,10 +37,21 @@ class SocialPost extends Model
      */
     public static function upsertFromApi(SocialFeed $feed, Collection $posts): void
     {
-        $records = $posts->map(fn (array $post) => array_merge($post, [
+        $records = $posts->map(fn (array $post) => [
             'social_feed_id' => $feed->id,
+            'platform_post_id' => $post['platform_post_id'],
+            'post_type' => $post['post_type'] ?? null,
+            'content' => $post['content'] ?? null,
+            'media' => json_encode($post['media'] ?? []),
+            'engagement' => json_encode($post['engagement'] ?? []),
+            'author_name' => $post['author_name'] ?? null,
+            'author_avatar_url' => $post['author_avatar_url'] ?? null,
+            'permalink' => $post['permalink'] ?? null,
+            'posted_at' => $post['posted_at'] ?? null,
+            'raw_data' => json_encode($post['raw_data'] ?? []),
+            'created_at' => now(),
             'updated_at' => now(),
-        ]))->all();
+        ])->all();
 
         if (empty($records)) {
             return;

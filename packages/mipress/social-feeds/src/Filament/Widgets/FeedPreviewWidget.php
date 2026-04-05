@@ -9,7 +9,7 @@ use MiPress\SocialFeeds\Services\SocialFeedManager;
 
 class FeedPreviewWidget extends Widget
 {
-    protected static string $view = 'social-feeds::filament.widgets.feed-preview';
+    protected string $view = 'social-feeds::filament.widgets.feed-preview';
 
     public ?Model $record = null;
 

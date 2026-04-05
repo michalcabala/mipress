@@ -104,25 +104,16 @@
     },
     "repositories": [
         {
-            "type": "path",
-            "url": "packages/mipress/core",
-            "options": {
-                "symlink": true
-            }
+            "type": "vcs",
+            "url": "https://github.com/michalcabala/mipress-core.git"
         },
         {
-            "type": "path",
-            "url": "packages/mipress/forms",
-            "options": {
-                "symlink": true
-            }
+            "type": "vcs",
+            "url": "https://github.com/michalcabala/mipress-forms.git"
         },
         {
-            "type": "path",
-            "url": "packages/mipress/social-feeds",
-            "options": {
-                "symlink": true
-            }
+            "type": "vcs",
+            "url": "https://github.com/michalcabala/mipress-social-feeds.git"
         }
     ],
     "minimum-stability": "stable",

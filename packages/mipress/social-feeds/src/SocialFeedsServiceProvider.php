@@ -13,28 +13,28 @@ class SocialFeedsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/social-feeds.php', 'social-feeds');
+        $this->mergeConfigFrom(__DIR__.'/../config/social-feeds.php', 'social-feeds');
 
         $this->app->singleton(SocialFeedManager::class);
     }
 
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'social-feeds');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'social-feeds');
 
         Blade::component('social-feed', SocialFeed::class);
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/social-feeds.php' => config_path('social-feeds.php'),
+                __DIR__.'/../config/social-feeds.php' => config_path('social-feeds.php'),
             ], 'social-feeds-config');
 
             $this->publishes([
-                __DIR__ . '/../resources/views' => resource_path('views/vendor/social-feeds'),
+                __DIR__.'/../resources/views' => resource_path('views/vendor/social-feeds'),
             ], 'social-feeds-views');
         }
 

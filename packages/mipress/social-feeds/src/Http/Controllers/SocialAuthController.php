@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Crypt;
 use Laravel\Socialite\Facades\Socialite;
 use MiPress\SocialFeeds\Enums\SocialPlatform;
 use MiPress\SocialFeeds\Models\SocialAccount;
+use MiPress\SocialFeeds\Providers\FacebookProvider;
 
 class SocialAuthController extends Controller
 {
@@ -72,7 +73,7 @@ class SocialAuthController extends Controller
     private function resolveProviderClass(SocialPlatform $platform): string
     {
         return match ($platform) {
-            SocialPlatform::Facebook => \MiPress\SocialFeeds\Providers\FacebookProvider::class,
+            SocialPlatform::Facebook => FacebookProvider::class,
             default => throw new \InvalidArgumentException('Provider nenalezen.'),
         };
     }

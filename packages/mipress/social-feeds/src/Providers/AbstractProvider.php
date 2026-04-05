@@ -3,6 +3,7 @@
 namespace MiPress\SocialFeeds\Providers;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use MiPress\SocialFeeds\Contracts\SocialProvider;
@@ -28,7 +29,7 @@ abstract class AbstractProvider implements SocialProvider
             $account->touch('last_verified_at');
 
             return $result;
-        } catch (\Illuminate\Http\Client\RequestException $e) {
+        } catch (RequestException $e) {
             $errorBody = $e->response?->json() ?? [];
             $message = $errorBody['error']['message']
                 ?? $errorBody['error_description']

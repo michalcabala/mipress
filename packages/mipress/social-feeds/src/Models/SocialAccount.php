@@ -2,6 +2,7 @@
 
 namespace MiPress\SocialFeeds\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -137,6 +138,6 @@ class SocialAccount extends Model
 
     public function connectedBy(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'connected_by');
+        return $this->belongsTo(User::class, 'connected_by');
     }
 }

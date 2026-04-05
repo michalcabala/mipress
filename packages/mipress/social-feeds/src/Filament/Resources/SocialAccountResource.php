@@ -2,6 +2,9 @@
 
 namespace MiPress\SocialFeeds\Filament\Resources;
 
+use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -10,6 +13,8 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use MiPress\SocialFeeds\Enums\SocialPlatform;
+use MiPress\SocialFeeds\Filament\Resources\SocialAccountResource\Pages\EditSocialAccount;
+use MiPress\SocialFeeds\Filament\Resources\SocialAccountResource\Pages\ListSocialAccounts;
 use MiPress\SocialFeeds\Models\SocialAccount;
 use MiPress\SocialFeeds\Services\SocialFeedManager;
 
@@ -126,7 +131,7 @@ class SocialAccountResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('verify')
+                Action::make('verify')
                     ->label('Ověřit token')
                     ->icon('heroicon-o-shield-check')
                     ->action(function (SocialAccount $record) {
@@ -146,12 +151,12 @@ class SocialAccountResource extends Resource
                                 ->send();
                         }
                     }),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make()
+                EditAction::make(),
+                DeleteAction::make()
                     ->label('Odpojit'),
             ])
             ->headerActions([
-                ...collect(SocialPlatform::enabled())->map(fn (SocialPlatform $p) => Tables\Actions\Action::make("connect_{$p->value}")
+                ...collect(SocialPlatform::enabled())->map(fn (SocialPlatform $p) => Action::make("connect_{$p->value}")
                     ->label("Připojit {$p->label()}")
                     ->icon('heroicon-o-plus-circle')
                     ->url(route('social.auth.redirect', $p->value))
@@ -163,8 +168,8 @@ class SocialAccountResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => \MiPress\SocialFeeds\Filament\Resources\SocialAccountResource\Pages\ListSocialAccounts::route('/'),
-            'edit' => \MiPress\SocialFeeds\Filament\Resources\SocialAccountResource\Pages\EditSocialAccount::route('/{record}/edit'),
+            'index' => ListSocialAccounts::route('/'),
+            'edit' => EditSocialAccount::route('/{record}/edit'),
         ];
     }
 }

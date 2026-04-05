@@ -2,6 +2,7 @@
 
 namespace MiPress\SocialFeeds\Contracts;
 
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use MiPress\SocialFeeds\Enums\SocialPlatform;
 use MiPress\SocialFeeds\Models\SocialAccount;
@@ -27,7 +28,7 @@ interface SocialProvider
      *     author_name: ?string,
      *     author_avatar_url: ?string,
      *     permalink: ?string,
-     *     posted_at: ?\Carbon\Carbon,
+     *     posted_at: ?Carbon,
      *     raw_data: ?array,
      * }>
      */

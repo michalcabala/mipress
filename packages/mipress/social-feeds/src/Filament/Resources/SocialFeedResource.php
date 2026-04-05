@@ -2,6 +2,11 @@
 
 namespace MiPress\SocialFeeds\Filament\Resources;
 
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -11,6 +16,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Collection;
 use MiPress\SocialFeeds\Enums\FeedLayout;
+use MiPress\SocialFeeds\Filament\Resources\SocialFeedResource\Pages\CreateSocialFeed;
+use MiPress\SocialFeeds\Filament\Resources\SocialFeedResource\Pages\EditSocialFeed;
+use MiPress\SocialFeeds\Filament\Resources\SocialFeedResource\Pages\ListSocialFeeds;
 use MiPress\SocialFeeds\Jobs\RefreshFeedJob;
 use MiPress\SocialFeeds\Models\SocialAccount;
 use MiPress\SocialFeeds\Models\SocialFeed;
@@ -140,7 +148,7 @@ class SocialFeedResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\Action::make('refresh')
+                Action::make('refresh')
                     ->label('Obnovit')
                     ->icon('heroicon-o-arrow-path')
                     ->action(function (SocialFeed $record) {
@@ -150,12 +158,12 @@ class SocialFeedResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\BulkAction::make('refresh_all')
+                DeleteBulkAction::make(),
+                BulkAction::make('refresh_all')
                     ->label('Obnovit vybrané')
                     ->icon('heroicon-o-arrow-path')
                     ->action(function (Collection $records) {
@@ -171,9 +179,9 @@ class SocialFeedResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => \MiPress\SocialFeeds\Filament\Resources\SocialFeedResource\Pages\ListSocialFeeds::route('/'),
-            'create' => \MiPress\SocialFeeds\Filament\Resources\SocialFeedResource\Pages\CreateSocialFeed::route('/create'),
-            'edit' => \MiPress\SocialFeeds\Filament\Resources\SocialFeedResource\Pages\EditSocialFeed::route('/{record}/edit'),
+            'index' => ListSocialFeeds::route('/'),
+            'create' => CreateSocialFeed::route('/create'),
+            'edit' => EditSocialFeed::route('/{record}/edit'),
         ];
     }
 }

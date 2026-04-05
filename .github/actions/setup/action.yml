@@ -20,6 +20,10 @@ runs:
     - name: Install Composer dependencies
       run: composer install --no-interaction --prefer-dist --no-progress
       shell: bash
+      env:
+        CACHE_STORE: array
+        SESSION_DRIVER: array
+        QUEUE_CONNECTION: sync
 
     - name: Install NPM dependencies
       run: npm ci

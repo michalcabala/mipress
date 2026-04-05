@@ -21,11 +21,9 @@ class FacebookProvider extends AbstractProvider
 
     public function requiredScopes(): array
     {
-        return [
-            'pages_show_list',
-            'pages_read_engagement',
-            'pages_read_user_content',
-        ];
+        return array_filter(config('social-feeds.providers.facebook.scopes', [
+            'public_profile',
+        ]));
     }
 
     public function fetchPosts(SocialAccount $account, array $options = []): Collection

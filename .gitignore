@@ -18,6 +18,7 @@
 /packages/mipress/*
 /public/build
 /public/hot
+/public/sitemap*.xml
 /public/storage
 /storage/*.key
 /storage/pail

@@ -6,8 +6,7 @@ use App\Models\User;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Pages\BotlyPage;
-use MiPress\Core\Filament\Pages\SitemapGeneratorPage;
-use MiPress\Core\Filament\Pages\SitemapSettingsPage;
+use MiPress\Core\Filament\Pages\SitemapSettings;
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
@@ -23,11 +22,7 @@ describe('seo tools authorization', function () {
             ->assertForbidden();
 
         $this->actingAs($contributor)
-            ->get(SitemapGeneratorPage::getUrl())
-            ->assertForbidden();
-
-        $this->actingAs($contributor)
-            ->get(SitemapSettingsPage::getUrl())
+            ->get(SitemapSettings::getUrl())
             ->assertForbidden();
     });
 
@@ -40,11 +35,7 @@ describe('seo tools authorization', function () {
             ->assertForbidden();
 
         $this->actingAs($editor)
-            ->get(SitemapGeneratorPage::getUrl())
-            ->assertForbidden();
-
-        $this->actingAs($editor)
-            ->get(SitemapSettingsPage::getUrl())
+            ->get(SitemapSettings::getUrl())
             ->assertForbidden();
     });
 
@@ -55,7 +46,6 @@ describe('seo tools authorization', function () {
         $this->actingAs($admin);
 
         expect(BotlyPage::canAccess())->toBeTrue()
-            ->and(SitemapGeneratorPage::canAccess())->toBeTrue()
-            ->and(SitemapSettingsPage::canAccess())->toBeTrue();
+            ->and(SitemapSettings::canAccess())->toBeTrue();
     });
 });

@@ -7,8 +7,7 @@ use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\EntryStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Pages\BotlyPage;
-use MiPress\Core\Filament\Pages\SitemapGeneratorPage;
-use MiPress\Core\Filament\Pages\SitemapSettingsPage;
+use MiPress\Core\Filament\Pages\SitemapSettings;
 use MiPress\Core\Filament\Resources\BlueprintResource;
 use MiPress\Core\Filament\Resources\CollectionResource;
 use MiPress\Core\Filament\Resources\EntryResource;
@@ -78,8 +77,7 @@ describe('production smoke', function () {
             FormSubmissionResource::getUrl('index'),
             FormNotificationSettings::getUrl(),
             BotlyPage::getUrl(),
-            SitemapGeneratorPage::getUrl(),
-            SitemapSettingsPage::getUrl(),
+            SitemapSettings::getUrl(),
         ];
 
         foreach ($adminUrls as $url) {

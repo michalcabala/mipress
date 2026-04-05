@@ -57,6 +57,9 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->brandLogo(asset('assets/images/mipress-logo.svg'))
+            ->darkModeBrandLogo(asset('assets/images/mipress-logo-white.svg'))
+            ->favicon(asset('assets/images/favicon.svg'))
             ->maxContentWidth(Width::Full)
             ->spa()
             ->unsavedChangesAlerts()

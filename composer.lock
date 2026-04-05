@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "898d1d133b91e5f02f57100ecc167394",
+    "content-hash": "993a070dcbf79c860d3e3e377b339500",
     "packages": [
         {
             "name": "awcodes/botly",
@@ -3976,11 +3976,11 @@
         },
         {
             "name": "mipress/core",
-            "version": "v0.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/michalcabala/mipress-core.git",
-                "reference": "a9af399d05df6628e6dfb5e288f6f4baa83a3b28"
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/mipress/core",
+                "reference": "76490587f9b4d22e4d1ccaa6d6c194ee0cf8a202"
             },
             "require": {
                 "awcodes/botly": "^1.0",
@@ -4016,14 +4016,17 @@
                 "MIT"
             ],
             "description": "MiPress CMS core package.",
-            "time": "2026-04-05T10:48:50+00:00"
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "mipress/forms",
-            "version": "v0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/michalcabala/mipress-forms.git",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/mipress/forms",
                 "reference": "26bfb8a6bdfa0b92e6a4bf5efcddfc0a8cc77403"
             },
             "require": {
@@ -4047,7 +4050,10 @@
                 "MIT"
             ],
             "description": "Form builder module for miPress CMS",
-            "time": "2026-04-04T17:34:55+00:00"
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "mipress/social-feeds",
@@ -4055,7 +4061,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/social-feeds",
-                "reference": "cd5f51af3cc02d0b1a42edc28d8ce696bc1ad5d8"
+                "reference": "b047406d1167699f2c9c5eb52b40289c7a567132"
             },
             "require": {
                 "filament/filament": "^5.0",
@@ -4081,6 +4087,7 @@
             ],
             "description": "Social feeds integration for miPress CMS",
             "transport-options": {
+                "symlink": true,
                 "relative": true
             }
         },
@@ -12833,6 +12840,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "mipress/core": 20,
+        "mipress/forms": 20,
         "mipress/social-feeds": 20
     },
     "prefer-stable": true,

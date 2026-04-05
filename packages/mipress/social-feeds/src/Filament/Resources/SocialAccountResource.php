@@ -154,14 +154,6 @@ class SocialAccountResource extends Resource
                 EditAction::make(),
                 DeleteAction::make()
                     ->label('Odpojit'),
-            ])
-            ->headerActions([
-                ...collect(SocialPlatform::enabled())->map(fn (SocialPlatform $p) => Action::make("connect_{$p->value}")
-                    ->label("Připojit {$p->label()}")
-                    ->icon('heroicon-o-plus-circle')
-                    ->url(route('social.auth.redirect', $p->value))
-                    ->openUrlInNewTab(false)
-                )->all(),
             ]);
     }
 

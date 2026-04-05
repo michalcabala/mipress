@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use MiPress\SocialFeeds\Jobs\RefreshAllFeedsJob;
+use MiPress\SocialFeeds\Mason\Bricks\SocialFeedBrick;
 use MiPress\SocialFeeds\Services\SocialFeedManager;
 use MiPress\SocialFeeds\View\Components\SocialFeed;
 
@@ -16,6 +17,10 @@ class SocialFeedsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/social-feeds.php', 'social-feeds');
 
         $this->app->singleton(SocialFeedManager::class);
+
+        $this->app->singleton('mipress.social-feeds.mason.bricks', fn (): array => [
+            SocialFeedBrick::class,
+        ]);
     }
 
     public function boot(): void

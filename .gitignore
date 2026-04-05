@@ -16,7 +16,6 @@
 /packages/*
 !/packages/mipress/
 /packages/mipress/*
-!/packages/mipress/social-feeds/
 /public/build
 /public/hot
 /public/sitemap*.xml

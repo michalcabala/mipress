@@ -32,7 +32,7 @@ class SocialAuthController extends Controller
         }
 
         return $driver
-            ->scopes($scopes)
+            ->setScopes($scopes)
             ->redirect();
     }
 

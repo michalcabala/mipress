@@ -2,8 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Plugins\BotlyPlugin;
-use App\Filament\Plugins\FilamentSitemapGeneratorPlugin;
 use Awcodes\Curator\CuratorPlugin;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -68,12 +66,6 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
-            ->plugin(
-                BotlyPlugin::make()
-                    ->navigationIcon('fal-user-robot')
-                    ->title('Správa robots.txt')
-            )
-            ->plugin(FilamentSitemapGeneratorPlugin::make())
             ->plugin(
                 CuratorPlugin::make()
                     ->label('Médium')

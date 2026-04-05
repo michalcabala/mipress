@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use App\Filament\Pages\BotlyPage;
-use App\Filament\Pages\SitemapGeneratorPage;
-use App\Filament\Pages\SitemapSettingsPage;
 use App\Models\User;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\EntryStatus;
 use MiPress\Core\Enums\UserRole;
+use MiPress\Core\Filament\Pages\BotlyPage;
+use MiPress\Core\Filament\Pages\SitemapGeneratorPage;
+use MiPress\Core\Filament\Pages\SitemapSettingsPage;
 use MiPress\Core\Filament\Resources\BlueprintResource;
 use MiPress\Core\Filament\Resources\CollectionResource;
 use MiPress\Core\Filament\Resources\EntryResource;

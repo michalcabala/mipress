@@ -7,7 +7,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "awcodes/botly": "^1.0",
         "awcodes/filament-curator": "^5.0",
         "awcodes/mason": "^3.0",
         "blade-ui-kit/blade-icons": "^1.9",
@@ -17,7 +16,6 @@
         "laravel/tinker": "^3.0",
         "mipress/core": "^0.1",
         "mipress/forms": "^0.1",
-        "muhammad-nawlo/filament-sitemap-generator": "^1.0",
         "spatie/laravel-permission": "^7.2",
         "spatie/laravel-sluggable": "^3.8"
     },

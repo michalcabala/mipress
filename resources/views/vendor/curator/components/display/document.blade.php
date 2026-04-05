@@ -18,10 +18,10 @@
     $attributes->get('class')
 ])>
     @if (curator()->isVideo($extension))
-        @svg('heroicon-o-video-camera', ['class' => 'opacity-20 ' . $iconClasses[$iconSize]])
+        @svg('fal-video', ['class' => 'opacity-20 ' . $iconClasses[$iconSize]])
         <span class="block absolute">{{ $extension }}</span>
     @else
-        @svg('heroicon-o-document', ['class' => 'opacity-20 ' . $iconClasses[$iconSize]])
+        @svg('fal-file-lines', ['class' => 'opacity-20 ' . $iconClasses[$iconSize]])
         <span class="block absolute">{{ $extension }}</span>
     @endif
     <span class="sr-only">{{ $label }}</span>

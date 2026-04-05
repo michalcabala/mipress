@@ -55,7 +55,7 @@
                             x-on:click="state = null"
                             class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                         >
-                            <x-filament::icon icon="heroicon-m-pencil-square" class="h-4 w-4" />
+                            <x-filament::icon icon="fal-pen-to-square" class="h-4 w-4" />
                             {{ trans('curator::views.curation.edit') }}
                         </button>
                     </div>

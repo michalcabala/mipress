@@ -86,7 +86,7 @@
                             <span x-show="! showMessage" class="filament-link">
                                 <x-filament::icon
                                     alias="curator::copy-link"
-                                    icon="heroicon-s-clipboard-document"
+                                    icon="fal-clipboard"
                                     class="w-4 h-4"
                                 />
                             </span>
@@ -94,7 +94,7 @@
                             <span x-show="showMessage" class="text-success-500 font-bold" style="display:none;">
                                 <x-filament::icon
                                     alias="curator::copy-link"
-                                    icon="heroicon-s-check-circle"
+                                    icon="fal-circle-check"
                                     class="w-4 h-4"
                                 />
                             </span>

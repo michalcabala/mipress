@@ -51,13 +51,13 @@
         {{ $attributes->except(['src', 'alt', 'lazy', 'item', 'class']) }}
     >
         @if (curator()->isVideo($item->ext))
-            @svg('heroicon-o-film', ['class' => 'opacity-20 ' . $iconClasses])
+            @svg('fal-film', ['class' => 'opacity-20 ' . $iconClasses])
             <span class="block absolute">{{ $item->ext }}</span>
         @elseif (curator()->isAudio($item->ext))
-            @svg('heroicon-o-speaker-wave', ['class' => 'opacity-20 ' . $iconClasses])
+            @svg('fal-volume-high', ['class' => 'opacity-20 ' . $iconClasses])
             <span class="block absolute">{{ $item->ext }}</span>
         @else
-            @svg('heroicon-o-document', ['class' => 'opacity-20 ' . $iconClasses])
+            @svg('fal-file-lines', ['class' => 'opacity-20 ' . $iconClasses])
             <span class="block absolute">{{ $item->ext }}</span>
         @endif
         <span class="sr-only">{{ $item->pretty_name }}</span>

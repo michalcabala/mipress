@@ -287,7 +287,7 @@ livewire(ListUsers::class)
 - Layout components (`Grid`, `Section`, `Fieldset`, `Tabs`, `Wizard`, etc.): `Filament\Schemas\Components\`
 - Schema utilities (`Get`, `Set`, etc.): `Filament\Schemas\Components\Utilities\`
 - Actions (`DeleteAction`, `CreateAction`, etc.): `Filament\Actions\`. Never use `Filament\Tables\Actions\`, `Filament\Forms\Actions\`, or any other sub-namespace for actions.
-- Icons: `Filament\Support\Icons\Heroicon` enum (e.g., `Heroicon::PencilSquare`)
+- Icons: use Font Awesome Blade icon strings (e.g., `fal-pen-to-square`, `far-circle-check`, `fas-xmark`), not Heroicons.
 
 ### Common Mistakes
 

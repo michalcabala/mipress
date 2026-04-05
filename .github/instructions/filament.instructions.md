@@ -18,7 +18,7 @@ use Filament\Resources\Resource;
 class EntryResource extends Resource
 {
     protected static ?string $model = Entry::class;
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'fal-file-lines';
     protected static ?string $navigationGroup = 'Obsah';
     protected static ?string $modelLabel = 'Položka';
     protected static ?string $pluralModelLabel = 'Položky';

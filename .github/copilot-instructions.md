@@ -65,6 +65,7 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 - Use Mason's `Mason` field for the primary Entry content blocks — never use `RichEditor` or any WYSIWYG for free-form content editing.
 - Blueprint custom field definitions may use `RichEditor` when the user selects the `richtext` field type — this is intentional for simple inline fields inside Blueprint-driven forms.
 - Translatable fields use custom `TranslatableField::make()` helper that wraps content in Filament Tabs with locale flags.
+- Use Font Awesome icon identifiers everywhere (`fal-*`, `far-*`, `fas-*`, `fab-*`). Do not use Heroicons in new or updated code.
 - Labels and navigation in Czech: Sekce (Collection), Šablona (Template), Třídění (Taxonomy), Štítek (Term), Položka (Entry).
 
 ## Testing

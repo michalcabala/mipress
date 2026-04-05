@@ -36,7 +36,7 @@ return [
         'default_layout' => 'grid',
         'navigation' => [
             'group' => null,
-            'icon' => 'heroicon-o-photo',
+            'icon' => 'fal-image',
             'sort' => null,
             'should_register' => true,
             'should_show_badge' => false,

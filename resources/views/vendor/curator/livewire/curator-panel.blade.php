@@ -82,7 +82,7 @@
             <label class="shrink-0 border border-gray-300 dark:border-gray-700 rounded-md relative flex items-center">
                 <span class="sr-only">{{ trans('curator::views.panel.search_label') }}</span>
                 <x-filament::input.wrapper
-                    prefix-icon="heroicon-s-magnifying-glass"
+                    prefix-icon="fal-magnifying-glass"
                     prefix-icon-alias="curator::icons.search"
                 >
                     <x-filament::input
@@ -98,7 +98,7 @@
             </label>
             <x-filament::icon-button
                 x-on:click="close()"
-                icon="heroicon-o-x-mark"
+                icon="fal-xmark"
                 color="gray"
             />
         </div>
@@ -147,7 +147,7 @@
                                 <div class="grid place-content-center place-items-center w-full h-full text-xs relative">
                                     <x-filament::icon
                                         alias="curator::icons.folder"
-                                        icon="heroicon-o-folder"
+                                        icon="fal-folder"
                                         class="w-12 h-12 opacity-20"
                                     />
                                     <span>{{ $dir['label'] }}</span>
@@ -189,7 +189,7 @@
                             <span class="flex items-center justify-center w-8 h-8 text-white rounded-full bg-primary-500 drop-shadow">
                                 <x-filament::icon
                                     alias="curator::icons.check"
-                                    icon="heroicon-s-check"
+                                    icon="fal-check"
                                     class="w-5 h-5"
                                 />
                             </span>
@@ -260,7 +260,7 @@
                                 >
                                     <x-filament::icon
                                         alias="curator::icons.remove"
-                                        icon="heroicon-s-x-mark"
+                                        icon="fal-xmark"
                                         class="w-6 h-6 text-white"
                                     />
                                 </button>

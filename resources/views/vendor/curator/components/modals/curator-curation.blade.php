@@ -37,7 +37,7 @@
                         </h2>
                         <x-filament::icon-button
                             x-on:click="close()"
-                            icon="heroicon-o-x-mark"
+                            icon="fal-xmark"
                             color="gray"
                             class="mr-2"
                         />
@@ -197,7 +197,7 @@
                                 <span class="sr-only">{{ trans('curator::views.curation.zoom_in') }}</span>
                                 <x-filament::icon
                                     alias="curator::icons.zoom_in"
-                                    icon="heroicon-o-magnifying-glass-plus"
+                                    icon="fal-magnifying-glass-plus"
                                     class="w-4 h-4 text-gray-950 dark:text-white"
                                 />
                             </x-filament::button>
@@ -210,7 +210,7 @@
                                 <span class="sr-only">{{ trans('curator::views.curation.zoom_out') }}</span>
                                 <x-filament::icon
                                     alias="curator::icons.zoom_out"
-                                    icon="heroicon-o-magnifying-glass-minus"
+                                    icon="fal-magnifying-glass-minus"
                                     class="w-4 h-4 text-gray-950 dark:text-white"
                                 />
                             </x-filament::button>

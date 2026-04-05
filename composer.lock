@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "06faf14d42de675f0deba1d9043af12d",
+    "content-hash": "514cebec124390988e19de6002682db0",
     "packages": [
         {
             "name": "awcodes/botly",
-            "version": "v1.0.0",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/awcodes/botly.git",
-                "reference": "cfa19daa80e8f43a67f58982300ae1f8bae94ff8"
+                "reference": "dd87b0950f27493e49e27bd6cb6ce540ed45f834"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/awcodes/botly/zipball/cfa19daa80e8f43a67f58982300ae1f8bae94ff8",
-                "reference": "cfa19daa80e8f43a67f58982300ae1f8bae94ff8",
+                "url": "https://api.github.com/repos/awcodes/botly/zipball/dd87b0950f27493e49e27bd6cb6ce540ed45f834",
+                "reference": "dd87b0950f27493e49e27bd6cb6ce540ed45f834",
                 "shasum": ""
             },
             "require": {
@@ -82,7 +82,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-03-05T21:25:57+00:00"
+            "time": "2026-04-01T18:42:43+00:00"
         },
         {
             "name": "awcodes/filament-curator",
@@ -3764,7 +3764,7 @@
         },
         {
             "name": "mipress/core",
-            "version": "dev-main",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/michalcabala/mipress-core.git",
@@ -3779,7 +3779,6 @@
                 "spatie/laravel-permission": "^7.0",
                 "spatie/laravel-sluggable": "^3.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -3809,7 +3808,7 @@
         },
         {
             "name": "mipress/forms",
-            "version": "dev-main",
+            "version": "v0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/michalcabala/mipress-forms.git",
@@ -3819,7 +3818,6 @@
                 "mipress/core": "@dev",
                 "php": "^8.3"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -12426,11 +12424,8 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
-    "stability-flags": {
-        "mipress/core": 20,
-        "mipress/forms": 20
-    },
+    "minimum-stability": "stable",
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

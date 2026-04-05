@@ -16,6 +16,7 @@
         "laravel/tinker": "^3.0",
         "mipress/core": "^0.2",
         "mipress/forms": "^0.1",
+        "mipress/social-feeds": "@dev",
         "spatie/laravel-permission": "^7.2",
         "spatie/laravel-sluggable": "^3.8"
     },
@@ -109,6 +110,10 @@
         {
             "type": "git",
             "url": "https://github.com/michalcabala/mipress-forms.git"
+        },
+        {
+            "type": "path",
+            "url": "packages/mipress/social-feeds"
         }
     ],
     "minimum-stability": "stable",

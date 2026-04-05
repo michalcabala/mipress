@@ -26,6 +26,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MiPress\Core\Filament\MiPressPlugin;
 use MiPress\Core\Services\GlobalSetManager;
 use MiPress\Forms\Filament\FormsPlugin;
+use MiPress\SocialFeeds\SocialFeedsPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -66,6 +67,7 @@ class AdminPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
+            ->plugin(SocialFeedsPlugin::make())
             ->plugin(
                 CuratorPlugin::make()
                     ->label('Médium')

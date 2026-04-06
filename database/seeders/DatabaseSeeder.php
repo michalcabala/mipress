@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(PermissionSeeder::class);
         $this->seedDefaultContentModels();
+        $this->call(SettingsSeeder::class);
 
         $admin = User::query()->updateOrCreate([
             'email' => 'admin@example.com',

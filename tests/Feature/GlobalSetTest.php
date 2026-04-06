@@ -3,284 +3,167 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Illuminate\Database\QueryException;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
-use MiPress\Core\Filament\Pages\ThemeSettings;
-use MiPress\Core\Filament\Resources\GlobalSetResource;
-use MiPress\Core\Filament\Resources\GlobalSetResource\Pages\CreateGlobalSet;
-use MiPress\Core\Filament\Resources\GlobalSetResource\Pages\EditGlobalSet;
-use MiPress\Core\Models\GlobalSet;
-use MiPress\Core\Services\GlobalSetManager;
+use MiPress\Core\Filament\Pages\EditSettings;
+use MiPress\Core\Models\Blueprint;
+use MiPress\Core\Models\Setting;
+use MiPress\Core\Services\SettingsManager;
 
-// --- Model: get() / set() ---
-
-it('reads a value from the data column', function () {
-    $set = GlobalSet::factory()->create([
-        'handle' => 'general',
-        'data' => ['site_name' => 'MiPress'],
+it('reads and writes values on setting data via get and set', function () {
+    $setting = Setting::factory()->create([
+        'handle' => 'contact',
+        'data' => ['email' => 'hello@example.com'],
     ]);
 
-    expect($set->get('site_name'))->toBe('MiPress');
+    expect($setting->get('email'))->toBe('hello@example.com')
+        ->and($setting->get('missing', 'fallback'))->toBe('fallback');
+
+    $setting->set('phone', '+420123456789')->save();
+
+    expect($setting->fresh()->get('phone'))->toBe('+420123456789');
 });
 
-it('returns the default when the key does not exist', function () {
-    $set = GlobalSet::factory()->create([
-        'handle' => 'general',
-        'data' => [],
+it('validates handle format on save', function () {
+    $setting = Setting::factory()->make([
+        'handle' => 'Invalid-Handle',
     ]);
 
-    expect($set->get('missing', 'fallback'))->toBe('fallback');
+    expect(fn () => $setting->save())
+        ->toThrow(ValidationException::class);
 });
 
-it('sets a value on the data column and returns self', function () {
-    $set = GlobalSet::factory()->create([
-        'handle' => 'general',
-        'data' => [],
-    ]);
+it('prevents handle changes after create', function () {
+    $setting = Setting::factory()->create(['handle' => 'general']);
 
-    $result = $set->set('site_name', 'Test');
-
-    expect($result)->toBe($set)
-        ->and($set->get('site_name'))->toBe('Test');
+    expect(function () use ($setting): void {
+        $setting->handle = 'changed';
+        $setting->save();
+    })->toThrow(ValidationException::class);
 });
 
-it('persists set() changes after save', function () {
-    $set = GlobalSet::factory()->create([
-        'handle' => 'general',
-        'data' => ['old_key' => 'old_value'],
-    ]);
+it('finds settings by handle using settings manager', function () {
+    Setting::factory()->create(['handle' => 'social', 'name' => 'Sociální sítě']);
 
-    $set->set('new_key', 'new_value')->save();
-
-    $fresh = $set->fresh();
-
-    expect($fresh->get('old_key'))->toBe('old_value')
-        ->and($fresh->get('new_key'))->toBe('new_value');
-});
-
-// --- Handle validation ---
-
-it('enforces unique handles', function () {
-    GlobalSet::factory()->create(['handle' => 'general']);
-
-    expect(fn () => GlobalSet::factory()->create(['handle' => 'general']))
-        ->toThrow(QueryException::class);
-});
-
-// --- GlobalSetManager ---
-
-it('finds a global set by handle', function () {
-    GlobalSet::factory()->create(['handle' => 'social', 'title' => 'Social']);
-
-    $manager = app(GlobalSetManager::class);
+    $manager = app(SettingsManager::class);
 
     expect($manager->find('social'))
-        ->toBeInstanceOf(GlobalSet::class)
-        ->title->toBe('Social');
+        ->not->toBeNull()
+        ->and($manager->find('social')?->name)->toBe('Sociální sítě')
+        ->and($manager->find('missing'))->toBeNull();
 });
 
-it('returns null for a nonexistent handle', function () {
-    $manager = app(GlobalSetManager::class);
+it('caches settings manager results per request until flush', function () {
+    $setting = Setting::factory()->create(['handle' => 'contact', 'name' => 'Kontakt']);
+    $manager = app(SettingsManager::class);
 
-    expect($manager->find('nonexistent'))->toBeNull();
+    expect($manager->find('contact')?->name)->toBe('Kontakt');
+
+    Setting::query()->whereKey($setting->id)->update(['name' => 'Kontakt 2']);
+
+    expect($manager->find('contact')?->name)->toBe('Kontakt');
+
+    $manager->flush();
+
+    expect($manager->find('contact')?->name)->toBe('Kontakt 2');
 });
 
-it('returns all global sets', function () {
-    GlobalSet::factory()->count(3)->create();
-
-    $manager = app(GlobalSetManager::class);
-
-    expect($manager->all())->toHaveCount(3);
-});
-
-it('reads a single value via the manager shortcut', function () {
-    GlobalSet::factory()->create([
-        'handle' => 'seo',
-        'data' => ['gtm_code' => 'GTM-ABC123'],
+it('returns values using settings helper', function () {
+    Setting::factory()->create([
+        'handle' => 'contact',
+        'data' => [
+            'email' => 'info@mipress.test',
+            'phone' => '+420111222333',
+        ],
     ]);
 
-    $manager = app(GlobalSetManager::class);
-
-    expect($manager->get('seo', 'gtm_code'))->toBe('GTM-ABC123');
+    expect(settings('contact', 'email'))->toBe('info@mipress.test')
+        ->and(settings('contact', 'missing', 'fallback'))->toBe('fallback')
+        ->and(settings('contact'))->toBeArray();
 });
 
-it('returns default from manager when set does not exist', function () {
-    $manager = app(GlobalSetManager::class);
+it('renders edit settings page for existing handle', function () {
+    $this->seed(PermissionSeeder::class);
 
-    expect($manager->get('missing', 'key', 'default'))->toBe('default');
-});
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::SuperAdmin->value);
+    $this->actingAs($user);
 
-// --- global_set() helper ---
-
-it('reads a value using helper with handle.key format', function () {
-    GlobalSet::factory()->create([
-        'handle' => 'general',
-        'data' => ['site_name' => 'My Site'],
+    $blueprint = Blueprint::factory()->create([
+        'fields' => [
+            [
+                'section' => 'Kontakt',
+                'fields' => [
+                    ['handle' => 'email', 'label' => 'E-mail', 'type' => 'text'],
+                ],
+            ],
+        ],
     ]);
 
-    expect(global_set('general.site_name'))->toBe('My Site');
+    Setting::factory()->create([
+        'handle' => 'contact',
+        'name' => 'Kontakt',
+        'blueprint_id' => $blueprint->id,
+    ]);
+
+    Livewire::test(EditSettings::class, ['handle' => 'contact'])
+        ->assertSuccessful();
 });
 
-it('returns default from helper for missing key', function () {
-    GlobalSet::factory()->create([
-        'handle' => 'general',
+it('returns 404 for non existing settings handle', function () {
+    $this->seed(PermissionSeeder::class);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::SuperAdmin->value);
+    $this->actingAs($user);
+
+    $this->get(EditSettings::getUrl(['handle' => 'missing']))
+        ->assertNotFound();
+});
+
+it('saves data from edit settings page', function () {
+    $this->seed(PermissionSeeder::class);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::SuperAdmin->value);
+    $this->actingAs($user);
+
+    $blueprint = Blueprint::factory()->create([
+        'fields' => [
+            [
+                'section' => 'Kontakt',
+                'fields' => [
+                    ['handle' => 'email', 'label' => 'E-mail', 'type' => 'text'],
+                ],
+            ],
+        ],
+    ]);
+
+    $setting = Setting::factory()->create([
+        'handle' => 'contact',
+        'name' => 'Kontakt',
+        'blueprint_id' => $blueprint->id,
         'data' => [],
     ]);
 
-    expect(global_set('general.missing', 'fallback'))->toBe('fallback');
-});
-
-it('returns null from helper for nonexistent set', function () {
-    expect(global_set('nonexistent.key'))->toBeNull();
-});
-
-it('returns the GlobalSet model when called with handle only', function () {
-    $set = GlobalSet::factory()->create(['handle' => 'general']);
-
-    $result = global_set('general');
-
-    expect($result)
-        ->toBeInstanceOf(GlobalSet::class)
-        ->handle->toBe('general');
-});
-
-// --- Filament Resource ---
-
-it('can render the global sets list page', function () {
-    $this->seed(PermissionSeeder::class);
-    $user = User::factory()->create();
-    $user->assignRole(UserRole::SuperAdmin->value);
-    $this->actingAs($user);
-
-    $this->get(GlobalSetResource::getUrl('index'))
-        ->assertSuccessful();
-});
-
-it('can render the global set create page', function () {
-    $this->seed(PermissionSeeder::class);
-    $user = User::factory()->create();
-    $user->assignRole(UserRole::SuperAdmin->value);
-    $this->actingAs($user);
-
-    $this->get(GlobalSetResource::getUrl('create'))
-        ->assertSuccessful();
-});
-
-it('can render the global set edit page', function () {
-    $this->seed(PermissionSeeder::class);
-    $user = User::factory()->create();
-    $user->assignRole(UserRole::SuperAdmin->value);
-    $this->actingAs($user);
-
-    $set = GlobalSet::factory()->create();
-
-    $this->get(GlobalSetResource::getUrl('edit', ['record' => $set]))
-        ->assertSuccessful();
-});
-
-it('prevents editor from accessing global sets pages', function () {
-    $this->seed(PermissionSeeder::class);
-    $editor = User::factory()->create();
-    $editor->assignRole(UserRole::Editor->value);
-    $this->actingAs($editor);
-
-    $set = GlobalSet::factory()->create();
-
-    $this->get(GlobalSetResource::getUrl('index'))
-        ->assertForbidden();
-
-    $this->get(GlobalSetResource::getUrl('create'))
-        ->assertForbidden();
-
-    $this->get(GlobalSetResource::getUrl('edit', ['record' => $set]))
-        ->assertForbidden();
-});
-
-it('prevents contributor from accessing global sets pages', function () {
-    $this->seed(PermissionSeeder::class);
-    $contributor = User::factory()->create();
-    $contributor->assignRole(UserRole::Contributor->value);
-    $this->actingAs($contributor);
-
-    $set = GlobalSet::factory()->create();
-
-    $this->get(GlobalSetResource::getUrl('index'))
-        ->assertForbidden();
-
-    $this->get(GlobalSetResource::getUrl('create'))
-        ->assertForbidden();
-
-    $this->get(GlobalSetResource::getUrl('edit', ['record' => $set]))
-        ->assertForbidden();
-});
-
-it('prevents editor from accessing theme settings page', function () {
-    $this->seed(PermissionSeeder::class);
-    $editor = User::factory()->create();
-    $editor->assignRole(UserRole::Editor->value);
-    $this->actingAs($editor);
-
-    $this->get(ThemeSettings::getUrl())
-        ->assertForbidden();
-});
-
-it('prevents contributor from accessing theme settings page', function () {
-    $this->seed(PermissionSeeder::class);
-    $contributor = User::factory()->create();
-    $contributor->assignRole(UserRole::Contributor->value);
-    $this->actingAs($contributor);
-
-    $this->get(ThemeSettings::getUrl())
-        ->assertForbidden();
-});
-
-it('can create a global set with key-value data', function () {
-    $this->seed(PermissionSeeder::class);
-    $user = User::factory()->create();
-    $user->assignRole(UserRole::SuperAdmin->value);
-    $this->actingAs($user);
-
-    Livewire::test(CreateGlobalSet::class)
-        ->fillForm([
-            'title' => 'Test Set',
-            'handle' => 'test_set',
-            'data' => [
-                'key1' => 'value1',
-                'key2' => 'value2',
-            ],
-        ])
-        ->call('create')
-        ->assertHasNoFormErrors();
-
-    $set = GlobalSet::where('handle', 'test_set')->first();
-
-    expect($set)->not->toBeNull()
-        ->and($set->data)->toBe(['key1' => 'value1', 'key2' => 'value2']);
-});
-
-it('saves edited key-value data back as flat JSON', function () {
-    $this->seed(PermissionSeeder::class);
-    $user = User::factory()->create();
-    $user->assignRole(UserRole::SuperAdmin->value);
-    $this->actingAs($user);
-
-    $set = GlobalSet::factory()->create([
-        'handle' => 'editable',
-        'data' => ['old' => 'value'],
-    ]);
-
-    Livewire::test(EditGlobalSet::class, [
-        'record' => $set->getRouteKey(),
-    ])
-        ->fillForm([
-            'data' => [
-                'new_key' => 'new_value',
-            ],
-        ])
+    Livewire::test(EditSettings::class, ['handle' => 'contact'])
+        ->set('data.email', 'new@example.com')
         ->call('save')
-        ->assertHasNoFormErrors();
+        ->assertHasNoErrors();
 
-    expect($set->fresh()->data)->toBe(['new_key' => 'new_value']);
+    expect($setting->fresh()->get('email'))->toBe('new@example.com');
+});
+
+it('denies settings page access for editor role', function () {
+    $this->seed(PermissionSeeder::class);
+
+    $editor = User::factory()->create();
+    $editor->assignRole(UserRole::Editor->value);
+    $this->actingAs($editor);
+
+    $setting = Setting::factory()->create(['handle' => 'contact']);
+
+    expect(EditSettings::canAccess())->toBeFalse();
 });

@@ -132,7 +132,7 @@ describe('ThemeManager activation', function () {
     });
 
     it('returns active theme slug from database', function () {
-        Setting::create(['key' => 'theme.active', 'value' => 'custom-theme']);
+        Setting::putValue('theme.active', 'custom-theme');
 
         expect((new ThemeManager($this->tempPath))->getActive())->toBe('custom-theme');
     });
@@ -142,7 +142,7 @@ describe('ThemeManager activation', function () {
 
         (new ThemeManager($this->tempPath))->activate('my-theme');
 
-        expect(Setting::find('theme.active')?->value)->toBe('my-theme');
+        expect(Setting::getValue('theme.active'))->toBe('my-theme');
     });
 
     it('throws InvalidArgumentException when activating a nonexistent theme', function () {
@@ -161,12 +161,12 @@ describe('ThemeManager activation', function () {
     });
 
     it('caches the active theme value', function () {
-        Setting::create(['key' => 'theme.active', 'value' => 'cached-theme']);
+        Setting::putValue('theme.active', 'cached-theme');
 
         $manager = new ThemeManager($this->tempPath);
         $manager->getActive(); // prime cache
         // delete from DB — cache should still return the value
-        Setting::where('key', 'theme.active')->delete();
+        Setting::where('handle', 'theme')->delete();
 
         expect($manager->getActive())->toBe('cached-theme');
     });
@@ -208,7 +208,7 @@ describe('ThemeManager view resolution', function () {
     it('prepends active theme path before default path', function () {
         mkdir($this->tempPath.'/default/views', 0777, true);
         mkdir($this->tempPath.'/custom/views', 0777, true);
-        Setting::create(['key' => 'theme.active', 'value' => 'custom']);
+        Setting::putValue('theme.active', 'custom');
 
         (new ThemeManager($this->tempPath))->registerViews();
 
@@ -254,7 +254,7 @@ describe('theme_asset helper', function () {
     });
 
     it('includes the active theme slug in the asset URL', function () {
-        Setting::create(['key' => 'theme.active', 'value' => 'my-theme']);
+        Setting::putValue('theme.active', 'my-theme');
 
         expect(theme_asset('css/theme.css'))
             ->toBe('/theme-files/my-theme/assets/css/theme.css');

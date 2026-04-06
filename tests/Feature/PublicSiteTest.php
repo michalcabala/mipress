@@ -11,7 +11,7 @@ use MiPress\Core\Models\Setting;
 test('the homepage falls back to the default theme landing page when no homepage entry is configured', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSeeText('Public theme pro magazín, journal i obsahové stránky bez kompromisu v editoru.');
+        ->assertSeeText('Prezentační web pro moderní obsahové projekty.');
 });
 
 test('the homepage renders the configured published entry', function () {

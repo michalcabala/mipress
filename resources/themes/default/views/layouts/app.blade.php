@@ -22,6 +22,8 @@
         })();
     </script>
     @vite('resources/css/app.css')
+    <link rel="stylesheet" href="{{ theme_asset('css/theme.css') }}">
+    <script src="{{ theme_asset('js/theme.js') }}" defer></script>
     @stack('styles')
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100" style="font-family: 'Plus Jakarta Sans', sans-serif;">

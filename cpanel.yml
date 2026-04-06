@@ -8,6 +8,7 @@ deployment:
     - /bin/bash -lc 'set -e; php artisan migrate --force --no-interaction'
     - /bin/bash -lc 'set -e; php artisan storage:link --force || true'
     - /bin/bash -lc 'set -e; php artisan optimize:clear'
+    - /bin/bash -lc 'set -e; TOKEN=$(head -c 32 /dev/urandom | base64 | tr -dc A-Za-z0-9 | head -c 32); echo "<?php if((\\\$_GET[\"t\"]??\"\")!==\"${TOKEN}\"){http_response_code(403);exit;}opcache_reset();echo\"OK\";" > public/opcache-reset.php; APP_URL=$(php artisan tinker --execute "echo config(\"app.url\");" 2>/dev/null | tail -1); RESULT=$(curl -sf "${APP_URL}/opcache-reset.php?t=${TOKEN}" 2>&1) || true; rm -f public/opcache-reset.php; echo "OPcache reset: ${RESULT:-skipped}"'
     - /bin/bash -lc 'set -e; php artisan config:cache; php artisan route:cache; php artisan view:cache; php artisan filament:cache-components'
     - /bin/bash -lc 'set -e; php artisan queue:restart || true'
     - /bin/bash -lc 'set -e; php artisan up'

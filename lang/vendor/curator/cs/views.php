@@ -3,9 +3,13 @@
 declare(strict_types=1);
 
 return [
+    'resource' => [
+        'label' => 'Médium',
+        'plural_label' => 'Média',
+    ],
     'details' => [
         'uploaded_on' => 'Nahráno',
-        'file_type' => 'Typ souboru',
+        'mime_type' => 'Typ souboru',
         'file_size' => 'Velikost souboru',
         'dimensions' => 'Rozměry',
         'disk' => 'Disk',
@@ -14,19 +18,20 @@ return [
         'file' => 'Soubor',
         'ext' => 'Formát',
         'copy_url' => 'Kopírovat URL',
-        'url_copied' => 'URL zkopírováno!',
+        'url_copied' => 'Zkopírováno!',
     ],
     'picker' => [
         'button' => 'Přidat média',
-        'reorder' => 'Přeobjednat',
+        'reorder' => 'Přeřadit',
         'view' => 'Zobrazit',
         'edit' => 'Upravit',
         'download' => 'Stáhnout',
         'remove' => 'Odstranit',
+        'clear' => 'Odebrat vše',
     ],
     'panel' => [
         'button' => 'Přidat média',
-        'heading' => 'Média',
+        'heading' => 'Výběr médií',
         'search_label' => 'Hledat',
         'search_placeholder' => 'Hledat...',
         'upload_tab' => 'Nahrát',
@@ -38,16 +43,19 @@ return [
         'edit_save' => 'Uložit',
         'edit_delete' => 'Smazat',
         'edit_cancel' => 'Zrušit',
-        'use_selected_image' => 'Použít vybraný obrázek',
+        'use_selected_image' => 'Vložit',
         'add_files' => 'Přidat soubory',
         'view' => 'Zobrazit',
         'edit' => 'Upravit',
         'download' => 'Stáhnout',
         'remove' => 'Odstranit',
+        'deselect_all' => 'Zrušit výběr všech',
+        'add_multiple_file' => 'Cmd + klik pro výběr více souborů.',
     ],
     'curation' => [
         'heading' => 'Ořez',
         'adjustments' => 'Úpravy',
+        'cancel' => 'Zrušit',
         'custom' => 'Vlastní',
         'key' => 'Klíč',
         'key_helper' => 'Klíč použitý pro získání ořezu pro zobrazení.',
@@ -65,6 +73,11 @@ return [
         'quality' => 'Kvalita',
         'rotate' => 'Otočit',
         'rotate_deg' => 'stupně',
-        'edit' => 'Upravit ořez',
+        'preset' => 'Předvolba',
+    ],
+    'attach_curator_media' => [
+        'modal' => [
+            'heading' => 'Vybrat médium z knihovny',
+        ],
     ],
 ];

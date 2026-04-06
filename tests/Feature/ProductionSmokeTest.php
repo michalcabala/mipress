@@ -7,11 +7,11 @@ use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\EntryStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Pages\BotlyPage;
+use MiPress\Core\Filament\Pages\EditSettings;
 use MiPress\Core\Filament\Pages\SitemapSettings;
 use MiPress\Core\Filament\Resources\BlueprintResource;
 use MiPress\Core\Filament\Resources\CollectionResource;
 use MiPress\Core\Filament\Resources\EntryResource;
-use MiPress\Core\Filament\Resources\GlobalSetResource;
 use MiPress\Core\Filament\Resources\PageResource;
 use MiPress\Core\Filament\Resources\TaxonomyResource;
 use MiPress\Core\Filament\Resources\TermResource;
@@ -63,6 +63,13 @@ describe('production smoke', function () {
             'hierarchical' => true,
         ]);
 
+        Setting::factory()->create([
+            'handle' => 'general',
+            'name' => 'Obecné',
+            'blueprint_id' => $blueprint->id,
+            'data' => [],
+        ]);
+
         $this->actingAs($superAdmin);
 
         $adminUrls = [
@@ -72,7 +79,7 @@ describe('production smoke', function () {
             PageResource::getUrl('index'),
             TaxonomyResource::getUrl('index'),
             TermResource::getUrl('index'),
-            GlobalSetResource::getUrl('index'),
+            EditSettings::getUrl(['handle' => 'general']),
             FormResource::getUrl('index'),
             FormSubmissionResource::getUrl('index'),
             FormNotificationSettings::getUrl(),

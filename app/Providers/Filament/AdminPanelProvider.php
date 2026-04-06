@@ -25,7 +25,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MiPress\Core\Filament\MiPressPlugin;
-use MiPress\Core\Services\GlobalSetManager;
+use MiPress\Core\Services\SettingsManager;
 use MiPress\Forms\Filament\FormsPlugin;
 use MiPress\SocialFeeds\SocialFeedsPlugin;
 
@@ -36,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
         FilamentView::registerRenderHook(
             PanelsRenderHook::USER_MENU_BEFORE,
             fn (): string => view('mipress::filament.site-menu', [
-                'siteName' => app(GlobalSetManager::class)->get('general', 'site_name', config('app.name')),
+                'siteName' => app(SettingsManager::class)->get('general', 'site_name', config('app.name')),
             ])->render(),
         );
     }

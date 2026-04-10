@@ -82,7 +82,6 @@ class AdminPanelProvider extends PanelProvider
             ->databaseTransactions()
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()
-            ->breadcrumbs(false)
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
             ->plugin(SocialFeedsPlugin::make())

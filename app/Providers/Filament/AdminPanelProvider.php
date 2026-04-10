@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Livewire\OptimizedDatabaseNotifications;
 use App\Filament\Pages\EditProfile as UserEditProfile;
 use App\Http\Middleware\SetAdminLocale;
 use Awcodes\Curator\CuratorPlugin;
@@ -78,7 +79,7 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->spa()
             ->unsavedChangesAlerts()
-            ->databaseNotifications()
+            ->databaseNotifications(livewireComponent: OptimizedDatabaseNotifications::class)
             ->databaseTransactions()
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()

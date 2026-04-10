@@ -1,10 +1,25 @@
+@php
+    $seoResource = $page ?? $entry ?? null;
+
+    if (! $seoResource instanceof \MiPress\Core\Models\Entry && ! $seoResource instanceof \MiPress\Core\Models\Page) {
+        $seoResource = null;
+    }
+
+    $mipressSeo = mipress_seo([
+        'resource' => $seoResource,
+        'collection' => $collection ?? null,
+        'title' => trim((string) $__env->yieldContent('title')),
+        'description' => trim((string) $__env->yieldContent('meta_description')),
+        'isPreview' => (bool) ($isPreview ?? false),
+    ]);
+@endphp
+
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ $mipressSeo['html_lang'] ?? str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', config('app.name'))</title>
-    <meta name="description" content="@yield('meta_description', '')">
+    @include('mipress::seo.head', ['seo' => $mipressSeo])
     <meta name="color-scheme" content="light dark">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|space-grotesk:500,600,700" rel="stylesheet" />
@@ -27,6 +42,8 @@
     @stack('styles')
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100" style="font-family: 'Plus Jakarta Sans', sans-serif;">
+    @include('mipress::seo.body-start', ['seo' => $mipressSeo])
+
     <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div class="absolute -left-28 -top-44 h-104 w-104 rounded-full bg-blue-300/35 blur-3xl dark:bg-blue-500/25"></div>
         <div class="absolute -right-24 top-36 h-80 w-80 rounded-full bg-cyan-200/45 blur-3xl dark:bg-cyan-500/20"></div>

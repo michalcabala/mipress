@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Awcodes\Botly\Models\Botly;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -23,5 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Botly::class, BotlyPolicy::class);
+
+        Gate::define('forceUnlockResourceLock', static fn (User $user): bool => $user->hasPermissionTo('entry.publish'));
     }
 }

@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Filament\Pages\EditProfile as ProfilePage;
 use App\Models\User;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
@@ -84,6 +86,29 @@ describe('create page', function () {
             ->and($user->email_verified_at)->toBeNull();
 
         Notification::assertSentTo($user, WelcomeNotification::class);
+    });
+
+    it('can create a user with avatar', function () {
+        Notification::fake();
+
+        Storage::fake('public');
+        Storage::disk('public')->put('avatars/users/avatar-user.webp', 'avatar');
+
+        Livewire::test(CreateUser::class)
+            ->fillForm([
+                'name' => 'Avatar User',
+                'email' => 'avatar-user@example.com',
+                'avatar_path' => ['avatars/users/avatar-user.webp'],
+                'role' => UserRole::Admin->value,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $user = User::where('email', 'avatar-user@example.com')->first();
+
+        expect($user)->not->toBeNull()
+            ->and($user->avatar_path)->toBe('avatars/users/avatar-user.webp')
+            ->and($user->getFilamentAvatarUrl())->toContain('avatars/users/avatar-user.webp');
     });
 
     it('can create a user with editor role', function () {
@@ -251,6 +276,54 @@ describe('edit page', function () {
 
         expect($user->name)->toBe('Upravený')
             ->and($user->email)->toBe('upraveny@example.com');
+    });
+
+    it('can update user avatar', function () {
+        $user = User::factory()->create();
+        $user->assignRole(UserRole::Admin->value);
+
+        Storage::fake('public');
+        Storage::disk('public')->put('avatars/users/updated-avatar.webp', 'avatar');
+
+        Livewire::test(EditUser::class, ['record' => $user->getRouteKey()])
+            ->fillForm([
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar_path' => ['avatars/users/updated-avatar.webp'],
+                'role' => UserRole::Admin->value,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $user->refresh();
+
+        expect($user->avatar_path)->toBe('avatars/users/updated-avatar.webp')
+            ->and($user->getFilamentAvatarUrl())->toContain('avatars/users/updated-avatar.webp');
+    });
+
+    it('deletes previous avatar file when avatar changes', function () {
+        Storage::fake('public');
+
+        Storage::disk('public')->put('avatars/users/original-avatar.webp', 'old-avatar');
+        Storage::disk('public')->put('avatars/users/new-avatar.webp', 'new-avatar');
+
+        $user = User::factory()->create([
+            'avatar_path' => 'avatars/users/original-avatar.webp',
+        ]);
+        $user->assignRole(UserRole::Admin->value);
+
+        Livewire::test(EditUser::class, ['record' => $user->getRouteKey()])
+            ->fillForm([
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar_path' => ['avatars/users/new-avatar.webp'],
+                'role' => UserRole::Admin->value,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        Storage::disk('public')->assertMissing('avatars/users/original-avatar.webp');
+        Storage::disk('public')->assertExists('avatars/users/new-avatar.webp');
     });
 
     it('can change a user role', function () {
@@ -470,5 +543,32 @@ describe('access control', function () {
 
         $this->get(UserResource::getUrl('edit', ['record' => $this->admin]))
             ->assertForbidden();
+    });
+});
+
+describe('profile page', function () {
+    it('can render the custom profile page', function () {
+        $this->get('/mpcp/profile')
+            ->assertSuccessful()
+            ->assertSee('Avatar');
+    });
+
+    it('can save an avatar from the profile page', function () {
+        Storage::fake('public');
+        Storage::disk('public')->put('avatars/users/profile-avatar.webp', 'avatar');
+
+        Livewire::test(ProfilePage::class)
+            ->fillForm([
+                'name' => $this->admin->name,
+                'email' => $this->admin->email,
+                'avatar_path' => ['avatars/users/profile-avatar.webp'],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->admin->refresh();
+
+        expect($this->admin->avatar_path)->toBe('avatars/users/profile-avatar.webp')
+            ->and($this->admin->getFilamentAvatarUrl())->toContain('avatars/users/profile-avatar.webp');
     });
 });

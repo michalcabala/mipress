@@ -14,7 +14,7 @@
     }
 
     if (!$src) {
-      $src = $item->url;
+            $src = mipress_media_path_url($item->path ?? null) ?? $item->url;
     }
 @endphp
 

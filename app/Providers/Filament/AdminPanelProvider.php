@@ -2,8 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\EditProfile as UserEditProfile;
 use App\Http\Middleware\SetAdminLocale;
 use Awcodes\Curator\CuratorPlugin;
+use Blendbyte\FilamentResourceLock\ResourceLockPlugin;
+use Filament\Actions\Action;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -15,6 +18,9 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentView;
+use Filament\Tables\Enums\ColumnManagerLayout;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Table;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -33,6 +39,14 @@ class AdminPanelProvider extends PanelProvider
 {
     public function boot(): void
     {
+        Table::configureUsing(function (Table $table): void {
+            $table
+                ->filtersLayout(FiltersLayout::Modal)
+                ->filtersTriggerAction(fn (Action $action): Action => $action->slideOver())
+                ->columnManagerLayout(ColumnManagerLayout::Modal)
+                ->columnManagerTriggerAction(fn (Action $action): Action => $action->slideOver());
+        });
+
         FilamentView::registerRenderHook(
             PanelsRenderHook::USER_MENU_BEFORE,
             fn (): string => view('mipress::filament.site-menu', [
@@ -50,7 +64,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->passwordReset()
-            ->profile()
+            ->profile(UserEditProfile::class)
             ->emailVerification()
             ->multiFactorAuthentication([
                 EmailAuthentication::make(),
@@ -72,6 +86,18 @@ class AdminPanelProvider extends PanelProvider
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
             ->plugin(SocialFeedsPlugin::make())
+            ->plugin(
+                ResourceLockPlugin::make()
+                    ->displayResourceLockOwner()
+                    ->usesPollingToDetectPresence()
+                    ->presencePollingInterval(30)
+                    ->pollingVisible()
+                    ->unlockerLimitedAccess()
+                    ->unlockerGate('forceUnlockResourceLock')
+                    ->limitedAccessToResourceLockManager()
+                    ->gate('forceUnlockResourceLock')
+                    ->registerNavigation(false)
+            )
             ->plugin(
                 CuratorPlugin::make()
                     ->label('Médium')

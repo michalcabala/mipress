@@ -2,14 +2,14 @@
 
 ## Project Overview
 
-miPress is a modular CMS built as a **Laravel package** (`mipress/core`) installed via Composer into a Laravel skeleton project. It is NOT a standalone Laravel application — all code lives in `packages/` or `src/` and is registered via a ServiceProvider.
+miPress is a modular CMS built primarily as a **set of Laravel packages** (`mipress/core`, `mipress/forms`, `mipress/social-feeds`) installed via Composer into a Laravel skeleton project. It is NOT a standalone package-only repository — reusable domain code lives primarily in `packages/`, while the Laravel skeleton in `app/` wires panel, provider, and host-app integration.
 
 ## Tech Stack
 
 - **PHP 8.3+** with strict types, readonly properties, enums, named arguments, and PHP 8 attributes where Laravel 13 supports them
 - **Laravel 13** — use current L13 conventions (e.g. `#[Table]`, `#[Fillable]` attributes are optional but preferred for new code)
 - **Filament 5** — admin panel at `/mpcp`, panel ID `admin`
-- **Livewire 3** — for interactive frontend components
+- **Livewire 4** — for interactive frontend components
 - **Blade** — templating engine, no Inertia/Vue/React
 - **Tailwind CSS 4** — for frontend styling
 - **Pest PHP** — for all tests, never PHPUnit syntax
@@ -25,13 +25,14 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 
 ## Package Development Rules
 
-- This is a **Laravel package**, not an application. All classes belong under the `MiPress\Core` namespace.
+- This is a package-driven Laravel project, not a standalone package-only repository.
+- Core package classes belong under the `MiPress\Core` namespace. Other packages use their own namespaces such as `MiPress\Forms`.
 - The ServiceProvider is `MiPress\Core\MiPressServiceProvider`.
 - Migrations are loaded from the package's `database/migrations/` directory via `loadMigrationsFrom()`.
 - Config is published from `config/mipress.php`.
 - Views are registered under the `mipress` namespace: `view('mipress::template.name')`.
 - Routes are loaded from the package's `routes/` directory.
-- All Filament Resources, Pages, and Widgets are auto-discovered from the package's `src/Filament/` directory.
+- Package Filament Resources, Pages, and Widgets are auto-discovered from package `src/Filament/` directories, while the host app may also register `app/Filament/*` classes.
 
 ## Coding Conventions
 
@@ -62,11 +63,14 @@ miPress is a modular CMS built as a **Laravel package** (`mipress/core`) install
 - Use Filament's built-in form components — do NOT create custom components unless absolutely necessary.
 - Use `Section`, `Grid`, and `Tabs` for form layout.
 - Use Curator's `CuratorPicker` for all image/file fields, never `FileUpload`.
-- Use Mason's `Mason` field for the primary Entry content blocks — never use `RichEditor` or any WYSIWYG for free-form content editing.
+- Use Mason's `Mason` field for the base content editor on Entries and Pages. In Entries it is stored at `data.content`; Blueprint fields are additional custom fields rendered alongside Mason.
+- Blueprint field types are registered through `FieldTypeRegistry` and rendered via `BlueprintFieldResolver`; extend that system instead of adding ad-hoc type switches in forms or tables.
+- Blueprint field definitions may include table-display settings such as `show_in_table`, `searchable`, and `sortable`, which drive dynamic Entry table columns and filters.
 - Blueprint custom field definitions may use `RichEditor` when the user selects the `richtext` field type — this is intentional for simple inline fields inside Blueprint-driven forms.
 - Translatable fields use custom `TranslatableField::make()` helper that wraps content in Filament Tabs with locale flags.
 - Use Font Awesome icon identifiers everywhere (`fal-*`, `far-*`, `fas-*`, `fab-*`). Do not use Heroicons in new or updated code.
 - Labels and navigation in Czech: Sekce (Collection), Šablona (Template), Třídění (Taxonomy), Štítek (Term), Položka (Entry).
+- If breadcrumbs should be hidden only on index tables, override `getBreadcrumbs(): array` on the specific `ListRecords` page instead of disabling breadcrumbs globally in the panel provider.
 
 ## Testing
 

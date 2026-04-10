@@ -1,5 +1,16 @@
 # Blueprint-driven Settings — Analysis
 
+## Aktualizace stavu k 10. dubna 2026
+
+Tento dokument vznikl jako návrh cílového řešení. K dnešnímu stavu už jsou hlavní části settings architektury implementované:
+
+- Migrace `2026_04_06_120000_restructure_settings_table_for_blueprints.php` už převádí původní key-value `settings` tabulku na strukturu `id`, `handle`, `name`, `blueprint_id`, `data`, `icon`, `sort_order`.
+- `SettingsManager` už existuje a načítá settings z nové tabulky včetně vazby na Blueprint.
+- Filament stránka `EditSettings` už existuje a renderuje settings formuláře dynamicky přes `BlueprintFieldResolver`.
+- Helper `settings()` je primární přístupová cesta; `global_set()` je nyní jen kompatibilní wrapper delegující na settings.
+- `GlobalSeoSettings` a `GlobalSeoSettingsManager` zůstávají jako specializovaná SEO vrstva vedle obecných Blueprint-driven settings.
+- `GlobalSetResource` je v kódu stále přítomen, takže dřívější plán na úplné odstranění legacy global sets je jen částečně dokončený.
+
 ## 1) Blueprint model and `fields` structure
 
 File: `packages/mipress/core/src/Models/Blueprint.php`

@@ -9,8 +9,11 @@ use MiPress\Core\Filament\Pages\BotlyPage;
 use MiPress\Core\Filament\Pages\GlobalSeoSettings;
 use MiPress\Core\Filament\Pages\SitemapSettings;
 
-beforeEach(function () {
-    $this->seed(PermissionSeeder::class);
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\seed;
+
+beforeEach(function (): void {
+    seed(PermissionSeeder::class);
 });
 
 describe('seo tools authorization', function () {
@@ -18,15 +21,15 @@ describe('seo tools authorization', function () {
         $contributor = User::factory()->create();
         $contributor->assignRole(UserRole::Contributor->value);
 
-        $this->actingAs($contributor)
+        actingAs($contributor)
             ->get(GlobalSeoSettings::getUrl())
             ->assertForbidden();
 
-        $this->actingAs($contributor)
+        actingAs($contributor)
             ->get(BotlyPage::getUrl())
             ->assertForbidden();
 
-        $this->actingAs($contributor)
+        actingAs($contributor)
             ->get(SitemapSettings::getUrl())
             ->assertForbidden();
     });
@@ -35,15 +38,15 @@ describe('seo tools authorization', function () {
         $editor = User::factory()->create();
         $editor->assignRole(UserRole::Editor->value);
 
-        $this->actingAs($editor)
+        actingAs($editor)
             ->get(GlobalSeoSettings::getUrl())
             ->assertForbidden();
 
-        $this->actingAs($editor)
+        actingAs($editor)
             ->get(BotlyPage::getUrl())
             ->assertForbidden();
 
-        $this->actingAs($editor)
+        actingAs($editor)
             ->get(SitemapSettings::getUrl())
             ->assertForbidden();
     });
@@ -52,7 +55,7 @@ describe('seo tools authorization', function () {
         $admin = User::factory()->create();
         $admin->assignRole(UserRole::Admin->value);
 
-        $this->actingAs($admin);
+        actingAs($admin);
 
         expect(GlobalSeoSettings::canAccess())->toBeTrue()
             ->and(BotlyPage::canAccess())->toBeTrue()

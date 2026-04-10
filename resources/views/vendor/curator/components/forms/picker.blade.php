@@ -28,7 +28,7 @@
                 >
                     @if ($shouldDisplayAsList)
                         <div class="w-full flex items-center gap-4 text-xs pe-2">
-                            <div class="curator-picker-list-preview flex-shrink-0 h-12 w-12 checkered">
+                            <div class="curator-picker-list-preview shrink-0 h-12 w-12 checkered">
                                 <x-curator::display
                                     :item="$item"
                                     :src="$item['thumbnail_url']"
@@ -39,10 +39,10 @@
                             <div class="curator-picker-list-details min-w-0 overflow-hidden py-2">
                                 <p>{{ $item['pretty_name'] }}</p>
                             </div>
-                            <div class="curator-picker-list-details flex-shrink-0 ml-auto py-2">
+                            <div class="curator-picker-list-details shrink-0 ml-auto py-2">
                                 <p>{{ curator()->sizeForHumans($item['size']) }}</p>
                             </div>
-                            <div class="curator-picker-list-actions flex-shrink-0">
+                            <div class="curator-picker-list-actions shrink-0">
                                 <div class="relative flex items-center">
                                     @if ($isMultiple)
                                         <div

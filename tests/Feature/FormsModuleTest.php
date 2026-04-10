@@ -19,12 +19,16 @@ use MiPress\Forms\Models\FormSubmission;
 use MiPress\Forms\Models\FormSubmissionAttachment;
 use MiPress\Forms\Notifications\NewFormSubmission;
 
-beforeEach(function () {
-    $this->seed(PermissionSeeder::class);
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\seed;
 
-    $this->admin = User::factory()->create();
-    $this->admin->assignRole(UserRole::SuperAdmin->value);
-    $this->actingAs($this->admin);
+beforeEach(function (): void {
+    seed(PermissionSeeder::class);
+
+    $admin = User::factory()->create();
+    $admin->assignRole(UserRole::SuperAdmin->value);
+
+    actingAs($admin);
 });
 
 function makeForm(array $overrides = []): Form

@@ -26,8 +26,10 @@ use MiPress\Forms\Filament\Resources\FormSubmissionResource;
 use MiPress\Forms\Models\Form;
 use MiPress\Forms\Models\FormSubmission;
 
-beforeEach(function () {
-    $this->seed(PermissionSeeder::class);
+use function Pest\Laravel\seed;
+
+beforeEach(function (): void {
+    seed(PermissionSeeder::class);
 });
 
 describe('production smoke', function () {

@@ -632,6 +632,23 @@ describe('edit page', function () {
             ->and((int) $lockedEntry->resourceLock->user_id)->toBe((int) $this->admin->getKey());
     });
 
+    it('renews entry lock without crashing on polling event', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        $component = Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->dispatch('resourceLockObserver::init')
+            ->dispatch('resourceLockObserver::renewLock');
+
+        $lockedEntry = $entry->fresh()->load('resourceLock');
+
+        expect($lockedEntry->resourceLock)->not->toBeNull()
+            ->and((int) $lockedEntry->resourceLock->user_id)->toBe((int) $this->admin->getKey())
+            ->and($component->instance()->isReadOnly)->toBeFalse();
+    });
+
     it('can cancel entry editing, redirect back to the list and unlock the record', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
@@ -793,17 +810,21 @@ describe('status workflow', function () {
     it('sets scheduled status when publishing with future publish date', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
             'status' => EntryStatus::Draft,
             'published_at' => now()->addHour(),
         ]);
 
         Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
-            ->callAction('publishEntry');
+            ->dispatch('resourceLockObserver::init')
+            ->callAction('publishEntry')
+            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
 
         $entry->refresh();
 
         expect($entry->status)->toBe(EntryStatus::Scheduled)
-            ->and($entry->published_at)->not->toBeNull();
+            ->and($entry->published_at)->not->toBeNull()
+            ->and($entry->resourceLock)->toBeNull();
     });
 
     it('publishes scheduled entry via command when time is due', function () {
@@ -824,17 +845,40 @@ describe('status workflow', function () {
     it('publishes immediately when publish date is empty', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
             'status' => EntryStatus::Draft,
             'published_at' => null,
         ]);
 
         Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
-            ->callAction('publishEntry');
+            ->dispatch('resourceLockObserver::init')
+            ->callAction('publishEntry')
+            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
 
         $entry->refresh();
 
         expect($entry->status)->toBe(EntryStatus::Published)
-            ->and($entry->published_at)->not->toBeNull();
+            ->and($entry->published_at)->not->toBeNull()
+            ->and($entry->resourceLock)->toBeNull();
+    });
+
+    it('shows validation feedback and closes the publish modal when required fields are missing', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Draft,
+        ]);
+
+        $component = Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->fillForm([
+                'title' => null,
+            ])
+            ->callAction('publishEntry')
+            ->assertHasFormErrors(['title' => 'required'])
+            ->assertNotified();
+
+        expect($entry->fresh()->status)->toBe(EntryStatus::Draft)
+            ->and($component->instance()->mountedActions)->toBe([]);
     });
 
     it('keeps backdated publish date when publishing', function () {

@@ -76,6 +76,22 @@ it('locks page when the edit page is mounted', function () {
         ->and((int) $lockedPage->resourceLock->user_id)->toBe((int) $this->admin->getKey());
 });
 
+it('renews page lock without crashing on polling event', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+    ]);
+
+    $component = Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->dispatch('resourceLockObserver::init')
+        ->dispatch('resourceLockObserver::renewLock');
+
+    $lockedPage = $page->fresh()->load('resourceLock');
+
+    expect($lockedPage->resourceLock)->not->toBeNull()
+        ->and((int) $lockedPage->resourceLock->user_id)->toBe((int) $this->admin->getKey())
+        ->and($component->instance()->isReadOnly)->toBeFalse();
+});
+
 it('can cancel page editing, redirect back to the list and unlock the record', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
@@ -90,6 +106,62 @@ it('can cancel page editing, redirect back to the list and unlock the record', f
         ->assertRedirect(PageResource::getUrl('index'));
 
     expect($page->fresh()->resourceLock)->toBeNull();
+});
+
+it('shows validation feedback and closes the publish modal when required fields are missing', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Draft,
+    ]);
+
+    $component = Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'title' => null,
+        ])
+        ->callAction('publishPage')
+        ->assertHasFormErrors(['title' => 'required'])
+        ->assertNotified();
+
+    expect($page->fresh()->status)->toBe(EntryStatus::Draft)
+        ->and($component->instance()->mountedActions)->toBe([]);
+});
+
+it('releases the page lock and redirects after publishing immediately', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Draft,
+        'published_at' => null,
+    ]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->dispatch('resourceLockObserver::init')
+        ->callAction('publishPage')
+        ->assertRedirect(PageResource::getUrl('index'));
+
+    $page->refresh();
+
+    expect($page->status)->toBe(EntryStatus::Published)
+        ->and($page->published_at)->not->toBeNull()
+        ->and($page->resourceLock)->toBeNull();
+});
+
+it('releases the page lock and redirects after scheduling publication', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Draft,
+        'published_at' => now()->addHour(),
+    ]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->dispatch('resourceLockObserver::init')
+        ->callAction('publishPage')
+        ->assertRedirect(PageResource::getUrl('index'));
+
+    $page->refresh();
+
+    expect($page->status)->toBe(EntryStatus::Scheduled)
+        ->and($page->published_at)->not->toBeNull()
+        ->and($page->resourceLock)->toBeNull();
 });
 
 it('filters pages by status and exposes all status options', function () {

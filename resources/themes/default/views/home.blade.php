@@ -44,7 +44,7 @@
                     </p>
                 </article>
 
-                <article class="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-600 to-cyan-500 p-6 text-white shadow-lg shadow-blue-500/25 dark:border-blue-700">
+                <article class="rounded-3xl border border-blue-200 bg-linear-to-br from-blue-600 to-cyan-500 p-6 text-white shadow-lg shadow-blue-500/25 dark:border-blue-700">
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-100">Mason</p>
                     <h2 class="mt-3 text-2xl font-semibold" style="font-family: 'Space Grotesk', sans-serif;">Bricky jsou registrované přes core kolekci a externí balíčky.</h2>
                     <p class="mt-3 text-sm leading-7 text-blue-50/95">

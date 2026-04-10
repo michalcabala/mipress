@@ -2,65 +2,15 @@
 applyTo: "tests/**"
 ---
 
-# Pest PHP Testing Instructions
+# Tests Wrapper Instructions
 
-## Syntax
+Primární pravidla jsou v:
 
-Always use Pest's functional syntax, never PHPUnit classes:
+- `.github/instructions/mipress.instructions.md`
 
-```php
-// CORRECT
-it('creates an entry', function () {
-    $entry = Entry::factory()->create();
+Tento wrapper doplňuje test-specific body:
 
-    expect($entry)->toBeInstanceOf(Entry::class)
-        ->and($entry->title)->not->toBeEmpty();
-});
-
-// WRONG — never use this
-class EntryTest extends TestCase
-{
-    public function test_creates_an_entry()
-    {
-        $this->assertTrue(true);
-    }
-}
-```
-
-## Structure
-
-- Use `describe()` blocks to group related tests.
-- Use `beforeEach()` for shared setup within a describe block.
-- Test file names match: `ModelNameTest.php`, `ResourceNameTest.php`.
-
-## Assertions
-
-Prefer Pest's `expect()` API:
-
-```php
-expect($entry->status)->toBe(EntryStatus::Published);
-expect($entries)->toHaveCount(3);
-expect($response)->toHaveStatus(200);
-expect($entry->slug)->toStartWith('test-');
-```
-
-## Filament Resource Tests
-
-Test Filament resources using Livewire test helpers:
-
-```php
-use function Pest\Livewire\livewire;
-
-it('can render the entry list page', function () {
-    $this->actingAs(User::factory()->create());
-
-    livewire(ListEntries::class)
-        ->assertSuccessful();
-});
-```
-
-## Database
-
-- Use `RefreshDatabase` trait (defined in `Pest.php`).
-- Use factories for all test data, never manual inserts.
-- Test both happy paths and edge cases.
+- Test framework: Pest.
+- Dodržuj existující styl root test suite (`tests/Feature`, `tests/Unit`, `tests/Browser`).
+- Při změnách ve workflow/revisions/taxonomy/social-feeds přidávej cílené regresní testy.
+- Preferuj čitelné názvy testů podle domény (resource/feature behavior), ne generické názvy.

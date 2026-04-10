@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Filament\Notifications\DatabaseNotification as FilamentDatabaseNotification;
+use Filament\Schemas\Components\Section;
+use Filament\Tables\Enums\ColumnManagerLayout;
+use Filament\Tables\Enums\FiltersLayout;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
@@ -73,6 +76,16 @@ describe('list page', function () {
             ->assertCanSeeTableRecords($entries);
     });
 
+    it('shows a resource lock indicator column in the entries list', function () {
+        Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+            ->assertTableColumnExists('resource_lock_state');
+    });
+
     it('can search entries by title', function () {
         $target = Entry::factory()->create([
             'collection_id' => $this->collection->id,
@@ -106,6 +119,132 @@ describe('list page', function () {
             ->assertCanNotSeeTableRecords([$articlesEntry]);
     });
 
+    it('filters entries by status and exposes all status options', function () {
+        $draftEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Draft,
+        ]);
+
+        $publishedEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Published,
+            'published_at' => now()->subMinute(),
+        ]);
+
+        $scheduledEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Scheduled,
+            'published_at' => now()->addHour(),
+        ]);
+
+        $reviewEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::InReview,
+        ]);
+
+        $rejectedEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Rejected,
+        ]);
+
+        $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages']);
+
+        expect($component->instance()->getTable()->getFilter('status')?->getOptions())
+            ->toBe(collect(EntryStatus::cases())
+                ->mapWithKeys(fn (EntryStatus $status): array => [$status->value => $status->getLabel()])
+                ->all());
+
+        $component
+            ->assertTableFilterExists('status')
+            ->filterTable('status', EntryStatus::Published)
+            ->assertCanSeeTableRecords([$publishedEntry])
+            ->assertCanNotSeeTableRecords([$draftEntry, $scheduledEntry, $reviewEntry, $rejectedEntry]);
+    });
+
+    it('shows state links above the table and hides empty statuses', function () {
+        Entry::factory()->count(2)->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Published,
+            'published_at' => now()->subMinute(),
+        ]);
+
+        $trashedEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Published,
+        ]);
+
+        $trashedEntry->delete();
+
+        $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+            ->assertSeeHtml('fi-ta-record-state-links');
+
+        $links = collect($component->instance()->getRecordStateLinks());
+
+        expect($links->pluck('label')->all())->toBe(['Celkem', 'Publikováno', 'Koš'])
+            ->and($links->pluck('count', 'label')->all())->toBe([
+                'Celkem' => 2,
+                'Publikováno' => 2,
+                'Koš' => 1,
+            ])
+            ->and($links->firstWhere('label', 'Celkem')['active'])->toBeTrue()
+            ->and($links->firstWhere('label', 'Publikováno')['url'])->toBe(EntryResource::getUrl('index', [
+                'collection' => 'pages',
+                'filters' => ['status' => ['value' => EntryStatus::Published->value]],
+            ]))
+            ->and($links->firstWhere('label', 'Koš')['url'])->toBe(EntryResource::getUrl('index', [
+                'collection' => 'pages',
+                'filters' => ['trashed' => ['value' => 0]],
+            ]));
+    });
+
+    it('shows deleted entries only in trash tab and removes the trashed table filter', function () {
+        $activeEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        $trashedEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        $trashedEntry->delete();
+
+        $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages']);
+
+        $component->assertTableFilterExists('trashed');
+
+        $component
+            ->assertCanSeeTableRecords([$activeEntry])
+            ->assertCanNotSeeTableRecords([$trashedEntry])
+            ->filterTable('trashed', false)
+            ->assertCanSeeTableRecords([$trashedEntry])
+            ->assertCanNotSeeTableRecords([$activeEntry]);
+    });
+
+    it('uses slideover modals globally for filters and column visibility', function () {
+        $table = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+            ->instance()
+            ->getTable();
+
+        $schema = $table->getFiltersFormSchema();
+
+        expect($table->getFiltersLayout())->toBe(FiltersLayout::Modal)
+            ->and($table->getFiltersTriggerAction()->isModalSlideOver())->toBeTrue()
+            ->and($table->getColumnManagerLayout())->toBe(ColumnManagerLayout::Modal)
+            ->and($table->getColumnManagerTriggerAction()->isModalSlideOver())->toBeTrue()
+            ->and($table->getFilter('created_at', true))->toBeNull()
+            ->and($table->getFilter('status', true))->not->toBeNull()
+            ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní', 'Stav']);
+    });
+
     it('shows dynamic taxonomy columns and filters for selected collection', function () {
         $taxonomy = Taxonomy::create([
             'title' => 'Kategorie',
@@ -127,10 +266,17 @@ describe('list page', function () {
 
         $entry->terms()->attach($term->id);
 
-        Livewire::test(ListEntries::class, ['collection' => 'pages'])
+        $component = Livewire::test(ListEntries::class, ['collection' => 'pages']);
+
+        $component
             ->assertTableColumnExists('taxonomy_'.$taxonomy->id)
             ->assertTableFilterExists('taxonomy_'.$taxonomy->id)
             ->assertCanSeeTableRecords([$entry]);
+
+        expect(array_map(
+            fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(),
+            $component->instance()->getTable()->getFiltersFormSchema(),
+        ))->toContain('Taxonomie');
     });
 
     it('can filter entries by dynamic taxonomy filter', function () {
@@ -260,6 +406,16 @@ describe('create page', function () {
             ->and($entry->title)->toBe('Nová stránka')
             ->and($entry->collection_id)->toBe($this->collection->id)
             ->and($entry->blueprint_id)->toBe($this->blueprint->id);
+    });
+
+    it('can cancel entry creation and return to the collection index', function () {
+        Livewire::withQueryParams(['collection' => 'pages'])
+            ->test(CreateEntry::class)
+            ->fillForm([
+                'title' => 'Rozpracovaná položka',
+            ])
+            ->callAction('cancel')
+            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
     });
 
     it('can create a child entry in hierarchical collection', function () {
@@ -459,6 +615,38 @@ describe('edit page', function () {
                 'title' => 'Existující stránka',
                 'slug' => 'existujici-stranka',
             ]);
+    });
+
+    it('locks entry when the edit page is mounted', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->dispatch('resourceLockObserver::init');
+
+        $lockedEntry = $entry->fresh()->load('resourceLock');
+
+        expect($lockedEntry->resourceLock)->not->toBeNull()
+            ->and((int) $lockedEntry->resourceLock->user_id)->toBe((int) $this->admin->getKey());
+    });
+
+    it('can cancel entry editing, redirect back to the list and unlock the record', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->dispatch('resourceLockObserver::init')
+            ->fillForm([
+                'title' => 'Rozpracovaná změna',
+            ])
+            ->callAction('cancel')
+            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
+
+        expect($entry->fresh()->resourceLock)->toBeNull();
     });
 
     it('can update entry title', function () {

@@ -8,6 +8,7 @@ use MiPress\Core\Enums\EntryStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Pages\BotlyPage;
 use MiPress\Core\Filament\Pages\EditSettings;
+use MiPress\Core\Filament\Pages\GlobalSeoSettings;
 use MiPress\Core\Filament\Pages\SitemapSettings;
 use MiPress\Core\Filament\Resources\BlueprintResource;
 use MiPress\Core\Filament\Resources\CollectionResource;
@@ -38,7 +39,7 @@ describe('production smoke', function () {
             'published_at' => now(),
         ]);
 
-        Setting::putValue('site.homepage_page_id', (string) $homepage->getKey());
+        Setting::putValue('general.homepage_page_id', (string) $homepage->getKey());
 
         $this->get('/')->assertSuccessful();
         $this->get('/theme-files/default/assets/css/theme.css')->assertSuccessful();
@@ -80,6 +81,7 @@ describe('production smoke', function () {
             TaxonomyResource::getUrl('index'),
             TermResource::getUrl('index'),
             EditSettings::getUrl(['handle' => 'general']),
+            GlobalSeoSettings::getUrl(),
             FormResource::getUrl('index'),
             FormSubmissionResource::getUrl('index'),
             FormNotificationSettings::getUrl(),

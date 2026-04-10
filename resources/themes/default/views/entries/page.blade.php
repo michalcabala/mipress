@@ -8,6 +8,7 @@
         $heroExcerpt = $entry->data['perex'] ?? $entry->data['excerpt'] ?? null;
         $bodyFallbackKeys = ['meta_title', 'meta_description', 'excerpt', 'perex', 'intro', 'summary', 'category', 'reading_time', 'content'];
         $entryUrl = mipress_entry_url($entry);
+        $heroImageUrl = mipress_media_url($entry->featuredImage, 'hero');
     @endphp
 
     <article class="pb-20 pt-14 sm:pt-18">
@@ -50,9 +51,9 @@
                 </div>
 
                 <div>
-                    @if ($entry->featuredImage?->url)
+                    @if ($heroImageUrl)
                         <img
-                            src="{{ $entry->featuredImage->url }}"
+                            src="{{ $heroImageUrl }}"
                             alt="{{ $entry->title }}"
                             class="h-full max-h-107.5 w-full rounded-3xl border border-slate-200 object-cover shadow-lg shadow-slate-300/30 dark:border-slate-800 dark:shadow-none"
                         >

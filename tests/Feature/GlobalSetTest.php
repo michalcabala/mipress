@@ -3,11 +3,19 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Filament\FilamentManager;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
+use MiPress\Core\Filament\Clusters\SeoCluster;
+use MiPress\Core\Filament\Clusters\WebCluster;
+use MiPress\Core\Filament\Pages\BotlyPage;
 use MiPress\Core\Filament\Pages\EditSettings;
+use MiPress\Core\Filament\Pages\GlobalSeoSettings;
+use MiPress\Core\Filament\Pages\SitemapSettings;
+use MiPress\Core\Filament\Pages\ThemeSettings;
+use MiPress\Core\Filament\Resources\GlobalSetResource;
 use MiPress\Core\Models\Blueprint;
 use MiPress\Core\Models\Setting;
 use MiPress\Core\Services\SettingsManager;
@@ -166,4 +174,139 @@ it('denies settings page access for editor role', function () {
     $setting = Setting::factory()->create(['handle' => 'contact']);
 
     expect(EditSettings::canAccess())->toBeFalse();
+});
+
+it('groups web settings into the web cluster and hides scripts from subnavigation', function () {
+    $this->seed(PermissionSeeder::class);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::SuperAdmin->value);
+    $this->actingAs($user);
+
+    Setting::factory()->create([
+        'handle' => 'general',
+        'name' => 'Obecné',
+        'sort_order' => 10,
+    ]);
+
+    Setting::factory()->create([
+        'handle' => 'scripts',
+        'name' => 'Skripty',
+        'sort_order' => 20,
+    ]);
+
+    Setting::factory()->create([
+        'handle' => 'site',
+        'name' => 'Web',
+        'sort_order' => 30,
+    ]);
+
+    $labels = collect(EditSettings::getNavigationItems())
+        ->map(fn ($item) => $item->getLabel())
+        ->all();
+
+    expect(EditSettings::getCluster())->toBe(WebCluster::class)
+        ->and(ThemeSettings::getCluster())->toBe(WebCluster::class)
+        ->and($labels)->toContain('Obecné')
+        ->and($labels)->not->toContain('Web')
+        ->and($labels)->not->toContain('Skripty');
+
+    $this->get(EditSettings::getUrl(['handle' => 'site']))
+        ->assertNotFound();
+});
+
+it('keeps seo out of generic settings navigation and exposes the dedicated global seo page', function () {
+    $this->seed(PermissionSeeder::class);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::SuperAdmin->value);
+    $this->actingAs($user);
+
+    Setting::factory()->create([
+        'handle' => 'general',
+        'name' => 'Obecné',
+        'icon' => 'fal-globe',
+        'sort_order' => 10,
+    ]);
+
+    Setting::factory()->create([
+        'handle' => 'seo',
+        'name' => 'SEO',
+        'icon' => 'fal-search',
+        'sort_order' => 20,
+    ]);
+
+    app(SettingsManager::class)->flush();
+
+    $labels = collect(EditSettings::getNavigationItems())
+        ->map(fn ($item) => $item->getLabel())
+        ->all();
+
+    $this->get(GlobalSeoSettings::getUrl())
+        ->assertSuccessful();
+
+    $this->get(EditSettings::getUrl(['handle' => 'seo']))
+        ->assertNotFound();
+
+    expect($labels)->not->toContain('SEO')
+        ->and(GlobalSeoSettings::getCluster())->toBe(SeoCluster::class)
+        ->and(BotlyPage::getCluster())->toBe(SeoCluster::class)
+        ->and(SitemapSettings::getCluster())->toBe(SeoCluster::class);
+});
+
+it('orders seo cluster navigation as global seo, robots and sitemap', function () {
+    $sorts = collect([
+        GlobalSeoSettings::class,
+        BotlyPage::class,
+        SitemapSettings::class,
+    ])->mapWithKeys(fn (string $page): array => [
+        $page => (new ReflectionClass($page))->getDefaultProperties()['navigationSort'] ?? null,
+    ]);
+
+    expect($sorts->all())->toBe([
+        GlobalSeoSettings::class => 10,
+        BotlyPage::class => 20,
+        SitemapSettings::class => 30,
+    ]);
+});
+
+it('uses the dedicated global seo page instead of the legacy dynamic seo settings route', function () {
+    $this->seed(PermissionSeeder::class);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::SuperAdmin->value);
+    $this->actingAs($user);
+
+    Setting::factory()->create([
+        'handle' => 'seo',
+        'name' => 'SEO',
+        'data' => [
+            'metadata' => [
+                'default_title' => 'MiPress Studio',
+            ],
+        ],
+    ]);
+
+    Livewire::test(GlobalSeoSettings::class)
+        ->assertSuccessful();
+
+    $this->get(GlobalSeoSettings::getUrl())
+        ->assertSuccessful()
+        ->assertSee('Globální SEO')
+        ->assertSee('Google site verification');
+});
+
+it('does not register legacy global set resource in the admin panel', function () {
+    $this->seed(PermissionSeeder::class);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::SuperAdmin->value);
+    $this->actingAs($user);
+
+    $resources = collect(app(FilamentManager::class)->getDefaultPanel()->getResources());
+
+    expect($resources)->not->toContain(GlobalSetResource::class);
+
+    $this->get('/'.trim((string) config('mipress.admin_path', 'mpcp'), '/').'/global-sets')
+        ->assertNotFound();
 });

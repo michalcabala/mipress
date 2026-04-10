@@ -88,18 +88,6 @@ class SettingsSeeder extends Seeder
                                 'config' => ['placeholder' => ' | Název webu'],
                             ],
                             ['handle' => 'meta_description', 'label' => 'Výchozí meta popis', 'type' => 'textarea'],
-                            [
-                                'handle' => 'robots',
-                                'label' => 'Robots',
-                                'type' => 'select',
-                                'config' => [
-                                    'options' => [
-                                        'index, follow' => 'index, follow',
-                                        'noindex, nofollow' => 'noindex, nofollow',
-                                        'noindex, follow' => 'noindex, follow',
-                                    ],
-                                ],
-                            ],
                         ],
                     ],
                 ],
@@ -155,7 +143,7 @@ class SettingsSeeder extends Seeder
 
         Setting::query()->updateOrCreate(
             ['handle' => 'seo'],
-            ['name' => 'SEO', 'blueprint_id' => $seoBlueprint->id, 'icon' => 'fal-search', 'sort_order' => 40, 'data' => []],
+            ['name' => 'SEO', 'blueprint_id' => $seoBlueprint->id, 'icon' => 'fal-magnifying-glass', 'sort_order' => 40, 'data' => []],
         );
 
         Setting::query()->updateOrCreate(

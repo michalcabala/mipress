@@ -6,6 +6,7 @@ use App\Models\User;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Pages\BotlyPage;
+use MiPress\Core\Filament\Pages\GlobalSeoSettings;
 use MiPress\Core\Filament\Pages\SitemapSettings;
 
 beforeEach(function () {
@@ -16,6 +17,10 @@ describe('seo tools authorization', function () {
     it('forbids contributor from robots and sitemap pages', function () {
         $contributor = User::factory()->create();
         $contributor->assignRole(UserRole::Contributor->value);
+
+        $this->actingAs($contributor)
+            ->get(GlobalSeoSettings::getUrl())
+            ->assertForbidden();
 
         $this->actingAs($contributor)
             ->get(BotlyPage::getUrl())
@@ -29,6 +34,10 @@ describe('seo tools authorization', function () {
     it('forbids editor from robots and sitemap pages', function () {
         $editor = User::factory()->create();
         $editor->assignRole(UserRole::Editor->value);
+
+        $this->actingAs($editor)
+            ->get(GlobalSeoSettings::getUrl())
+            ->assertForbidden();
 
         $this->actingAs($editor)
             ->get(BotlyPage::getUrl())
@@ -45,7 +54,8 @@ describe('seo tools authorization', function () {
 
         $this->actingAs($admin);
 
-        expect(BotlyPage::canAccess())->toBeTrue()
+        expect(GlobalSeoSettings::canAccess())->toBeTrue()
+            ->and(BotlyPage::canAccess())->toBeTrue()
             ->and(SitemapSettings::canAccess())->toBeTrue();
     });
 });

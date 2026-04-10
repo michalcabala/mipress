@@ -22,11 +22,26 @@ test('the homepage renders the configured published entry', function () {
         'published_at' => now(),
     ]);
 
-    Setting::putValue('site.homepage_page_id', (string) $page->getKey());
+    Setting::putValue('general.homepage_page_id', (string) $page->getKey());
 
     $this->get('/')
         ->assertOk()
         ->assertSee('Domovská stránka');
+});
+
+test('the homepage still resolves the legacy site homepage setting during the transition', function () {
+    $page = Page::factory()->create([
+        'title' => 'Legacy homepage',
+        'slug' => 'legacy-homepage',
+        'status' => EntryStatus::Published,
+        'published_at' => now(),
+    ]);
+
+    Setting::putValue('site.homepage_page_id', (string) $page->getKey());
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('Legacy homepage');
 });
 
 test('theme assets are served without requiring a published public symlink', function () {

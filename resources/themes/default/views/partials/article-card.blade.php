@@ -1,6 +1,7 @@
 @php
     $entryUrl = mipress_entry_url($entry);
     $isFeature = ($variant ?? 'default') === 'feature';
+    $featuredImageUrl = mipress_media_url($entry->featuredImage, 'card');
 @endphp
 
 @if ($entryUrl)
@@ -10,8 +11,8 @@
         'border-slate-200 dark:border-slate-800' => ! $isFeature,
     ])>
         <a href="{{ url($entryUrl) }}" class="block overflow-hidden">
-            @if ($entry->featuredImage?->url)
-                <img src="{{ $entry->featuredImage->url }}" alt="{{ $entry->title }}" class="h-56 w-full object-cover transition duration-500 group-hover:scale-105 {{ $isFeature ? 'md:h-72' : '' }}">
+            @if ($featuredImageUrl)
+                <img src="{{ $featuredImageUrl }}" alt="{{ $entry->title }}" class="h-56 w-full object-cover transition duration-500 group-hover:scale-105 {{ $isFeature ? 'md:h-72' : '' }}">
             @else
                 <span class="block h-56 w-full bg-linear-to-br from-blue-500 to-cyan-400 {{ $isFeature ? 'md:h-72' : '' }}"></span>
             @endif

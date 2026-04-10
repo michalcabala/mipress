@@ -31,9 +31,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasEmailA
     use InteractsWithEmailAuthentication;
     use Notifiable;
 
-    /** @var array<int, string> */
-    protected $with = ['roles'];
-
     protected static function booted(): void
     {
         static::updating(function (self $user): void {

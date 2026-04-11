@@ -37,6 +37,33 @@ jobs:
       - name: Prepare environment
         run: cp .env.example .env
 
+      - name: Checkout local path packages
+        env:
+          MIPRESS_PACKAGES_TOKEN: ${{ secrets.MIPRESS_PACKAGES_TOKEN }}
+        run: |
+          set -e
+          mkdir -p packages/mipress
+
+          clone_package() {
+            repo="$1"
+            path="$2"
+
+            if [ -f "$path/composer.json" ]; then
+              echo "Package already available at $path"
+              return
+            fi
+
+            if [ -n "$MIPRESS_PACKAGES_TOKEN" ]; then
+              git clone --depth=1 "https://x-access-token:${MIPRESS_PACKAGES_TOKEN}@github.com/michalcabala/${repo}.git" "$path"
+            else
+              git clone --depth=1 "https://github.com/michalcabala/${repo}.git" "$path"
+            fi
+          }
+
+          clone_package mipress-core packages/mipress/core
+          clone_package mipress-forms packages/mipress/forms
+          clone_package mipress-social-feeds packages/mipress/social-feeds
+
       - name: Install PHP dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
@@ -68,6 +95,33 @@ jobs:
 
       - name: Prepare environment
         run: cp .env.example .env
+
+      - name: Checkout local path packages
+        env:
+          MIPRESS_PACKAGES_TOKEN: ${{ secrets.MIPRESS_PACKAGES_TOKEN }}
+        run: |
+          set -e
+          mkdir -p packages/mipress
+
+          clone_package() {
+            repo="$1"
+            path="$2"
+
+            if [ -f "$path/composer.json" ]; then
+              echo "Package already available at $path"
+              return
+            fi
+
+            if [ -n "$MIPRESS_PACKAGES_TOKEN" ]; then
+              git clone --depth=1 "https://x-access-token:${MIPRESS_PACKAGES_TOKEN}@github.com/michalcabala/${repo}.git" "$path"
+            else
+              git clone --depth=1 "https://github.com/michalcabala/${repo}.git" "$path"
+            fi
+          }
+
+          clone_package mipress-core packages/mipress/core
+          clone_package mipress-forms packages/mipress/forms
+          clone_package mipress-social-feeds packages/mipress/social-feeds
 
       - name: Install PHP dependencies
         run: composer install --prefer-dist --no-interaction --no-progress

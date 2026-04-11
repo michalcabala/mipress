@@ -120,7 +120,7 @@ describe('list page', function () {
             ->assertCanNotSeeTableRecords([$articlesEntry]);
     });
 
-    it('filters entries by status and exposes all status options', function () {
+    it('filters entries by status tabs and exposes deferred badges for all state enums', function () {
         $draftEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
@@ -155,19 +155,22 @@ describe('list page', function () {
 
         $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages']);
 
-        expect($component->instance()->getTable()->getFilter('status')?->getOptions())
-            ->toBe(collect(EntryStatus::cases())
-                ->mapWithKeys(fn (EntryStatus $status): array => [$status->value => $status->getLabel()])
-                ->all());
+        $tabs = $component->instance()->getCachedTabs();
+
+        expect(array_keys($tabs))->toBe(['all', 'draft', 'in_review', 'published', 'scheduled', 'rejected', 'trashed'])
+            ->and($tabs['all']->getBadge())->toBe(5)
+            ->and($tabs['all']->isBadgeDeferred())->toBeTrue()
+            ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(1)
+            ->and($tabs[EntryStatus::Published->value]->getBadgeColor())->toBe('success')
+            ->and($tabs[EntryStatus::Published->value]->isBadgeDeferred())->toBeTrue();
 
         $component
-            ->assertTableFilterExists('status')
-            ->filterTable('status', EntryStatus::Published)
+            ->set('activeTab', EntryStatus::Published->value)
             ->assertCanSeeTableRecords([$publishedEntry])
             ->assertCanNotSeeTableRecords([$draftEntry, $scheduledEntry, $reviewEntry, $rejectedEntry]);
     });
 
-    it('shows state links above the table and hides empty statuses', function () {
+    it('renders state tabs instead of the legacy record state links row', function () {
         Entry::factory()->count(2)->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
@@ -184,25 +187,13 @@ describe('list page', function () {
         $trashedEntry->delete();
 
         $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
-            ->assertSeeHtml('fi-ta-record-state-links');
+            ->assertDontSeeHtml('fi-ta-record-state-links');
 
-        $links = collect($component->instance()->getRecordStateLinks());
+        $tabs = $component->instance()->getCachedTabs();
 
-        expect($links->pluck('label')->all())->toBe(['Celkem', 'Publikováno', 'Koš'])
-            ->and($links->pluck('count', 'label')->all())->toBe([
-                'Celkem' => 2,
-                'Publikováno' => 2,
-                'Koš' => 1,
-            ])
-            ->and($links->firstWhere('label', 'Celkem')['active'])->toBeTrue()
-            ->and($links->firstWhere('label', 'Publikováno')['url'])->toBe(EntryResource::getUrl('index', [
-                'collection' => 'pages',
-                'filters' => ['status' => ['value' => EntryStatus::Published->value]],
-            ]))
-            ->and($links->firstWhere('label', 'Koš')['url'])->toBe(EntryResource::getUrl('index', [
-                'collection' => 'pages',
-                'filters' => ['trashed' => ['value' => 0]],
-            ]));
+        expect($tabs['all']->getBadge())->toBe(2)
+            ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(2)
+            ->and($tabs['trashed']->getBadge())->toBe(1);
     });
 
     it('shows deleted entries only in trash tab and removes the trashed table filter', function () {
@@ -220,14 +211,15 @@ describe('list page', function () {
 
         $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages']);
 
-        $component->assertTableFilterExists('trashed');
+        expect($component->instance()->getTable()->getFilter('trashed', true))->toBeNull();
 
         $component
-            ->assertCanSeeTableRecords([$activeEntry])
-            ->assertCanNotSeeTableRecords([$trashedEntry])
-            ->filterTable('trashed', false)
+            ->set('activeTab', 'trashed')
             ->assertCanSeeTableRecords([$trashedEntry])
-            ->assertCanNotSeeTableRecords([$activeEntry]);
+            ->assertCanNotSeeTableRecords([$activeEntry])
+            ->set('activeTab', 'all')
+            ->assertCanSeeTableRecords([$activeEntry])
+            ->assertCanNotSeeTableRecords([$trashedEntry]);
     });
 
     it('uses slideover modals globally for filters and column visibility', function () {
@@ -242,8 +234,9 @@ describe('list page', function () {
             ->and($table->getColumnManagerLayout())->toBe(ColumnManagerLayout::Modal)
             ->and($table->getColumnManagerTriggerAction()->isModalSlideOver())->toBeTrue()
             ->and($table->getFilter('created_at', true))->toBeNull()
-            ->and($table->getFilter('status', true))->not->toBeNull()
-            ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní', 'Stav']);
+            ->and($table->getFilter('status', true))->toBeNull()
+            ->and($table->getFilter('trashed', true))->toBeNull()
+            ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní']);
     });
 
     it('shows dynamic taxonomy columns and filters for selected collection', function () {

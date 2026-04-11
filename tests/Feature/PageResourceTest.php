@@ -264,7 +264,7 @@ it('clears rejection note when page is saved as draft', function () {
         ->and($page->review_note)->toBeNull();
 });
 
-it('filters pages by status and exposes all status options', function () {
+it('filters pages by status tabs and exposes deferred badges for all state enums', function () {
     $draftPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Draft,
@@ -294,14 +294,17 @@ it('filters pages by status and exposes all status options', function () {
 
     $component = Livewire::test(ListPages::class);
 
-    expect($component->instance()->getTable()->getFilter('status')?->getOptions())
-        ->toBe(collect(EntryStatus::cases())
-            ->mapWithKeys(fn (EntryStatus $status): array => [$status->value => $status->getLabel()])
-            ->all());
+    $tabs = $component->instance()->getCachedTabs();
+
+    expect(array_keys($tabs))->toBe(['all', 'draft', 'in_review', 'published', 'scheduled', 'rejected', 'trashed'])
+        ->and($tabs['all']->getBadge())->toBe(5)
+        ->and($tabs['all']->isBadgeDeferred())->toBeTrue()
+        ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(1)
+        ->and($tabs[EntryStatus::Published->value]->getBadgeColor())->toBe('success')
+        ->and($tabs[EntryStatus::Published->value]->isBadgeDeferred())->toBeTrue();
 
     $component
-        ->assertTableFilterExists('status')
-        ->filterTable('status', EntryStatus::Published)
+        ->set('activeTab', EntryStatus::Published->value)
         ->assertCanSeeTableRecords([$publishedPage])
         ->assertCanNotSeeTableRecords([$draftPage, $scheduledPage, $reviewPage, $rejectedPage]);
 });
@@ -316,7 +319,7 @@ it('uses the title column for resource lock indicators in the pages list', funct
         ->assertTableColumnExists('slug');
 });
 
-it('shows state links above the pages table and hides empty statuses', function () {
+it('renders state tabs instead of the legacy record state links row', function () {
     Page::factory()->count(2)->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Published,
@@ -331,23 +334,13 @@ it('shows state links above the pages table and hides empty statuses', function 
     $trashedPage->delete();
 
     $component = Livewire::test(ListPages::class)
-        ->assertSeeHtml('fi-ta-record-state-links');
+        ->assertDontSeeHtml('fi-ta-record-state-links');
 
-    $links = collect($component->instance()->getRecordStateLinks());
+    $tabs = $component->instance()->getCachedTabs();
 
-    expect($links->pluck('label')->all())->toBe(['Celkem', 'Publikováno', 'Koš'])
-        ->and($links->pluck('count', 'label')->all())->toBe([
-            'Celkem' => 2,
-            'Publikováno' => 2,
-            'Koš' => 1,
-        ])
-        ->and($links->firstWhere('label', 'Celkem')['active'])->toBeTrue()
-        ->and($links->firstWhere('label', 'Publikováno')['url'])->toBe(PageResource::getUrl('index', [
-            'filters' => ['status' => ['value' => EntryStatus::Published->value]],
-        ]))
-        ->and($links->firstWhere('label', 'Koš')['url'])->toBe(PageResource::getUrl('index', [
-            'filters' => ['trashed' => ['value' => 0]],
-        ]));
+    expect($tabs['all']->getBadge())->toBe(2)
+        ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(2)
+        ->and($tabs['trashed']->getBadge())->toBe(1);
 });
 
 it('shows deleted pages only in trash tab and removes the trashed table filter', function () {
@@ -363,14 +356,15 @@ it('shows deleted pages only in trash tab and removes the trashed table filter',
 
     $component = Livewire::test(ListPages::class);
 
-    $component->assertTableFilterExists('trashed');
+    expect($component->instance()->getTable()->getFilter('trashed', true))->toBeNull();
 
     $component
-        ->assertCanSeeTableRecords([$activePage])
-        ->assertCanNotSeeTableRecords([$trashedPage])
-        ->filterTable('trashed', false)
+        ->set('activeTab', 'trashed')
         ->assertCanSeeTableRecords([$trashedPage])
-        ->assertCanNotSeeTableRecords([$activePage]);
+        ->assertCanNotSeeTableRecords([$activePage])
+        ->set('activeTab', 'all')
+        ->assertCanSeeTableRecords([$activePage])
+        ->assertCanNotSeeTableRecords([$trashedPage]);
 });
 
 it('uses slideover modals globally for page filters and column visibility', function () {
@@ -385,8 +379,9 @@ it('uses slideover modals globally for page filters and column visibility', func
         ->and($table->getColumnManagerLayout())->toBe(ColumnManagerLayout::Modal)
         ->and($table->getColumnManagerTriggerAction()->isModalSlideOver())->toBeTrue()
         ->and($table->getFilter('created_at', true))->toBeNull()
-        ->and($table->getFilter('status', true))->not->toBeNull()
-        ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní', 'Stav']);
+        ->and($table->getFilter('status', true))->toBeNull()
+        ->and($table->getFilter('trashed', true))->toBeNull()
+        ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní']);
 });
 
 it('stores homepage selection in general settings and clears legacy site settings', function () {

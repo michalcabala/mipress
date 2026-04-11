@@ -323,6 +323,120 @@ describe('list page', function () {
             ->assertCanNotSeeTableRecords([$designEntry]);
     });
 
+    it('respects taxonomy visibility settings for dynamic columns and filters', function () {
+        $taxonomy = Taxonomy::create([
+            'title' => 'Skryté štítky',
+            'handle' => 'skryte-stitky',
+            'is_hierarchical' => false,
+            'collection_id' => $this->collection->id,
+            'show_in_entries_table' => false,
+            'show_in_entries_filter' => false,
+        ]);
+
+        $component = Livewire::test(ListEntries::class, ['collection' => 'pages']);
+        $table = $component->instance()->getTable();
+
+        expect($table->getColumn('taxonomy_'.$taxonomy->id))->toBeNull()
+            ->and($table->getFilter('taxonomy_'.$taxonomy->id, true))->toBeNull();
+    });
+
+    it('can search entries by searchable taxonomy column', function () {
+        $taxonomy = Taxonomy::create([
+            'title' => 'Klíčové slovo',
+            'handle' => 'klicove-slovo',
+            'is_hierarchical' => false,
+            'collection_id' => $this->collection->id,
+            'show_in_entries_table' => true,
+            'show_in_entries_filter' => true,
+            'searchable_in_entries_table' => true,
+            'sortable_in_entries_table' => false,
+        ]);
+
+        $devTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Vyvoj',
+            'slug' => 'vyvoj-search',
+        ]);
+
+        $designTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Design',
+            'slug' => 'design-search',
+        ]);
+
+        $devEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Vyvojovy clanek',
+        ]);
+
+        $designEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Designovy clanek',
+        ]);
+
+        $devEntry->terms()->attach($devTerm->id);
+        $designEntry->terms()->attach($designTerm->id);
+
+        Livewire::test(ListEntries::class, ['collection' => 'pages'])
+            ->searchTable('Vyvoj')
+            ->assertCanSeeTableRecords([$devEntry])
+            ->assertCanNotSeeTableRecords([$designEntry]);
+    });
+
+    it('can sort entries by sortable taxonomy column', function () {
+        $taxonomy = Taxonomy::create([
+            'title' => 'Seraditelne stitky',
+            'handle' => 'seraditelne-stitky',
+            'is_hierarchical' => false,
+            'collection_id' => $this->collection->id,
+            'show_in_entries_table' => true,
+            'show_in_entries_filter' => true,
+            'searchable_in_entries_table' => false,
+            'sortable_in_entries_table' => true,
+        ]);
+
+        $alphaTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Alpha',
+            'slug' => 'alpha-sort',
+        ]);
+
+        $zuluTerm = Term::create([
+            'taxonomy_id' => $taxonomy->id,
+            'title' => 'Zulu',
+            'slug' => 'zulu-sort',
+        ]);
+
+        $zuluEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Zulu record',
+        ]);
+
+        $alphaEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Alpha record',
+        ]);
+
+        $zuluEntry->terms()->attach($zuluTerm->id);
+        $alphaEntry->terms()->attach($alphaTerm->id);
+
+        $component = Livewire::test(ListEntries::class, ['collection' => 'pages']);
+        $column = $component->instance()->getTable()->getColumn('taxonomy_'.$taxonomy->id);
+
+        expect($column)->not->toBeNull()
+            ->and($column?->isSortable())->toBeTrue();
+
+        $component
+            ->sortTable('taxonomy_'.$taxonomy->id, 'asc')
+            ->assertCanSeeTableRecords([$alphaEntry, $zuluEntry], true)
+            ->sortTable('taxonomy_'.$taxonomy->id, 'desc')
+            ->assertCanSeeTableRecords([$zuluEntry, $alphaEntry], true);
+    });
+
     it('shows in-review badge in navigation for users who can publish', function () {
         $blogCollection = Collection::factory()->create([
             'name' => 'Blog',
@@ -538,6 +652,29 @@ describe('create page', function () {
 
         expect($entry->collection_id)->toBe($this->collection->id)
             ->and($entry->blueprint_id)->toBe($this->blueprint->id);
+    });
+
+    it('synchronizes entry blueprint id with the collection blueprint on save', function () {
+        $differentBlueprint = Blueprint::factory()->create();
+
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $differentBlueprint->id,
+            'title' => 'Sync blueprint test',
+        ]);
+
+        expect($entry->fresh()->blueprint_id)->toBe($this->blueprint->id);
+
+        $newCollectionBlueprint = Blueprint::factory()->create();
+        $this->collection->update([
+            'blueprint_id' => $newCollectionBlueprint->id,
+        ]);
+
+        $entry->update([
+            'title' => 'Sync blueprint test updated',
+        ]);
+
+        expect($entry->fresh()->blueprint_id)->toBe($newCollectionBlueprint->id);
     });
 
     it('creates entry with draft status by default', function () {

@@ -159,10 +159,10 @@ describe('list page', function () {
 
         $tabs = $component->instance()->getCachedTabs();
 
-        expect(array_keys($tabs))->toBe(['all', 'draft', 'in_review', 'published', 'scheduled', 'rejected'])
-            ->and($tabs['all']->getBadge())->toBe(5)
-            ->and($tabs['all']->getIcon())->toBe('far-layer-group')
-            ->and($tabs['all']->isBadgeDeferred())->toBeTrue()
+        expect(array_keys($tabs))->toBe(['', 'draft', 'in_review', 'published', 'scheduled', 'rejected'])
+            ->and($tabs['']->getBadge())->toBe(5)
+            ->and($tabs['']->getIcon())->toBe('far-layer-group')
+            ->and($tabs['']->isBadgeDeferred())->toBeTrue()
             ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(1)
             ->and($tabs[EntryStatus::Published->value]->getIcon())->toBe(EntryStatus::Published->getIcon())
             ->and($tabs[EntryStatus::Published->value]->getBadgeColor())->toBe('success')
@@ -195,8 +195,8 @@ describe('list page', function () {
 
         $tabs = $component->instance()->getCachedTabs();
 
-        expect(array_keys($tabs))->toBe(['all', 'published', 'trashed'])
-            ->and($tabs['all']->getBadge())->toBe(2)
+        expect(array_keys($tabs))->toBe(['', 'published', 'trashed'])
+            ->and($tabs['']->getBadge())->toBe(2)
             ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(2)
             ->and($tabs['trashed']->getIcon())->toBe('far-trash-can')
             ->and($tabs['trashed']->getBadge())->toBe(1);
@@ -223,7 +223,7 @@ describe('list page', function () {
             ->set('activeTab', 'trashed')
             ->assertCanSeeTableRecords([$trashedEntry])
             ->assertCanNotSeeTableRecords([$activeEntry])
-            ->set('activeTab', 'all')
+            ->set('activeTab', null)
             ->assertCanSeeTableRecords([$activeEntry])
             ->assertCanNotSeeTableRecords([$trashedEntry]);
     });
@@ -237,8 +237,6 @@ describe('list page', function () {
 
         $component = Livewire::withQueryParams(['tab' => 'trashed'])
             ->test(ListEntries::class, ['collectionHandle' => 'pages']);
-
-        expect($component->instance()->activeTab)->toBe('all');
 
         $component->assertCanSeeTableRecords([$draftEntry]);
     });

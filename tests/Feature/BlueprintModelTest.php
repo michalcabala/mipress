@@ -73,6 +73,40 @@ it('normalizes flat blueprint field payloads before saving', function () {
         ->and($fields[0]['config'])->toBe(['rows' => 3]);
 });
 
+it('normalizes visibility condition config on save', function () {
+    $blueprint = Blueprint::factory()->create([
+        'fields' => [
+            [
+                'handle' => 'cta_text',
+                'label' => 'CTA text',
+                'type' => 'text',
+                'config' => [
+                    'visibility_mode' => 'ANY',
+                    'visibility_conditions' => [
+                        ['field' => ' show_cta ', 'operator' => 'EQUALS', 'value' => ' 1 '],
+                        ['field' => '', 'operator' => 'filled'],
+                        ['field' => 'category', 'operator' => 'unsupported', 'value' => 'news'],
+                        ['field' => 'tags', 'operator' => 'contains', 'value' => ' featured '],
+                        ['field' => 'meta', 'operator' => 'blank', 'value' => 'ignored'],
+                        ['field' => 'state', 'operator' => 'filled', 'value' => 'ignored'],
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $config = $blueprint->fresh()->fields[0]['config'];
+
+    expect($config['visibility_mode'])->toBe('any')
+        ->and($config['visibility_conditions'])->toBe([
+            ['field' => 'show_cta', 'operator' => 'equals', 'value' => '1'],
+            ['field' => 'category', 'operator' => 'equals', 'value' => 'news'],
+            ['field' => 'tags', 'operator' => 'contains', 'value' => 'featured'],
+            ['field' => 'meta', 'operator' => 'blank'],
+            ['field' => 'state', 'operator' => 'filled'],
+        ]);
+});
+
 it('rejects duplicate field handles in one blueprint', function () {
     expect(fn () => Blueprint::factory()->create([
         'fields' => [

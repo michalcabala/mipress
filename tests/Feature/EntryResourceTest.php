@@ -120,7 +120,7 @@ describe('list page', function () {
             ->assertCanNotSeeTableRecords([$articlesEntry]);
     });
 
-    it('filters entries by status tabs and exposes deferred badges for all state enums', function () {
+    it('loads entries in the default tab and exposes deferred badges only for current states', function () {
         $draftEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
@@ -155,12 +155,16 @@ describe('list page', function () {
 
         $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages']);
 
+        $component->assertCanSeeTableRecords([$draftEntry, $publishedEntry, $scheduledEntry, $reviewEntry, $rejectedEntry]);
+
         $tabs = $component->instance()->getCachedTabs();
 
-        expect(array_keys($tabs))->toBe(['all', 'draft', 'in_review', 'published', 'scheduled', 'rejected', 'trashed'])
+        expect(array_keys($tabs))->toBe(['all', 'draft', 'in_review', 'published', 'scheduled', 'rejected'])
             ->and($tabs['all']->getBadge())->toBe(5)
+            ->and($tabs['all']->getIcon())->toBe('far-layer-group')
             ->and($tabs['all']->isBadgeDeferred())->toBeTrue()
             ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(1)
+            ->and($tabs[EntryStatus::Published->value]->getIcon())->toBe(EntryStatus::Published->getIcon())
             ->and($tabs[EntryStatus::Published->value]->getBadgeColor())->toBe('success')
             ->and($tabs[EntryStatus::Published->value]->isBadgeDeferred())->toBeTrue();
 
@@ -191,8 +195,10 @@ describe('list page', function () {
 
         $tabs = $component->instance()->getCachedTabs();
 
-        expect($tabs['all']->getBadge())->toBe(2)
+        expect(array_keys($tabs))->toBe(['all', 'published', 'trashed'])
+            ->and($tabs['all']->getBadge())->toBe(2)
             ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(2)
+            ->and($tabs['trashed']->getIcon())->toBe('far-trash-can')
             ->and($tabs['trashed']->getBadge())->toBe(1);
     });
 
@@ -220,6 +226,21 @@ describe('list page', function () {
             ->set('activeTab', 'all')
             ->assertCanSeeTableRecords([$activeEntry])
             ->assertCanNotSeeTableRecords([$trashedEntry]);
+    });
+
+    it('falls back to the all tab on first load when the requested tab is no longer available', function () {
+        $draftEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Draft,
+        ]);
+
+        $component = Livewire::withQueryParams(['tab' => 'trashed'])
+            ->test(ListEntries::class, ['collectionHandle' => 'pages']);
+
+        expect($component->instance()->activeTab)->toBe('all');
+
+        $component->assertCanSeeTableRecords([$draftEntry]);
     });
 
     it('uses slideover modals globally for filters and column visibility', function () {

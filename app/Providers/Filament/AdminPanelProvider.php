@@ -111,7 +111,7 @@ class AdminPanelProvider extends PanelProvider
                     ->unlockerGate('forceUnlockResourceLock')
                     ->limitedAccessToResourceLockManager()
                     ->gate('forceUnlockResourceLock')
-                    ->registerNavigation(false)
+                    ->registerNavigation()
             )
             ->plugin(
                 CuratorPlugin::make()

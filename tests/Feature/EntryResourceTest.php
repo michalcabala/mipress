@@ -711,6 +711,19 @@ describe('create page', function () {
         expect($entry->status)->toBe(EntryStatus::Draft);
     });
 
+    it('auto-switches entry status to scheduled when a future publish date is selected on create', function () {
+        $futurePublishAt = now()->addDay()->startOfHour();
+
+        Livewire::withQueryParams(['collection' => 'pages'])
+            ->test(CreateEntry::class)
+            ->fillForm([
+                'published_at' => $futurePublishAt->format('Y-m-d H:i:s'),
+            ])
+            ->assertFormSet([
+                'status' => EntryStatus::Scheduled->value,
+            ]);
+    });
+
     it('keeps collection context during live form updates on create page', function () {
         Livewire::withQueryParams(['collection' => 'pages'])
             ->test(CreateEntry::class)
@@ -976,6 +989,48 @@ describe('status workflow', function () {
 
         expect($entry->status)->toBe(EntryStatus::Draft)
             ->and($entry->review_note)->toBeNull();
+    });
+
+    it('switches scheduled entry status to published when the publish date is moved into the past', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Scheduled,
+            'published_at' => now()->addHour(),
+            'scheduled_at' => now()->addHour(),
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->fillForm([
+                'published_at' => now()->subMinute()->format('Y-m-d H:i:s'),
+            ])
+            ->assertFormSet([
+                'status' => EntryStatus::Published->value,
+            ]);
+    });
+
+    it('publishes scheduled entry immediately when the status is switched to published in the form', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Scheduled,
+            'published_at' => now()->addHour(),
+            'scheduled_at' => now()->addHour(),
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->fillForm([
+                'status' => EntryStatus::Published->value,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $entry->refresh();
+
+        expect($entry->status)->toBe(EntryStatus::Published)
+            ->and($entry->scheduled_at)->toBeNull()
+            ->and($entry->published_at)->not->toBeNull()
+            ->and($entry->published_at?->isFuture())->toBeFalse();
     });
 
     it('sets scheduled status when publishing with future publish date', function () {

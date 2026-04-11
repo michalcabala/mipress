@@ -53,6 +53,18 @@ it('creates a standalone page in the pages table', function () {
         ->and($page->blueprint_id)->toBe($this->blueprint->id);
 });
 
+it('auto-switches page status to scheduled when a future publish date is selected on create', function () {
+    $futurePublishAt = now()->addDay()->startOfHour();
+
+    Livewire::test(CreatePage::class)
+        ->fillForm([
+            'published_at' => $futurePublishAt->format('Y-m-d H:i:s'),
+        ])
+        ->assertFormSet([
+            'status' => EntryStatus::Scheduled->value,
+        ]);
+});
+
 it('auto-fills the slug from the title while preserving a custom slug', function () {
     Livewire::test(CreatePage::class)
         ->fillForm([
@@ -122,6 +134,46 @@ it('releases page lock when the edit page unload event is fired', function () {
         ->dispatch('resourceLockObserver::unload');
 
     expect($page->fresh()->resourceLock)->toBeNull();
+});
+
+it('switches scheduled page status to published when the publish date is moved into the past', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Scheduled,
+        'published_at' => now()->addHour(),
+        'scheduled_at' => now()->addHour(),
+    ]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'published_at' => now()->subMinute()->format('Y-m-d H:i:s'),
+        ])
+        ->assertFormSet([
+            'status' => EntryStatus::Published->value,
+        ]);
+});
+
+it('publishes scheduled page immediately when the status is switched to published in the form', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Scheduled,
+        'published_at' => now()->addHour(),
+        'scheduled_at' => now()->addHour(),
+    ]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->fillForm([
+            'status' => EntryStatus::Published->value,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $page->refresh();
+
+    expect($page->status)->toBe(EntryStatus::Published)
+        ->and($page->scheduled_at)->toBeNull()
+        ->and($page->published_at)->not->toBeNull()
+        ->and($page->published_at?->isFuture())->toBeFalse();
 });
 
 it('shows validation feedback and closes the publish modal when required fields are missing', function () {

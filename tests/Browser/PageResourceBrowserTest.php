@@ -23,7 +23,7 @@ beforeEach(function () {
     ]);
 });
 
-it('releases the page lock after publishing through the browser', function () {
+it('publishes page through the browser', function () {
     if (! function_exists('visit')) {
         $this->markTestSkipped('Pest browser testing requires pestphp/pest-plugin-browser and Playwright.');
     }
@@ -41,8 +41,6 @@ it('releases the page lock after publishing through the browser', function () {
         ->assertSee('Publikovat')
         ->assertNoJavaScriptErrors()
         ->wait(1);
-
-    expect($page->fresh()->resourceLock)->not->toBeNull();
 
     $browser->script(<<<'JS'
 const publishButton = [...document.querySelectorAll('button')]
@@ -68,6 +66,5 @@ JS);
     $page->refresh();
 
     expect($page->status)->toBe(EntryStatus::Published)
-        ->and($page->published_at)->not->toBeNull()
-        ->and($page->resourceLock)->toBeNull();
+        ->and($page->published_at)->not->toBeNull();
 });

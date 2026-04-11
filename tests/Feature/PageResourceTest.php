@@ -91,51 +91,6 @@ it('can cancel page creation and return to the pages index', function () {
         ->assertRedirect(PageResource::getUrl('index'));
 });
 
-it('locks page when the edit page is mounted', function () {
-    $page = Page::factory()->create([
-        'blueprint_id' => $this->blueprint->id,
-    ]);
-
-    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->dispatch('resourceLockObserver::init');
-
-    $lockedPage = $page->fresh()->load('resourceLock');
-
-    expect($lockedPage->resourceLock)->not->toBeNull()
-        ->and((int) $lockedPage->resourceLock->user_id)->toBe((int) $this->admin->getKey());
-});
-
-it('renews page lock without crashing on polling event', function () {
-    $page = Page::factory()->create([
-        'blueprint_id' => $this->blueprint->id,
-    ]);
-
-    $component = Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->dispatch('resourceLockObserver::init')
-        ->dispatch('resourceLockObserver::renewLock');
-
-    $lockedPage = $page->fresh()->load('resourceLock');
-
-    expect($lockedPage->resourceLock)->not->toBeNull()
-        ->and((int) $lockedPage->resourceLock->user_id)->toBe((int) $this->admin->getKey())
-        ->and($component->instance()->isReadOnly)->toBeFalse();
-});
-
-it('releases page lock when the edit page unload event is fired', function () {
-    $page = Page::factory()->create([
-        'blueprint_id' => $this->blueprint->id,
-    ]);
-
-    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->dispatch('resourceLockObserver::init')
-        ->fillForm([
-            'title' => 'Rozpracovaná změna',
-        ])
-        ->dispatch('resourceLockObserver::unload');
-
-    expect($page->fresh()->resourceLock)->toBeNull();
-});
-
 it('switches scheduled page status to published when the publish date is moved into the past', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
@@ -194,7 +149,7 @@ it('shows validation feedback and closes the publish modal when required fields 
         ->and($component->instance()->mountedActions)->toBe([]);
 });
 
-it('releases the page lock and redirects after publishing immediately', function () {
+it('redirects after publishing immediately', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Draft,
@@ -202,18 +157,16 @@ it('releases the page lock and redirects after publishing immediately', function
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->dispatch('resourceLockObserver::init')
         ->callAction('publishPage')
         ->assertRedirect(PageResource::getUrl('index'));
 
     $page->refresh();
 
     expect($page->status)->toBe(EntryStatus::Published)
-        ->and($page->published_at)->not->toBeNull()
-        ->and($page->resourceLock)->toBeNull();
+        ->and($page->published_at)->not->toBeNull();
 });
 
-it('releases the page lock and redirects after scheduling publication', function () {
+it('redirects after scheduling publication', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Draft,
@@ -221,15 +174,13 @@ it('releases the page lock and redirects after scheduling publication', function
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->dispatch('resourceLockObserver::init')
         ->callAction('publishPage')
         ->assertRedirect(PageResource::getUrl('index'));
 
     $page->refresh();
 
     expect($page->status)->toBe(EntryStatus::Scheduled)
-        ->and($page->published_at)->not->toBeNull()
-        ->and($page->resourceLock)->toBeNull();
+        ->and($page->published_at)->not->toBeNull();
 });
 
 it('returns page in review back to draft', function () {
@@ -264,7 +215,7 @@ it('clears rejection note when page is saved as draft', function () {
         ->and($page->review_note)->toBeNull();
 });
 
-it('loads pages in the default tab and exposes deferred badges only for current states', function () {
+it('loads pages by default and can filter them by status', function () {
     $draftPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Draft,
@@ -292,23 +243,11 @@ it('loads pages in the default tab and exposes deferred badges only for current 
         'status' => EntryStatus::Rejected,
     ]);
 
-    $component = Livewire::test(ListPages::class);
-
-    $component->assertCanSeeTableRecords([$draftPage, $publishedPage, $scheduledPage, $reviewPage, $rejectedPage]);
-
-    $tabs = $component->instance()->getCachedTabs();
-
-    expect(array_keys($tabs))->toBe(['', 'draft', 'in_review', 'published', 'scheduled', 'rejected'])
-        ->and($tabs['']->getBadge())->toBe(5)
-        ->and($tabs['']->getIcon())->toBe('far-layer-group')
-        ->and($tabs['']->isBadgeDeferred())->toBeTrue()
-        ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(1)
-        ->and($tabs[EntryStatus::Published->value]->getIcon())->toBe(EntryStatus::Published->getIcon())
-        ->and($tabs[EntryStatus::Published->value]->getBadgeColor())->toBe('success')
-        ->and($tabs[EntryStatus::Published->value]->isBadgeDeferred())->toBeTrue();
-
-    $component
-        ->set('activeTab', EntryStatus::Published->value)
+    Livewire::test(ListPages::class)
+        ->assertCanSeeTableRecords([$draftPage, $publishedPage, $scheduledPage, $reviewPage, $rejectedPage])
+        ->assertTableFilterExists('status')
+        ->assertTableFilterExists('trashed')
+        ->filterTable('status', EntryStatus::Published)
         ->assertCanSeeTableRecords([$publishedPage])
         ->assertCanNotSeeTableRecords([$draftPage, $scheduledPage, $reviewPage, $rejectedPage]);
 });
@@ -323,7 +262,7 @@ it('uses the title column for resource lock indicators in the pages list', funct
         ->assertTableColumnExists('slug');
 });
 
-it('renders state tabs instead of the legacy record state links row', function () {
+it('does not render record state tabs or the legacy record state links row', function () {
     Page::factory()->count(2)->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Published,
@@ -340,16 +279,10 @@ it('renders state tabs instead of the legacy record state links row', function (
     $component = Livewire::test(ListPages::class)
         ->assertDontSeeHtml('fi-ta-record-state-links');
 
-    $tabs = $component->instance()->getCachedTabs();
-
-    expect(array_keys($tabs))->toBe(['', 'published', 'trashed'])
-        ->and($tabs['']->getBadge())->toBe(2)
-        ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(2)
-        ->and($tabs['trashed']->getIcon())->toBe('far-trash-can')
-        ->and($tabs['trashed']->getBadge())->toBe(1);
+    expect($component->instance()->getCachedTabs())->toBe([]);
 });
 
-it('shows deleted pages only in trash tab and removes the trashed table filter', function () {
+it('shows deleted pages through the trashed table filter', function () {
     $activePage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
     ]);
@@ -360,29 +293,43 @@ it('shows deleted pages only in trash tab and removes the trashed table filter',
 
     $trashedPage->delete();
 
-    $component = Livewire::test(ListPages::class);
-
-    expect($component->instance()->getTable()->getFilter('trashed', true))->toBeNull();
-
-    $component
-        ->set('activeTab', 'trashed')
+    Livewire::test(ListPages::class)
+        ->assertTableFilterExists('trashed')
+        ->filterTable('trashed', false)
         ->assertCanSeeTableRecords([$trashedPage])
         ->assertCanNotSeeTableRecords([$activePage])
-        ->set('activeTab', null)
+        ->filterTable('trashed', true)
+        ->assertCanSeeTableRecords([$activePage, $trashedPage])
+        ->removeTableFilter('trashed')
         ->assertCanSeeTableRecords([$activePage])
         ->assertCanNotSeeTableRecords([$trashedPage]);
 });
 
-it('falls back to the all tab on first load when the requested tab is no longer available', function () {
+it('ignores an unrelated tab query string on first load', function () {
     $draftPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Draft,
     ]);
 
-    $component = Livewire::withQueryParams(['tab' => 'trashed'])
+    $component = Livewire::withQueryParams(['tab' => 'unknown'])
         ->test(ListPages::class);
 
     $component->assertCanSeeTableRecords([$draftPage]);
+});
+
+it('ignores a stale generic page query string on first load', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Published,
+        'published_at' => now(),
+    ]);
+
+    $component = Livewire::withQueryParams(['page' => 2])
+        ->test(ListPages::class);
+
+    expect($component->instance()->getTablePaginationPageName())->toBe('pagesPage');
+
+    $component->assertCanSeeTableRecords([$page]);
 });
 
 it('uses slideover modals globally for page filters and column visibility', function () {
@@ -397,8 +344,8 @@ it('uses slideover modals globally for page filters and column visibility', func
         ->and($table->getColumnManagerLayout())->toBe(ColumnManagerLayout::Modal)
         ->and($table->getColumnManagerTriggerAction()->isModalSlideOver())->toBeTrue()
         ->and($table->getFilter('created_at', true))->toBeNull()
-        ->and($table->getFilter('status', true))->toBeNull()
-        ->and($table->getFilter('trashed', true))->toBeNull()
+        ->and($table->getFilter('status', true))->not->toBeNull()
+        ->and($table->getFilter('trashed', true))->not->toBeNull()
         ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní']);
 });
 

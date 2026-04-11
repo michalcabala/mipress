@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\EntryStatus;
@@ -52,16 +51,6 @@ function contributorWorkflowContext(): array
         'contributor' => $contributor,
     ];
 }
-
-it('allows force unlock only to users with publish permission', function () {
-    ['contributor' => $contributor] = contributorWorkflowContext();
-
-    $editor = User::factory()->create();
-    $editor->assignRole(UserRole::Editor->value);
-
-    expect(Gate::forUser($contributor)->allows('forceUnlockResourceLock'))->toBeFalse()
-        ->and(Gate::forUser($editor)->allows('forceUnlockResourceLock'))->toBeTrue();
-});
 
 it('allows contributor to edit own published entry and submit changes for review', function () {
     [

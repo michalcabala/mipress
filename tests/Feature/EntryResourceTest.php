@@ -159,14 +159,16 @@ describe('list page', function () {
 
         $tabs = $component->instance()->getCachedTabs();
 
-        expect(array_keys($tabs))->toBe(['', 'draft', 'in_review', 'published', 'scheduled', 'rejected'])
-            ->and($tabs['']->getBadge())->toBe(5)
-            ->and($tabs['']->getIcon())->toBe('far-layer-group')
-            ->and($tabs['']->isBadgeDeferred())->toBeTrue()
+        expect(array_keys($tabs))->toBe(['all', 'draft', 'in_review', 'published', 'scheduled', 'rejected', 'trashed'])
+            ->and($component->instance()->activeTab)->toBe('all')
+            ->and($tabs['all']->getBadge())->toBe(5)
+            ->and($tabs['all']->getIcon())->toBe('far-layer-group')
+            ->and($tabs['all']->isBadgeDeferred())->toBeTrue()
             ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(1)
             ->and($tabs[EntryStatus::Published->value]->getIcon())->toBe(EntryStatus::Published->getIcon())
             ->and($tabs[EntryStatus::Published->value]->getBadgeColor())->toBe('success')
-            ->and($tabs[EntryStatus::Published->value]->isBadgeDeferred())->toBeTrue();
+            ->and($tabs[EntryStatus::Published->value]->isBadgeDeferred())->toBeTrue()
+            ->and($tabs['trashed']->getBadge())->toBeNull();
 
         $component
             ->set('activeTab', EntryStatus::Published->value)
@@ -195,8 +197,8 @@ describe('list page', function () {
 
         $tabs = $component->instance()->getCachedTabs();
 
-        expect(array_keys($tabs))->toBe(['', 'published', 'trashed'])
-            ->and($tabs['']->getBadge())->toBe(2)
+        expect(array_keys($tabs))->toBe(['all', 'draft', 'in_review', 'published', 'scheduled', 'rejected', 'trashed'])
+            ->and($tabs['all']->getBadge())->toBe(2)
             ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(2)
             ->and($tabs['trashed']->getIcon())->toBe('far-trash-can')
             ->and($tabs['trashed']->getBadge())->toBe(1);
@@ -223,22 +225,40 @@ describe('list page', function () {
             ->set('activeTab', 'trashed')
             ->assertCanSeeTableRecords([$trashedEntry])
             ->assertCanNotSeeTableRecords([$activeEntry])
-            ->set('activeTab', null)
+            ->set('activeTab', 'all')
             ->assertCanSeeTableRecords([$activeEntry])
             ->assertCanNotSeeTableRecords([$trashedEntry]);
     });
 
-    it('falls back to the all tab on first load when the requested tab is no longer available', function () {
+    it('falls back to the all tab on first load when the requested tab is invalid', function () {
         $draftEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
             'status' => EntryStatus::Draft,
         ]);
 
-        $component = Livewire::withQueryParams(['tab' => 'trashed'])
+        $component = Livewire::withQueryParams(['tab' => 'unknown'])
             ->test(ListEntries::class, ['collectionHandle' => 'pages']);
 
         $component->assertCanSeeTableRecords([$draftEntry]);
+
+        expect($component->instance()->activeTab)->toBe('all');
+    });
+
+    it('ignores a stale generic page query string on first load', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => EntryStatus::Published,
+            'published_at' => now(),
+        ]);
+
+        $component = Livewire::withQueryParams(['page' => 2])
+            ->test(ListEntries::class, ['collectionHandle' => 'pages']);
+
+        expect($component->instance()->getTablePaginationPageName())->toBe('entriesPagesPage');
+
+        $component->assertCanSeeTableRecords([$entry]);
     });
 
     it('uses slideover modals globally for filters and column visibility', function () {
@@ -253,8 +273,8 @@ describe('list page', function () {
             ->and($table->getColumnManagerLayout())->toBe(ColumnManagerLayout::Modal)
             ->and($table->getColumnManagerTriggerAction()->isModalSlideOver())->toBeTrue()
             ->and($table->getFilter('created_at', true))->toBeNull()
-            ->and($table->getFilter('status', true))->toBeNull()
-            ->and($table->getFilter('trashed', true))->toBeNull()
+            ->and($table->getFilter('status', true))->not->toBeNull()
+            ->and($table->getFilter('trashed', true))->not->toBeNull()
             ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní']);
     });
 
@@ -798,54 +818,6 @@ describe('edit page', function () {
             ]);
     });
 
-    it('locks entry when the edit page is mounted', function () {
-        $entry = Entry::factory()->create([
-            'collection_id' => $this->collection->id,
-            'blueprint_id' => $this->blueprint->id,
-        ]);
-
-        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
-            ->dispatch('resourceLockObserver::init');
-
-        $lockedEntry = $entry->fresh()->load('resourceLock');
-
-        expect($lockedEntry->resourceLock)->not->toBeNull()
-            ->and((int) $lockedEntry->resourceLock->user_id)->toBe((int) $this->admin->getKey());
-    });
-
-    it('renews entry lock without crashing on polling event', function () {
-        $entry = Entry::factory()->create([
-            'collection_id' => $this->collection->id,
-            'blueprint_id' => $this->blueprint->id,
-        ]);
-
-        $component = Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
-            ->dispatch('resourceLockObserver::init')
-            ->dispatch('resourceLockObserver::renewLock');
-
-        $lockedEntry = $entry->fresh()->load('resourceLock');
-
-        expect($lockedEntry->resourceLock)->not->toBeNull()
-            ->and((int) $lockedEntry->resourceLock->user_id)->toBe((int) $this->admin->getKey())
-            ->and($component->instance()->isReadOnly)->toBeFalse();
-    });
-
-    it('releases entry lock when the edit page unload event is fired', function () {
-        $entry = Entry::factory()->create([
-            'collection_id' => $this->collection->id,
-            'blueprint_id' => $this->blueprint->id,
-        ]);
-
-        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
-            ->dispatch('resourceLockObserver::init')
-            ->fillForm([
-                'title' => 'Rozpracovaná změna',
-            ])
-            ->dispatch('resourceLockObserver::unload');
-
-        expect($entry->fresh()->resourceLock)->toBeNull();
-    });
-
     it('can update entry title', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
@@ -1054,15 +1026,13 @@ describe('status workflow', function () {
         ]);
 
         Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
-            ->dispatch('resourceLockObserver::init')
             ->callAction('publishEntry')
             ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
 
         $entry->refresh();
 
         expect($entry->status)->toBe(EntryStatus::Scheduled)
-            ->and($entry->published_at)->not->toBeNull()
-            ->and($entry->resourceLock)->toBeNull();
+            ->and($entry->published_at)->not->toBeNull();
     });
 
     it('publishes scheduled entry via command when time is due', function () {
@@ -1089,15 +1059,13 @@ describe('status workflow', function () {
         ]);
 
         Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
-            ->dispatch('resourceLockObserver::init')
             ->callAction('publishEntry')
             ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
 
         $entry->refresh();
 
         expect($entry->status)->toBe(EntryStatus::Published)
-            ->and($entry->published_at)->not->toBeNull()
-            ->and($entry->resourceLock)->toBeNull();
+            ->and($entry->published_at)->not->toBeNull();
     });
 
     it('shows validation feedback and closes the publish modal when required fields are missing', function () {

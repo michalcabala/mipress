@@ -6,7 +6,6 @@ use App\Filament\Livewire\OptimizedDatabaseNotifications;
 use App\Filament\Pages\EditProfile as UserEditProfile;
 use App\Http\Middleware\SetAdminLocale;
 use Awcodes\Curator\CuratorPlugin;
-use Blendbyte\FilamentResourceLock\ResourceLockPlugin;
 use Filament\Actions\Action;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -32,7 +31,6 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MiPress\Core\Filament\MiPressPlugin;
-use MiPress\Core\Filament\Resources\ResourceLockResource;
 use MiPress\Core\Services\SettingsManager;
 use MiPress\Forms\Filament\FormsPlugin;
 use MiPress\SocialFeeds\SocialFeedsPlugin;
@@ -54,21 +52,6 @@ class AdminPanelProvider extends PanelProvider
             fn (): string => view('mipress::filament.site-menu', [
                 'siteName' => app(SettingsManager::class)->get('general', 'site_name', config('app.name')),
             ])->render(),
-        );
-
-        FilamentView::registerRenderHook(
-            PanelsRenderHook::PAGE_END,
-            static fn (): string => <<<'HTML'
-                <script>
-                    if (!window.__mipressResourceLockNavigatingHookRegistered) {
-                        document.addEventListener('livewire:navigating', () => {
-                            window.Livewire?.dispatch('resourceLockObserver::unload')
-                        })
-
-                        window.__mipressResourceLockNavigatingHookRegistered = true
-                    }
-                </script>
-            HTML,
         );
     }
 
@@ -102,19 +85,6 @@ class AdminPanelProvider extends PanelProvider
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
             ->plugin(SocialFeedsPlugin::make())
-            ->plugin(
-                ResourceLockPlugin::make()
-                    ->displayResourceLockOwner()
-                    ->usesPollingToDetectPresence()
-                    ->presencePollingInterval(30)
-                    ->pollingVisible()
-                    ->resourceClass(ResourceLockResource::class)
-                    ->unlockerLimitedAccess()
-                    ->unlockerGate('forceUnlockResourceLock')
-                    ->limitedAccessToResourceLockManager()
-                    ->gate('forceUnlockResourceLock')
-                    ->registerNavigation()
-            )
             ->plugin(
                 CuratorPlugin::make()
                     ->label('Médium')

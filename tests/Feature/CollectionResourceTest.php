@@ -21,8 +21,6 @@ beforeEach(function () {
     $this->actingAs($this->admin);
 });
 
-// --- List Page ---
-
 describe('list page', function () {
     it('can render', function () {
         $this->get(CollectionResource::getUrl('index'))
@@ -46,8 +44,6 @@ describe('list page', function () {
             ->assertCanNotSeeTableRecords([$other]);
     });
 });
-
-// --- Create Page ---
 
 describe('create page', function () {
     it('can render', function () {
@@ -85,6 +81,23 @@ describe('create page', function () {
             ->and($collection->hierarchical)->toBeTrue();
     });
 
+    it('auto-fills the handle from the name while keeping custom handles intact', function () {
+        Livewire::test(CreateCollection::class)
+            ->fillForm([
+                'name' => 'Tiskové zprávy',
+            ])
+            ->assertFormSet([
+                'handle' => 'tiskove-zpravy',
+            ])
+            ->fillForm([
+                'handle' => 'custom-handle',
+                'name' => 'Nový název',
+            ])
+            ->assertFormSet([
+                'handle' => 'custom-handle',
+            ]);
+    });
+
     it('validates required fields', function () {
         Livewire::test(CreateCollection::class)
             ->fillForm([
@@ -110,8 +123,6 @@ describe('create page', function () {
             ->assertHasFormErrors(['handle' => 'unique']);
     });
 });
-
-// --- Edit Page ---
 
 describe('edit page', function () {
     it('can render', function () {
@@ -171,8 +182,6 @@ describe('edit page', function () {
     });
 });
 
-// --- Delete ---
-
 describe('delete', function () {
     it('can delete a collection', function () {
         $collection = Collection::factory()->create();
@@ -183,8 +192,6 @@ describe('delete', function () {
         expect(Collection::find($collection->id))->toBeNull();
     });
 });
-
-// --- Authorization ---
 
 describe('authorization', function () {
     it('denies access to contributor role', function () {

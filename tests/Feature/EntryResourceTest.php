@@ -83,7 +83,8 @@ describe('list page', function () {
         ]);
 
         Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
-            ->assertTableColumnExists('title');
+            ->assertTableColumnExists('title')
+            ->assertTableColumnExists('slug');
     });
 
     it('can search entries by title', function () {
@@ -520,6 +521,24 @@ describe('create page', function () {
             ->and($entry->title)->toBe('Nová stránka')
             ->and($entry->collection_id)->toBe($this->collection->id)
             ->and($entry->blueprint_id)->toBe($this->blueprint->id);
+    });
+
+    it('auto-fills the slug from the title without overwriting a custom slug', function () {
+        Livewire::withQueryParams(['collection' => 'pages'])
+            ->test(CreateEntry::class)
+            ->fillForm([
+                'title' => 'Prvni navrh',
+            ])
+            ->assertFormSet([
+                'slug' => 'prvni-navrh',
+            ])
+            ->fillForm([
+                'slug' => 'vlastni-slug',
+                'title' => 'Upraveny navrh',
+            ])
+            ->assertFormSet([
+                'slug' => 'vlastni-slug',
+            ]);
     });
 
     it('can cancel entry creation and return to the collection index', function () {

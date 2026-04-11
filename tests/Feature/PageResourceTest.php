@@ -53,6 +53,23 @@ it('creates a standalone page in the pages table', function () {
         ->and($page->blueprint_id)->toBe($this->blueprint->id);
 });
 
+it('auto-fills the slug from the title while preserving a custom slug', function () {
+    Livewire::test(CreatePage::class)
+        ->fillForm([
+            'title' => 'Úvodní stránka',
+        ])
+        ->assertFormSet([
+            'slug' => 'uvodni-stranka',
+        ])
+        ->fillForm([
+            'slug' => 'custom-slug',
+            'title' => 'Nový titulek',
+        ])
+        ->assertFormSet([
+            'slug' => 'custom-slug',
+        ]);
+});
+
 it('can cancel page creation and return to the pages index', function () {
     Livewire::test(CreatePage::class)
         ->fillForm([
@@ -243,7 +260,8 @@ it('uses the title column for resource lock indicators in the pages list', funct
     ]);
 
     Livewire::test(ListPages::class)
-        ->assertTableColumnExists('title');
+        ->assertTableColumnExists('title')
+        ->assertTableColumnExists('slug');
 });
 
 it('shows state links above the pages table and hides empty statuses', function () {

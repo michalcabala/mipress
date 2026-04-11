@@ -807,6 +807,22 @@ describe('status workflow', function () {
         expect(Entry::draft()->count())->toBe(3);
     });
 
+    it('returns entry in review back to draft', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'status' => EntryStatus::InReview,
+            'review_note' => 'Zkontrolujte perex.',
+        ]);
+
+        Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
+            ->callAction('returnToDraft');
+
+        $entry->refresh();
+
+        expect($entry->status)->toBe(EntryStatus::Draft)
+            ->and($entry->review_note)->toBeNull();
+    });
+
     it('sets scheduled status when publishing with future publish date', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,

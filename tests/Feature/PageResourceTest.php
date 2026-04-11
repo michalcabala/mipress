@@ -164,6 +164,38 @@ it('releases the page lock and redirects after scheduling publication', function
         ->and($page->resourceLock)->toBeNull();
 });
 
+it('returns page in review back to draft', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::InReview,
+        'review_note' => 'Doplnit titulek.',
+    ]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->callAction('returnToDraft');
+
+    $page->refresh();
+
+    expect($page->status)->toBe(EntryStatus::Draft)
+        ->and($page->review_note)->toBeNull();
+});
+
+it('clears rejection note when page is saved as draft', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Rejected,
+        'review_note' => 'Upravit SEO metadata.',
+    ]);
+
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+        ->callAction('saveDraft');
+
+    $page->refresh();
+
+    expect($page->status)->toBe(EntryStatus::Draft)
+        ->and($page->review_note)->toBeNull();
+});
+
 it('filters pages by status and exposes all status options', function () {
     $draftPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,

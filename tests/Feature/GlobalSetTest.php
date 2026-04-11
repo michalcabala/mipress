@@ -157,7 +157,9 @@ it('saves data from edit settings page', function () {
     ]);
 
     Livewire::test(EditSettings::class, ['handle' => 'contact'])
-        ->set('data.email', 'new@example.com')
+        ->set('data', [
+            'email' => 'new@example.com',
+        ])
         ->call('save')
         ->assertHasNoErrors();
 
@@ -246,7 +248,7 @@ it('keeps seo out of generic settings navigation and exposes the dedicated globa
         ->assertSuccessful();
 
     $this->get(EditSettings::getUrl(['handle' => 'seo']))
-        ->assertNotFound();
+        ->assertRedirect(GlobalSeoSettings::getUrl());
 
     expect($labels)->not->toContain('SEO')
         ->and(GlobalSeoSettings::getCluster())->toBe(SeoCluster::class)

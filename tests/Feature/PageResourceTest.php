@@ -206,13 +206,13 @@ it('filters pages by status and exposes all status options', function () {
         ->assertCanNotSeeTableRecords([$draftPage, $scheduledPage, $reviewPage, $rejectedPage]);
 });
 
-it('shows a resource lock indicator column in the pages list', function () {
+it('uses the title column for resource lock indicators in the pages list', function () {
     Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
     ]);
 
     Livewire::test(ListPages::class)
-        ->assertTableColumnExists('resource_lock_state');
+        ->assertTableColumnExists('title');
 });
 
 it('shows state links above the pages table and hides empty statuses', function () {

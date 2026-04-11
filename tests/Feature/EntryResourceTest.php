@@ -76,14 +76,14 @@ describe('list page', function () {
             ->assertCanSeeTableRecords($entries);
     });
 
-    it('shows a resource lock indicator column in the entries list', function () {
+    it('uses the title column for resource lock indicators in the entries list', function () {
         Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
         ]);
 
         Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
-            ->assertTableColumnExists('resource_lock_state');
+            ->assertTableColumnExists('title');
     });
 
     it('can search entries by title', function () {

@@ -92,7 +92,7 @@ it('renews page lock without crashing on polling event', function () {
         ->and($component->instance()->isReadOnly)->toBeFalse();
 });
 
-it('can cancel page editing, redirect back to the list and unlock the record', function () {
+it('releases page lock when the edit page unload event is fired', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
     ]);
@@ -102,8 +102,7 @@ it('can cancel page editing, redirect back to the list and unlock the record', f
         ->fillForm([
             'title' => 'Rozpracovaná změna',
         ])
-        ->callAction('cancel')
-        ->assertRedirect(PageResource::getUrl('index'));
+        ->dispatch('resourceLockObserver::unload');
 
     expect($page->fresh()->resourceLock)->toBeNull();
 });

@@ -54,6 +54,21 @@ class AdminPanelProvider extends PanelProvider
                 'siteName' => app(SettingsManager::class)->get('general', 'site_name', config('app.name')),
             ])->render(),
         );
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::PAGE_END,
+            static fn (): string => <<<'HTML'
+                <script>
+                    if (!window.__mipressResourceLockNavigatingHookRegistered) {
+                        document.addEventListener('livewire:navigating', () => {
+                            window.Livewire?.dispatch('resourceLockObserver::unload')
+                        })
+
+                        window.__mipressResourceLockNavigatingHookRegistered = true
+                    }
+                </script>
+            HTML,
+        );
     }
 
     public function panel(Panel $panel): Panel

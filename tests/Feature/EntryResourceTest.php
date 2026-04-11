@@ -786,7 +786,7 @@ describe('edit page', function () {
             ->and($component->instance()->isReadOnly)->toBeFalse();
     });
 
-    it('can cancel entry editing, redirect back to the list and unlock the record', function () {
+    it('releases entry lock when the edit page unload event is fired', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
@@ -797,8 +797,7 @@ describe('edit page', function () {
             ->fillForm([
                 'title' => 'Rozpracovaná změna',
             ])
-            ->callAction('cancel')
-            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
+            ->dispatch('resourceLockObserver::unload');
 
         expect($entry->fresh()->resourceLock)->toBeNull();
     });

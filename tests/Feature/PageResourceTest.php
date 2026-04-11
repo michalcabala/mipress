@@ -298,10 +298,10 @@ it('loads pages in the default tab and exposes deferred badges only for current 
 
     $tabs = $component->instance()->getCachedTabs();
 
-    expect(array_keys($tabs))->toBe(['', 'draft', 'in_review', 'published', 'scheduled', 'rejected'])
-        ->and($tabs['']->getBadge())->toBe(5)
-        ->and($tabs['']->getIcon())->toBe('far-layer-group')
-        ->and($tabs['']->isBadgeDeferred())->toBeTrue()
+    expect(array_keys($tabs))->toBe(['all', 'draft', 'in_review', 'published', 'scheduled', 'rejected'])
+        ->and($tabs['all']->getBadge())->toBe(5)
+        ->and($tabs['all']->getIcon())->toBe('far-layer-group')
+        ->and($tabs['all']->isBadgeDeferred())->toBeTrue()
         ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(1)
         ->and($tabs[EntryStatus::Published->value]->getIcon())->toBe(EntryStatus::Published->getIcon())
         ->and($tabs[EntryStatus::Published->value]->getBadgeColor())->toBe('success')
@@ -342,8 +342,8 @@ it('renders state tabs instead of the legacy record state links row', function (
 
     $tabs = $component->instance()->getCachedTabs();
 
-    expect(array_keys($tabs))->toBe(['', 'published', 'trashed'])
-        ->and($tabs['']->getBadge())->toBe(2)
+    expect(array_keys($tabs))->toBe(['all', 'published', 'trashed'])
+        ->and($tabs['all']->getBadge())->toBe(2)
         ->and($tabs[EntryStatus::Published->value]->getBadge())->toBe(2)
         ->and($tabs['trashed']->getIcon())->toBe('far-trash-can')
         ->and($tabs['trashed']->getBadge())->toBe(1);
@@ -368,7 +368,7 @@ it('shows deleted pages only in trash tab and removes the trashed table filter',
         ->set('activeTab', 'trashed')
         ->assertCanSeeTableRecords([$trashedPage])
         ->assertCanNotSeeTableRecords([$activePage])
-        ->set('activeTab', null)
+        ->set('activeTab', 'all')
         ->assertCanSeeTableRecords([$activePage])
         ->assertCanNotSeeTableRecords([$trashedPage]);
 });
@@ -382,7 +382,7 @@ it('falls back to the all tab on first load when the requested tab is no longer 
     $component = Livewire::withQueryParams(['tab' => 'trashed'])
         ->test(ListPages::class);
 
-    expect($component->instance()->activeTab)->toBe('');
+    expect($component->instance()->activeTab)->toBe('all');
 
     $component->assertCanSeeTableRecords([$draftPage]);
 });

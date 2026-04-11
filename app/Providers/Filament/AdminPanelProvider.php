@@ -32,6 +32,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use MiPress\Core\Filament\MiPressPlugin;
+use MiPress\Core\Filament\Resources\ResourceLockResource;
 use MiPress\Core\Services\SettingsManager;
 use MiPress\Forms\Filament\FormsPlugin;
 use MiPress\SocialFeeds\SocialFeedsPlugin;
@@ -107,6 +108,7 @@ class AdminPanelProvider extends PanelProvider
                     ->usesPollingToDetectPresence()
                     ->presencePollingInterval(30)
                     ->pollingVisible()
+                    ->resourceClass(ResourceLockResource::class)
                     ->unlockerLimitedAccess()
                     ->unlockerGate('forceUnlockResourceLock')
                     ->limitedAccessToResourceLockManager()

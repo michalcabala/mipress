@@ -109,6 +109,7 @@ class MediaForm
             ]),
 
             Section::make('Focal point a přehled konverzí')
+                ->columnSpanFull()
                 ->visible(fn (?Media $record): bool => $record?->isImage() ?? false)
                 ->schema([
                     ViewField::make('focal_point_preview')

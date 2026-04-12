@@ -78,13 +78,7 @@ class EditMedia extends EditRecord
                     ->preserveFilenames()
                     ->imageEditor()
                     ->imageEditorMode(2)
-                    ->imageEditorAspectRatioOptions([
-                        null,
-                        '1:1',
-                        '4:3',
-                        '16:9',
-                        '1200:630',
-                    ])
+                    ->imageEditorAspectRatioOptions($this->cropperAspectRatioOptions())
                     ->acceptedFileTypes(MediaConfig::allowedMimeTypesForGroup('images'))
                     ->maxSize((int) floor(MediaConfig::maxUploadSize() / 1024))
                     ->required(),
@@ -236,6 +230,25 @@ class EditMedia extends EditRecord
     private function conversionActionName(string $conversionName): string
     {
         return 'editConversion_'.$conversionName;
+    }
+
+    /**
+     * @return array<int, string|null>
+     */
+    private function cropperAspectRatioOptions(): array
+    {
+        $options = [null]; // volný ořez
+
+        foreach (MediaConfig::cropConversions() as $conversion) {
+            $w = (int) ($conversion['w'] ?? 0);
+            $h = (int) ($conversion['h'] ?? 0);
+
+            if ($w > 0 && $h > 0) {
+                $options[] = $w.':'.$h;
+            }
+        }
+
+        return array_values(array_unique($options));
     }
 
     protected function afterSave(): void

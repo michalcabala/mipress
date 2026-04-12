@@ -35,7 +35,7 @@ return [
         'default_layout' => 'grid',
         'navigation' => [
             'group' => null,
-            'icon' => 'heroicon-o-photo',
+            'icon' => 'fal-photo-video-film',
             'sort' => null,
             'should_register' => true,
             'should_show_badge' => false,

@@ -40,8 +40,8 @@ class AppServiceProvider extends ServiceProvider
 
         Curation::presets([
             CurationPreset::make('Miniatura')
-                ->width(200)
-                ->height(200)
+                ->width(400)
+                ->height(400)
                 ->format('webp')
                 ->quality(85),
             CurationPreset::make('Open Graph')
@@ -50,18 +50,18 @@ class AppServiceProvider extends ServiceProvider
                 ->format('webp')
                 ->quality(85),
             CurationPreset::make('Čtverec')
-                ->width(600)
-                ->height(600)
+                ->width(1200)
+                ->height(1200)
                 ->format('webp')
                 ->quality(85),
             CurationPreset::make('Krajina 16:9')
-                ->width(1200)
-                ->height(675)
+                ->width(1600)
+                ->height(900)
                 ->format('webp')
                 ->quality(85),
             CurationPreset::make('Krajina 4:3')
-                ->width(1200)
-                ->height(900)
+                ->width(1600)
+                ->height(height: 1200)
                 ->format('webp')
                 ->quality(85),
         ]);

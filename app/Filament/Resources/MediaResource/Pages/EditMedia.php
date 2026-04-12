@@ -395,6 +395,7 @@ class EditMedia extends EditRecord
         }
 
         $record->markAsConversionGenerated($conversionName);
+        $record->markManualConversionOverride($conversionName);
 
         return true;
     }
@@ -404,13 +405,7 @@ class EditMedia extends EditRecord
      */
     private function resolveConversionConfig(string $conversionName): ?array
     {
-        foreach (MediaConfig::conversions() as $conversion) {
-            if (($conversion['name'] ?? null) === $conversionName) {
-                return $conversion;
-            }
-        }
-
-        return null;
+        return MediaConfig::findConversion($conversionName);
     }
 
     private function replaceImageFromTemporaryUpload(Media $record, string $temporaryPath): bool
@@ -466,8 +461,37 @@ class EditMedia extends EditRecord
             $record->saveQuietly();
         }
 
+        $this->invalidateManualConversionOverrides($record);
+
         RegenerateMediaConversionsJob::dispatch([(int) $record->getKey()]);
 
         return true;
+    }
+
+    private function invalidateManualConversionOverrides(Media $record): void
+    {
+        $overrides = $record->manualConversionOverrides();
+
+        if ($overrides === []) {
+            return;
+        }
+
+        /** @var FilesystemAdapter $storage */
+        $storage = Storage::disk(MediaConfig::disk());
+        $generatedConversions = is_array($record->generated_conversions) ? $record->generated_conversions : [];
+
+        foreach (array_keys($overrides) as $conversionName) {
+            $conversionPath = ltrim((string) $record->getPathRelativeToRoot($conversionName), '/');
+
+            if ($conversionPath !== '' && $storage->exists($conversionPath)) {
+                $storage->delete($conversionPath);
+            }
+
+            $generatedConversions[$conversionName] = false;
+        }
+
+        $record->generated_conversions = $generatedConversions;
+        $record->setCustomProperty('manual_conversion_overrides', []);
+        $record->saveQuietly();
     }
 }

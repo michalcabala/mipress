@@ -10,14 +10,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Filesystem\FilesystemAdapter;
-use Illuminate\Support\Facades\Storage;
+use Filament\Support\Enums\Width;
 use MiPress\Core\Jobs\RegenerateMediaConversionsJob;
 use MiPress\Core\Media\MediaConfig;
 use MiPress\Core\Models\Media;
-use Spatie\Image\Enums\Fit;
-use Spatie\Image\Image;
-use Throwable;
+use MiPress\Core\Services\MediaFileService;
 
 class EditMedia extends EditRecord
 {
@@ -38,6 +35,20 @@ class EditMedia extends EditRecord
         return $data;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        unset($data['replace_upload']);
+
+        return $data;
+    }
+
+    /**
+     * @return array<int, Action>
+     */
     protected function getHeaderActions(): array
     {
         return [
@@ -61,23 +72,25 @@ class EditMedia extends EditRecord
 
     private function makeOriginalImageCropperAction(): Action
     {
+        $service = app(MediaFileService::class);
+
         return Action::make('editWithCropper')
-            ->label('Upravit obrázek (Cropper)')
+            ->label('Upravit originál')
             ->icon('fal-crop-simple')
             ->color('primary')
             ->visible(fn (): bool => $this->getRecord()->isImage())
-            ->modalWidth('3xl')
-            ->modalHeading('Upravit obrázek')
+            ->modalWidth(Width::Screen)
+            ->modalHeading('Upravit originální obrázek')
             ->modalDescription('Pracujete s aktuálním originálem. V editoru můžete upravit výřez a přepínat poměry stran podle aktivních crop konverzí.')
             ->modalSubmitActionLabel('Uložit upravený obrázek')
-            ->fillForm(function (): array {
+            ->fillForm(function () use ($service): array {
                 $record = $this->getRecord();
 
                 if (! $record instanceof Media || ! $record->isImage()) {
                     return [];
                 }
 
-                $temporaryPath = $this->createTemporaryEditorCopy($record, 'original');
+                $temporaryPath = $service->createEditorCopy($record, 'original');
 
                 if ($temporaryPath === null) {
                     return [];
@@ -87,7 +100,7 @@ class EditMedia extends EditRecord
             })
             ->schema([
                 FileUpload::make('upload')
-                    ->label('Originální obrázek — upravte výřez v editoru')
+                    ->label('Originální obrázek')
                     ->disk(MediaConfig::disk())
                     ->directory('tmp/resource')
                     ->visibility('public')
@@ -95,25 +108,25 @@ class EditMedia extends EditRecord
                     ->image()
                     ->imageEditor()
                     ->imageEditorMode(2)
-                    ->imageEditorAspectRatioOptions($this->cropperAspectRatioOptions())
+                    ->imageEditorAspectRatioOptions($service->cropperAspectRatioOptions())
                     ->acceptedFileTypes(MediaConfig::allowedMimeTypesForGroup('images'))
                     ->maxSize((int) floor(MediaConfig::maxUploadSize() / 1024))
                     ->required(),
             ])
-            ->action(function (array $data): void {
+            ->action(function (array $data) use ($service): void {
                 $record = $this->getRecord();
 
                 if (! $record instanceof Media || ! $record->isImage()) {
                     return;
                 }
 
-                $temporaryPath = $this->extractTemporaryUploadPath(data_get($data, 'upload'));
+                $temporaryPath = $service->extractUploadPath(data_get($data, 'upload'));
 
                 if ($temporaryPath === null) {
                     return;
                 }
 
-                if (! $this->replaceImageFromTemporaryUpload($record, $temporaryPath)) {
+                if (! $service->replaceOriginal($record, $temporaryPath)) {
                     Notification::make()
                         ->title('Obrázek se nepodařilo aktualizovat')
                         ->danger()
@@ -155,6 +168,8 @@ class EditMedia extends EditRecord
      */
     private function makeConversionCropperAction(array $conversion): ?Action
     {
+        $service = app(MediaFileService::class);
+
         $conversionName = (string) ($conversion['name'] ?? '');
         $conversionLabel = (string) ($conversion['label'] ?? $conversionName);
         $width = (int) ($conversion['w'] ?? 0);
@@ -174,18 +189,18 @@ class EditMedia extends EditRecord
             ->icon('fal-crop-simple')
             ->color('gray')
             ->visible(fn (): bool => $this->getRecord()->isImage())
-            ->modalWidth('3xl')
+            ->modalWidth(Width::Screen)
             ->modalHeading('Upravit konverzi: '.$conversionLabel)
             ->modalDescription($this->conversionCropperDescription($ratio, $width, $height, $editorHelpText, $usageContext, $manualCropRequired))
             ->modalSubmitActionLabel('Uložit konverzi')
-            ->fillForm(function () use ($conversionName): array {
+            ->fillForm(function () use ($service, $conversionName): array {
                 $record = $this->getRecord();
 
                 if (! $record instanceof Media || ! $record->isImage()) {
                     return [];
                 }
 
-                $temporaryPath = $this->createTemporaryEditorCopy($record, 'crop_'.$conversionName);
+                $temporaryPath = $service->createEditorCopy($record, 'crop_'.$conversionName);
 
                 if ($temporaryPath === null) {
                     return [];
@@ -195,7 +210,7 @@ class EditMedia extends EditRecord
             })
             ->schema([
                 FileUpload::make('upload')
-                    ->label('Zdrojový obrázek — upravte ořez v editoru')
+                    ->label('Zdrojový obrázek')
                     ->disk(MediaConfig::disk())
                     ->directory('tmp/resource')
                     ->visibility('public')
@@ -211,20 +226,20 @@ class EditMedia extends EditRecord
                     ->maxSize((int) floor(MediaConfig::maxUploadSize() / 1024))
                     ->required(),
             ])
-            ->action(function (array $data) use ($conversionName, $conversionLabel): void {
+            ->action(function (array $data) use ($service, $conversionName, $conversionLabel): void {
                 $record = $this->getRecord();
 
                 if (! $record instanceof Media || ! $record->isImage()) {
                     return;
                 }
 
-                $temporaryPath = $this->extractTemporaryUploadPath(data_get($data, 'upload'));
+                $temporaryPath = $service->extractUploadPath(data_get($data, 'upload'));
 
                 if ($temporaryPath === null) {
                     return;
                 }
 
-                if (! $this->replaceConversionFromTemporaryUpload($record, $conversionName, $temporaryPath)) {
+                if (! $service->replaceConversion($record, $conversionName, $temporaryPath)) {
                     Notification::make()
                         ->title('Konverzi se nepodařilo aktualizovat')
                         ->danger()
@@ -275,223 +290,44 @@ class EditMedia extends EditRecord
         return implode(' ', $parts);
     }
 
-    private function createTemporaryEditorCopy(Media $record, string $prefix): ?string
-    {
-        /** @var FilesystemAdapter $storage */
-        $storage = Storage::disk(MediaConfig::disk());
-        $originalPath = ltrim((string) $record->getPathRelativeToRoot(), '/');
-
-        if (! $storage->exists($originalPath)) {
-            return null;
-        }
-
-        $tmpName = $prefix.'_'.uniqid().'_'.basename($record->file_name);
-        $tmpPath = 'tmp/resource/'.$tmpName;
-
-        if (! $storage->copy($originalPath, $tmpPath)) {
-            return null;
-        }
-
-        return $tmpPath;
-    }
-
-    private function extractTemporaryUploadPath(mixed $state): ?string
-    {
-        if (is_string($state)) {
-            $state = trim($state);
-
-            return $state !== '' ? $state : null;
-        }
-
-        if (is_array($state)) {
-            $first = reset($state);
-
-            return $this->extractTemporaryUploadPath($first === false ? null : $first);
-        }
-
-        return null;
-    }
-
-    /**
-     * @return array<int, string|null>
-     */
-    private function cropperAspectRatioOptions(): array
-    {
-        $options = [null]; // volný ořez
-
-        foreach (MediaConfig::editorCropConversions() as $conversion) {
-            $w = (int) ($conversion['w'] ?? 0);
-            $h = (int) ($conversion['h'] ?? 0);
-
-            if ($w > 0 && $h > 0) {
-                $options[] = $w.':'.$h;
-            }
-        }
-
-        return array_values(array_unique($options));
-    }
-
     protected function afterSave(): void
     {
         /** @var Media $record */
         $record = $this->getRecord();
+
+        $this->handleReplaceUpload($record);
 
         if ($record->isImage()) {
             RegenerateMediaConversionsJob::dispatch([(int) $record->getKey()]);
         }
     }
 
-    protected function getSavedNotificationTitle(): ?string
+    private function handleReplaceUpload(Media $record): void
     {
-        return 'Médium bylo uloženo. Konverze se regenerují na pozadí.';
-    }
+        $replaceUpload = data_get($this->data, 'replace_upload');
 
-    private function replaceConversionFromTemporaryUpload(Media $record, string $conversionName, string $temporaryPath): bool
-    {
-        $conversion = $this->resolveConversionConfig($conversionName);
-
-        if ($conversion === null) {
-            return false;
-        }
-
-        $targetWidth = (int) ($conversion['w'] ?? 0);
-        $targetHeight = (int) ($conversion['h'] ?? 0);
-
-        if ($targetWidth <= 0 || $targetHeight <= 0) {
-            return false;
-        }
-
-        $disk = MediaConfig::disk();
-        $storage = Storage::disk($disk);
-
-        if (! $storage->exists($temporaryPath)) {
-            return false;
-        }
-
-        $targetRelativePath = ltrim((string) $record->getPathRelativeToRoot($conversionName), '/');
-
-        if ($targetRelativePath === '') {
-            return false;
-        }
-
-        $targetDirectory = trim((string) dirname($targetRelativePath), '/');
-
-        if ($targetDirectory !== '' && ! $storage->exists($targetDirectory)) {
-            $storage->makeDirectory($targetDirectory);
-        }
-
-        try {
-            Image::load($storage->path($temporaryPath))
-                ->fit(Fit::Crop, $targetWidth, $targetHeight)
-                ->format('webp')
-                ->quality(MediaConfig::conversionQuality())
-                ->save($storage->path($targetRelativePath));
-        } catch (Throwable) {
-            return false;
-        } finally {
-            if ($storage->exists($temporaryPath)) {
-                $storage->delete($temporaryPath);
-            }
-        }
-
-        $record->markAsConversionGenerated($conversionName);
-        $record->markManualConversionOverride($conversionName);
-
-        return true;
-    }
-
-    /**
-     * @return array{name: string, label: string, w: int, h: int|null, mode: 'crop'|'resize'}|null
-     */
-    private function resolveConversionConfig(string $conversionName): ?array
-    {
-        return MediaConfig::findConversion($conversionName);
-    }
-
-    private function replaceImageFromTemporaryUpload(Media $record, string $temporaryPath): bool
-    {
-        $disk = MediaConfig::disk();
-        /** @var FilesystemAdapter $storage */
-        $storage = Storage::disk($disk);
-
-        if (! $storage->exists($temporaryPath)) {
-            return false;
-        }
-
-        $currentRelativePath = ltrim((string) $record->getPathRelativeToRoot(), '/');
-        $targetDirectory = trim((string) dirname($currentRelativePath), '/');
-        $newFileName = basename($temporaryPath);
-
-        if ($newFileName === '' || $newFileName === '.') {
-            return false;
-        }
-
-        $targetRelativePath = $targetDirectory !== ''
-            ? $targetDirectory.'/'.$newFileName
-            : $newFileName;
-
-        if ($targetDirectory !== '' && ! $storage->exists($targetDirectory)) {
-            $storage->makeDirectory($targetDirectory);
-        }
-
-        if ($storage->exists($targetRelativePath)) {
-            $storage->delete($targetRelativePath);
-        }
-
-        if (! $storage->move($temporaryPath, $targetRelativePath)) {
-            return false;
-        }
-
-        if ($currentRelativePath !== $targetRelativePath && $storage->exists($currentRelativePath)) {
-            $storage->delete($currentRelativePath);
-        }
-
-        $record->forceFill([
-            'name' => pathinfo($newFileName, PATHINFO_FILENAME),
-            'file_name' => $newFileName,
-            'mime_type' => (string) ($storage->mimeType($targetRelativePath) ?: $record->mime_type),
-            'size' => (int) ($storage->size($targetRelativePath) ?: $record->size),
-        ])->saveQuietly();
-
-        $dimensions = @getimagesize($record->getPath());
-
-        if (is_array($dimensions) && isset($dimensions[0], $dimensions[1])) {
-            $record->setCustomProperty('width', (int) $dimensions[0]);
-            $record->setCustomProperty('height', (int) $dimensions[1]);
-            $record->saveQuietly();
-        }
-
-        $this->invalidateManualConversionOverrides($record);
-
-        RegenerateMediaConversionsJob::dispatch([(int) $record->getKey()]);
-
-        return true;
-    }
-
-    private function invalidateManualConversionOverrides(Media $record): void
-    {
-        $overrides = $record->manualConversionOverrides();
-
-        if ($overrides === []) {
+        if (empty($replaceUpload)) {
             return;
         }
 
-        /** @var FilesystemAdapter $storage */
-        $storage = Storage::disk(MediaConfig::disk());
-        $generatedConversions = is_array($record->generated_conversions) ? $record->generated_conversions : [];
+        $service = app(MediaFileService::class);
+        $temporaryPath = $service->extractUploadPath($replaceUpload);
 
-        foreach (array_keys($overrides) as $conversionName) {
-            $conversionPath = ltrim((string) $record->getPathRelativeToRoot($conversionName), '/');
-
-            if ($conversionPath !== '' && $storage->exists($conversionPath)) {
-                $storage->delete($conversionPath);
-            }
-
-            $generatedConversions[$conversionName] = false;
+        if ($temporaryPath === null) {
+            return;
         }
 
-        $record->generated_conversions = $generatedConversions;
-        $record->setCustomProperty('manual_conversion_overrides', []);
-        $record->saveQuietly();
+        if ($service->replaceOriginal($record, $temporaryPath)) {
+            Notification::make()
+                ->title('Originální soubor byl nahrazen')
+                ->body('Konverze se regenerují na pozadí.')
+                ->success()
+                ->send();
+        }
+    }
+
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return 'Médium bylo uloženo. Konverze se regenerují na pozadí.';
     }
 }

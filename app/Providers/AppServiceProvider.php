@@ -5,6 +5,8 @@ namespace App\Providers;
 use Awcodes\Botly\Models\Botly;
 use Awcodes\Curator\Curations\CurationPreset;
 use Awcodes\Curator\Facades\Curation;
+use Awcodes\Curator\Facades\Glide;
+use Awcodes\Curator\Glide\SymfonyResponseFactory;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use MiPress\Core\Policies\BotlyPolicy;
@@ -25,6 +27,16 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Botly::class, BotlyPolicy::class);
+
+        Glide::configure()->serverConfig([
+            'response' => new SymfonyResponseFactory(app('request')),
+            'source' => storage_path('app'),
+            'source_path_prefix' => 'public/uploads',
+            'cache' => storage_path('app'),
+            'cache_path_prefix' => '.cache',
+            'max_image_size' => 2000 * 2000,
+            'base_url' => 'curator',
+        ]);
 
         Curation::presets([
             CurationPreset::make('Miniatura')

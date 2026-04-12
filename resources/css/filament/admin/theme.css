@@ -1,11 +1,67 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 @import '../../../../vendor/awcodes/mason/resources/css/plugin.css';
+@import '../../../../vendor/awcodes/filament-curator/resources/css/plugin.css';
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 @source '../../../../packages/mipress/core/src/Filament/**/*';
 @source '../../../../packages/mipress/core/resources/views/**/*';
 @source '../../../../vendor/awcodes/mason/resources/**/*.blade.php';
+@source '../../../../vendor/awcodes/filament-curator/resources/views/**/*.blade.php';
+
+/* Curator: extend .fi-resource-media styles to our custom CuratorMediaResource */
+.fi-resource-curator-media {
+    .fi-forms-tabs-component-header {
+        @apply bg-gray-100 dark:bg-gray-900;
+    }
+
+    .fi-ta {
+        .fi-ta-record:has(.curator-grid-column) {
+            @apply block p-0;
+
+            &.fi-selected {
+                @apply ring-primary-600 dark:ring-primary-500;
+            }
+
+            .fi-ta-record-checkbox {
+                @apply absolute top-0 left-0 z-10 bg-black;
+
+                &:checked {
+                    @apply bg-primary-500;
+                }
+            }
+
+            .fi-ta-record-content-ctn {
+                @apply p-0 overflow-hidden relative gap-0;
+
+                > div:first-child {
+                    @apply flex flex-col p-0;
+                }
+
+                .fi-ta-record-content {
+                    @apply h-[9.5rem] w-full p-0 aspect-video;
+
+                    > div:first-child {
+                        @apply h-full w-full relative;
+                    }
+                }
+
+                label {
+                    @apply w-full h-auto aspect-video;
+                    z-index: 1;
+                }
+
+                input:not(:checked) {
+                    @apply bg-white dark:bg-gray-800;
+                }
+
+                .fi-ta-actions {
+                    @apply flex flex-row p-3;
+                }
+            }
+        }
+    }
+}
 
 /* Sidebar background + right border (matches topbar) */
 .fi-sidebar {

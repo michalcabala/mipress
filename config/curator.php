@@ -5,10 +5,10 @@ use App\Filament\Resources\CuratorMediaResource;
 use App\Filament\Resources\CuratorMediaResource\Pages\CreateCuratorMedia;
 use App\Filament\Resources\CuratorMediaResource\Pages\EditCuratorMedia;
 use App\Filament\Resources\CuratorMediaResource\Pages\ListCuratorMedia;
+use App\Filament\Resources\CuratorMediaResource\Schemas\CuratorMediaForm;
+use App\Models\CuratorMedia;
 use Awcodes\Curator\Enums\PreviewableExtensions;
-use Awcodes\Curator\Models\Media;
 use Awcodes\Curator\Providers\GlideUrlProvider;
-use Awcodes\Curator\Resources\Media\Schemas\MediaForm;
 use Awcodes\Curator\Resources\Media\Tables\MediaTable;
 
 return [
@@ -27,7 +27,7 @@ return [
         ],
     ],
     'glide_token' => env('CURATOR_GLIDE_TOKEN'),
-    'model' => Media::class,
+    'model' => CuratorMedia::class,
     'path_generator' => null,
     'resource' => [
         'label' => 'Media',
@@ -47,7 +47,7 @@ return [
             'index' => ListCuratorMedia::class,
         ],
         'schemas' => [
-            'form' => MediaForm::class,
+            'form' => CuratorMediaForm::class,
         ],
         'tables' => [
             'table' => MediaTable::class,

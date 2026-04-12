@@ -43,7 +43,7 @@ class CuratorMediaForm
                                                 $component->state($record);
                                             }),
                                     ]),
-                                Tab::make('Focal Point')
+                                Tab::make('Ohniskový bod')
                                     ->icon('far-crosshairs')
                                     ->visible(fn ($record): bool => $record && is_media_resizable($record->ext))
                                     ->schema([

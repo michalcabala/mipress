@@ -87,9 +87,8 @@ class AdminPanelProvider extends PanelProvider
             ->plugin(SocialFeedsPlugin::make())
             ->plugin(
                 CuratorPlugin::make()
-                    ->label('Curator médium')
-                    ->pluralLabel('Curator média')
-                    ->navigationGroup('Curator')
+                    ->label('Médium')
+                    ->pluralLabel('Média')
                     ->navigationIcon('fal-images')
                     ->navigationSort(90)
                     ->curations()

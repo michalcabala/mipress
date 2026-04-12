@@ -30,8 +30,8 @@ return [
     'model' => CuratorMedia::class,
     'path_generator' => null,
     'resource' => [
-        'label' => 'Media',
-        'plural_label' => 'Media',
+        'label' => 'Médium',
+        'plural_label' => 'Média',
         'default_layout' => 'grid',
         'navigation' => [
             'group' => null,

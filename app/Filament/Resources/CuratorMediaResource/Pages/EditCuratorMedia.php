@@ -41,13 +41,13 @@ class EditCuratorMedia extends EditMedia
                 ->action('save')
                 ->label(trans('curator::views.panel.edit_save')),
             Action::make('regenerate_curations')
-                ->label('Přegenerovat curations')
+                ->label('Přegenerovat ořezy')
                 ->icon('far-arrows-rotate')
                 ->color('warning')
                 ->visible(fn (): bool => $this->record && is_media_resizable($this->record->ext))
                 ->requiresConfirmation()
-                ->modalHeading('Přegenerovat curations')
-                ->modalDescription('Všechny stávající curations budou nahrazeny novými, vygenerovanými podle aktuálního focal pointu.')
+                ->modalHeading('Přegenerovat ořezy')
+                ->modalDescription('Všechny stávající ořezy budou nahrazeny novými, vygenerovanými podle aktuálního ohniskového bodu.')
                 ->action(function (): void {
                     $this->regenerateCurations(redirect: true);
                 }),
@@ -87,8 +87,8 @@ class EditCuratorMedia extends EditMedia
         if ($notify) {
             $count = count($curations);
             Notification::make()
-                ->title("Vygenerováno {$count} curations")
-                ->body('Curations byly přegenerovány podle focal pointu ('.$record->focal_point_x.'% / '.$record->focal_point_y.'%).')
+                ->title("Vygenerováno {$count} ořezů")
+                ->body('Ořezy byly přegenerovány podle ohniskového bodu ('.$record->focal_point_x.'% / '.$record->focal_point_y.'%).')
                 ->success()
                 ->send();
         }

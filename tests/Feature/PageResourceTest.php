@@ -121,7 +121,8 @@ it('publishes scheduled page immediately when the status is switched to publishe
             'status' => EntryStatus::Published->value,
         ])
         ->call('save')
-        ->assertHasNoFormErrors();
+        ->assertHasNoFormErrors()
+        ->assertRedirect(PageResource::getUrl('edit', ['record' => $page]));
 
     $page->refresh();
 
@@ -250,6 +251,45 @@ it('loads pages by default and can filter them by status', function () {
         ->filterTable('status', EntryStatus::Published)
         ->assertCanSeeTableRecords([$publishedPage])
         ->assertCanNotSeeTableRecords([$draftPage, $scheduledPage, $reviewPage, $rejectedPage]);
+});
+
+it('shows only author names in the multi author filter indicator', function () {
+    $firstAuthor = User::factory()->create([
+        'name' => 'Petr Novak',
+    ]);
+
+    $secondAuthor = User::factory()->create([
+        'name' => 'Jana Svobodova',
+    ]);
+
+    $firstAuthoredPage = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'author_id' => $firstAuthor->getKey(),
+    ]);
+
+    $secondAuthoredPage = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'author_id' => $secondAuthor->getKey(),
+    ]);
+
+    $otherPage = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'author_id' => $this->admin->getKey(),
+    ]);
+
+    $component = Livewire::test(ListPages::class)
+        ->assertTableFilterExists('author_id', fn ($filter): bool => $filter->isMultiple())
+        ->filterTable('author_id', [$firstAuthor->getKey(), $secondAuthor->getKey()])
+        ->assertCanSeeTableRecords([$firstAuthoredPage, $secondAuthoredPage])
+        ->assertCanNotSeeTableRecords([$otherPage]);
+
+    $indicators = $component->instance()->getTable()->getFilter('author_id')?->getIndicators();
+    $indicatorLabel = (string) ($indicators[0]?->getLabel() ?? '');
+
+    expect($indicators)->toHaveCount(1)
+        ->and($indicatorLabel)->toBe('Autor: Petr Novak & Jana Svobodova')
+        ->and($indicatorLabel)->not->toContain('<img')
+        ->and($indicatorLabel)->not->toContain('<span');
 });
 
 it('uses the title column for resource lock indicators in the pages list', function () {

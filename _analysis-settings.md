@@ -1,12 +1,22 @@
-# _analysis-settings.md — Sloučeno
+# _analysis-settings.md - Sloučeno
 
-Tento dokument byl k 11. dubnu 2026 sloučen do sjednocené analýzy:
+Aktualizováno: 12. dubna 2026
 
-- Viz `_analysis.md`
+Tento soubor zůstává jen jako tracked rozcestník.
+Aktuální canonical analýza projektu je v lokálním souboru:
 
-Důvod:
+- `_analysis.md`
 
-- původní settings analýza už byla částečně překrytá novou implementací,
-- držení více paralelních analýz vedlo k duplicitám a rozporům.
+Klíčový závěr poslední aktualizace:
 
-Historický kontext settings je nyní zahrnut v sekcích o modelu `Setting`, `SettingsManager`, `EditSettings` stránce a DB schématu uvnitř `_analysis.md`.
+- miPress je funkční staging-ready CMS,
+- hlavní mezery už nejsou v základním CRUD, ale v release readiness,
+- nejdůležitější P0 body pro první produkční verzi jsou:
+  - CI workflow,
+  - instalační bootstrap,
+  - scheduler orchestrace pro publikaci,
+  - produkční queue/cron/env baseline,
+  - rozhodnutí o scope social-feeds pro v1.
+
+Historický settings kontext už neudržuj paralelně zde.
+Pro aktuální stav používej `_analysis.md` a `ROADMAP_REFAKTORING.md`.

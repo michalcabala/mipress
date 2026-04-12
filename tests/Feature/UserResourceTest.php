@@ -31,6 +31,14 @@ describe('list page', function () {
             ->assertSuccessful();
     });
 
+    it('uses the shared user column instead of separate avatar and name columns', function () {
+        User::factory()->create();
+
+        Livewire::test(ListUsers::class)
+            ->assertTableColumnExists('name')
+            ->assertTableColumnDoesNotExist('avatar');
+    });
+
     it('can list users', function () {
         $users = User::factory()->count(3)->create();
 
@@ -108,7 +116,8 @@ describe('create page', function () {
 
         expect($user)->not->toBeNull()
             ->and($user->avatar_path)->toBe('avatars/users/avatar-user.webp')
-            ->and($user->getFilamentAvatarUrl())->toContain('avatars/users/avatar-user.webp');
+            ->and($user->getFilamentAvatarUrl())->toContain('/storage/avatars/users/avatar-user.webp')
+            ->and($user->getFilamentAvatarUrl())->not->toContain('/curator/');
     });
 
     it('can create a user with editor role', function () {
@@ -298,7 +307,8 @@ describe('edit page', function () {
         $user->refresh();
 
         expect($user->avatar_path)->toBe('avatars/users/updated-avatar.webp')
-            ->and($user->getFilamentAvatarUrl())->toContain('avatars/users/updated-avatar.webp');
+            ->and($user->getFilamentAvatarUrl())->toContain('/storage/avatars/users/updated-avatar.webp')
+            ->and($user->getFilamentAvatarUrl())->not->toContain('/curator/');
     });
 
     it('deletes previous avatar file when avatar changes', function () {
@@ -569,6 +579,7 @@ describe('profile page', function () {
         $this->admin->refresh();
 
         expect($this->admin->avatar_path)->toBe('avatars/users/profile-avatar.webp')
-            ->and($this->admin->getFilamentAvatarUrl())->toContain('avatars/users/profile-avatar.webp');
+            ->and($this->admin->getFilamentAvatarUrl())->toContain('/storage/avatars/users/profile-avatar.webp')
+            ->and($this->admin->getFilamentAvatarUrl())->not->toContain('/curator/');
     });
 });

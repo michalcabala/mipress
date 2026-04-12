@@ -830,7 +830,8 @@ describe('edit page', function () {
                 'title' => 'Upravená stránka',
             ])
             ->call('save')
-            ->assertHasNoFormErrors();
+            ->assertHasNoFormErrors()
+            ->assertRedirect(EntryResource::getUrl('edit', ['record' => $entry]));
 
         expect($entry->fresh()->title)->toBe('Upravená stránka');
     });

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('avatar_id')
                 ->nullable()
                 ->after('remember_token')
-                ->constrained('curator')
+                ->constrained('media')
                 ->nullOnDelete();
         });
     }

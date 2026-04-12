@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Awcodes\Curator\Models\Media;
 use Database\Factories\UserFactory;
 use Filament\Auth\MultiFactor\Email\Concerns\InteractsWithEmailAuthentication;
 use Filament\Auth\MultiFactor\Email\Contracts\HasEmailAuthentication;
@@ -19,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use MiPress\Core\Models\Media;
 use MiPress\Core\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'avatar_path'])]
@@ -69,7 +69,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasEmailA
     public function getFilamentAvatarUrl(): ?string
     {
         if (filled($this->avatar_path)) {
-            return mipress_media_path_url($this->avatar_path, 'avatar');
+            return url(Storage::disk('public')->url($this->avatar_path));
         }
 
         return $this->avatar instanceof Media

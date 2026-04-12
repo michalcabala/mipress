@@ -6,34 +6,36 @@
 
 @if ($entryUrl)
     <article @class([
-        'group overflow-hidden rounded-3xl border bg-white/90 shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl dark:bg-slate-900/90',
-        'border-blue-200/70 shadow-blue-100/70 dark:border-blue-800/70 dark:shadow-none' => $isFeature,
-        'border-slate-200 dark:border-slate-800' => ! $isFeature,
+        'mp-article-card',
+        'mp-article-card--feature' => $isFeature,
     ])>
-        <a href="{{ url($entryUrl) }}" class="block overflow-hidden">
+        <a href="{{ url($entryUrl) }}" class="mp-article-card__media">
             @if ($featuredImageUrl)
-                <img src="{{ $featuredImageUrl }}" alt="{{ $entry->title }}" class="h-56 w-full object-cover transition duration-500 group-hover:scale-105 {{ $isFeature ? 'md:h-72' : '' }}">
+                <img src="{{ $featuredImageUrl }}" alt="{{ $entry->title }}">
             @else
-                <span class="block h-56 w-full bg-linear-to-br from-blue-500 to-cyan-400 {{ $isFeature ? 'md:h-72' : '' }}"></span>
+                <span class="mp-article-card__placeholder"></span>
             @endif
         </a>
 
-        <div class="p-6">
-            @if (filled($entry->data['category'] ?? null))
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-300">{{ $entry->data['category'] }}</p>
-            @endif
+        <div class="mp-article-card__body">
+            <span class="mp-card-kicker">{{ $entry->data['category'] ?? ($entry->collection?->name ?? 'Entry') }}</span>
 
-            <h3 class="mt-2 text-2xl font-semibold leading-tight text-slate-900 dark:text-white" style="font-family: 'Space Grotesk', sans-serif;">
+            <h3>
                 <a href="{{ url($entryUrl) }}">{{ $entry->title }}</a>
             </h3>
 
-            <p class="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">{{ $entry->getExcerpt() }}</p>
+            <p>{{ $entry->getExcerpt() }}</p>
 
-            <div class="mt-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+            <div class="mp-article-card__meta">
                 @if ($entry->published_at)
                     <span>{{ $entry->published_at->format('d.m.Y') }}</span>
                 @endif
-                <span>{{ $entry->getReadingTimeMinutes() }} min čtení</span>
+
+                <span>{{ $entry->getReadingTimeMinutes() }} min read</span>
+
+                @if (filled($entry->author?->name))
+                    <span>{{ $entry->author?->name }}</span>
+                @endif
             </div>
         </div>
     </article>

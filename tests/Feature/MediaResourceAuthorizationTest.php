@@ -2,35 +2,66 @@
 
 declare(strict_types=1);
 
+use App\Filament\Resources\MediaResource as FilamentMediaResource;
 use App\Models\User;
-use Awcodes\Curator\Models\Media;
-use Awcodes\Curator\Resources\Media\MediaResource;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\UserRole;
+use MiPress\Core\Media\MediaConfig;
+use MiPress\Core\Models\Attachment;
+use MiPress\Core\Models\Media;
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
+    Storage::fake(MediaConfig::disk());
 
-    $this->media = Media::factory()->create([
-        'type' => 'image/jpeg',
-        'ext' => 'jpg',
-    ]);
+    $this->media = createLibraryMedia();
 });
 
-describe('media curation regeneration permissions', function () {
-    it('applies regenerate abilities by role', function (UserRole $role, bool $allowed) {
+function createLibraryMedia(?int $uploadedBy = null): Media
+{
+    $attachment = Attachment::query()->create([
+        'name' => 'Testovací médium',
+    ]);
+
+    /** @var Media $media */
+    $media = $attachment
+        ->addMedia(UploadedFile::fake()->image('test-image.jpg', 1200, 800))
+        ->usingName('test-image')
+        ->toMediaCollection(MediaConfig::libraryCollection(), MediaConfig::disk());
+
+    if ($uploadedBy !== null) {
+        $media->forceFill([
+            'uploaded_by' => $uploadedBy,
+        ])->saveQuietly();
+    }
+
+    return $media->refresh();
+}
+
+describe('media conversion regeneration permissions', function () {
+    it('applies regenerate-all ability by role', function (UserRole $role, bool $allowed) {
         $user = User::factory()->create();
         $user->assignRole($role->value);
 
-        expect($user->can('regenerateAllCurations', Media::class))->toBe($allowed)
-            ->and($user->can('regenerateSelectedCurations', Media::class))->toBe($allowed)
-            ->and($user->can('regenerateSingleCuration', $this->media))->toBe($allowed);
+        expect($user->can('regenerateAllConversions', Media::class))->toBe($allowed);
     })->with([
         [UserRole::SuperAdmin, true],
         [UserRole::Admin, true],
         [UserRole::Editor, true],
         [UserRole::Contributor, false],
     ]);
+
+    it('allows contributor to regenerate own medium only', function () {
+        $user = User::factory()->create();
+        $user->assignRole(UserRole::Contributor->value);
+
+        $ownedMedia = createLibraryMedia($user->id);
+
+        expect($user->can('regenerateConversions', $ownedMedia))->toBeTrue()
+            ->and($user->can('regenerateConversions', $this->media))->toBeFalse();
+    });
 });
 
 describe('media resource action visibility', function () {
@@ -40,16 +71,16 @@ describe('media resource action visibility', function () {
 
         $this->actingAs($user);
 
-        $response = $this->get(MediaResource::getUrl('index'));
+        $response = $this->get(FilamentMediaResource::getUrl('index'));
         $response->assertSuccessful();
 
         if ($visible) {
-            $response->assertSee('Přegenerovat vše');
+            $response->assertSee('Regenerovat všechny konverze');
 
             return;
         }
 
-        $response->assertDontSee('Přegenerovat vše');
+        $response->assertDontSee('Regenerovat všechny konverze');
     })->with([
         [UserRole::SuperAdmin, true],
         [UserRole::Admin, true],
@@ -61,32 +92,26 @@ describe('media resource action visibility', function () {
         $user = User::factory()->create();
         $user->assignRole($role->value);
 
-        $media = $this->media;
-
-        if ($role === UserRole::Contributor) {
-            $media = Media::factory()->create([
-                'type' => 'image/jpeg',
-                'ext' => 'jpg',
-                'uploaded_by' => $user->id,
-            ]);
-        }
+        $media = $role === UserRole::Contributor
+            ? createLibraryMedia($user->id)
+            : $this->media;
 
         $this->actingAs($user);
 
-        $response = $this->get(MediaResource::getUrl('edit', ['record' => $media]));
+        $response = $this->get(FilamentMediaResource::getUrl('edit', ['record' => $media]));
         $response->assertSuccessful();
 
         if ($visible) {
-            $response->assertSee('Přegenerovat ořezy');
+            $response->assertSee('Regenerovat konverze');
 
             return;
         }
 
-        $response->assertDontSee('Přegenerovat ořezy');
+        $response->assertDontSee('Regenerovat konverze');
     })->with([
         [UserRole::SuperAdmin, true],
         [UserRole::Admin, true],
         [UserRole::Editor, true],
-        [UserRole::Contributor, false],
+        [UserRole::Contributor, true],
     ]);
 });

@@ -49,7 +49,7 @@ class EditCuratorMedia extends EditMedia
                 ->modalHeading('Přegenerovat curations')
                 ->modalDescription('Všechny stávající curations budou nahrazeny novými, vygenerovanými podle aktuálního focal pointu.')
                 ->action(function (): void {
-                    $this->regenerateCurations();
+                    $this->regenerateCurations(redirect: true);
                 }),
             Action::make('preview')
                 ->color('gray')
@@ -70,13 +70,11 @@ class EditCuratorMedia extends EditMedia
         $newY = $record->focal_point_y ?? 50;
 
         if ($newX !== $this->originalFocalPoint['x'] || $newY !== $this->originalFocalPoint['y']) {
-            $this->regenerateCurations(notify: true);
-
-            $this->originalFocalPoint = ['x' => $newX, 'y' => $newY];
+            $this->regenerateCurations(notify: true, redirect: true);
         }
     }
 
-    protected function regenerateCurations(bool $notify = true): void
+    protected function regenerateCurations(bool $notify = true, bool $redirect = false): void
     {
         /** @var CuratorMedia $record */
         $record = $this->record->fresh();
@@ -86,8 +84,6 @@ class EditCuratorMedia extends EditMedia
 
         $record->update(['curations' => $curations]);
 
-        $this->refreshFormData(['curations']);
-
         if ($notify) {
             $count = count($curations);
             Notification::make()
@@ -95,6 +91,10 @@ class EditCuratorMedia extends EditMedia
                 ->body('Curations byly přegenerovány podle focal pointu ('.$record->focal_point_x.'% / '.$record->focal_point_y.'%).')
                 ->success()
                 ->send();
+        }
+
+        if ($redirect) {
+            $this->redirect($this->getUrl());
         }
     }
 }

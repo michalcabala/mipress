@@ -5,7 +5,6 @@ namespace App\Providers\Filament;
 use App\Filament\Livewire\OptimizedDatabaseNotifications;
 use App\Filament\Pages\EditProfile as UserEditProfile;
 use App\Http\Middleware\SetAdminLocale;
-use Awcodes\Curator\CuratorPlugin;
 use Filament\Actions\Action;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -85,15 +84,6 @@ class AdminPanelProvider extends PanelProvider
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
             ->plugin(SocialFeedsPlugin::make())
-            ->plugin(
-                CuratorPlugin::make()
-                    ->label('Médium')
-                    ->pluralLabel('Média')
-                    ->navigationIcon('fal-images')
-                    ->navigationSort(90)
-                    ->curations()
-                    ->fileSwap()
-            )
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

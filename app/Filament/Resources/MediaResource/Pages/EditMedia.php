@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use MiPress\Core\Jobs\RegenerateMediaConversionsJob;
 use MiPress\Core\Media\MediaConfig;
@@ -67,15 +68,31 @@ class EditMedia extends EditRecord
             ->visible(fn (): bool => $this->getRecord()->isImage())
             ->modalWidth('3xl')
             ->modalHeading('Upravit obrázek')
-            ->modalDescription('Nahrajte novou verzi obrázku, upravte ořez v editoru a potvrďte. Konverze se následně přegenerují.')
+            ->modalDescription('Pracujete s aktuálním originálem. V editoru můžete upravit výřez a přepínat poměry stran podle aktivních crop konverzí.')
             ->modalSubmitActionLabel('Uložit upravený obrázek')
+            ->fillForm(function (): array {
+                $record = $this->getRecord();
+
+                if (! $record instanceof Media || ! $record->isImage()) {
+                    return [];
+                }
+
+                $temporaryPath = $this->createTemporaryEditorCopy($record, 'original');
+
+                if ($temporaryPath === null) {
+                    return [];
+                }
+
+                return ['upload' => [$temporaryPath]];
+            })
             ->schema([
                 FileUpload::make('upload')
-                    ->label('Upravený obrázek')
+                    ->label('Originální obrázek — upravte výřez v editoru')
                     ->disk(MediaConfig::disk())
                     ->directory('tmp/resource')
                     ->visibility('public')
                     ->preserveFilenames()
+                    ->image()
                     ->imageEditor()
                     ->imageEditorMode(2)
                     ->imageEditorAspectRatioOptions($this->cropperAspectRatioOptions())
@@ -90,9 +107,9 @@ class EditMedia extends EditRecord
                     return;
                 }
 
-                $temporaryPath = data_get($data, 'upload');
+                $temporaryPath = $this->extractTemporaryUploadPath(data_get($data, 'upload'));
 
-                if (! is_string($temporaryPath) || trim($temporaryPath) === '') {
+                if ($temporaryPath === null) {
                     return;
                 }
 
@@ -122,7 +139,7 @@ class EditMedia extends EditRecord
     {
         $actions = [];
 
-        foreach (MediaConfig::editorCropConversions() as $conversion) {
+        foreach (MediaConfig::editorManualCropConversions() as $conversion) {
             $action = $this->makeConversionCropperAction($conversion);
 
             if ($action instanceof Action) {
@@ -134,7 +151,7 @@ class EditMedia extends EditRecord
     }
 
     /**
-     * @param  array{name: string, label: string, w: int, h: int|null, mode: 'crop'|'resize'|'crop_resize'}  $conversion
+     * @param  array<string, mixed>  $conversion
      */
     private function makeConversionCropperAction(array $conversion): ?Action
     {
@@ -142,6 +159,9 @@ class EditMedia extends EditRecord
         $conversionLabel = (string) ($conversion['label'] ?? $conversionName);
         $width = (int) ($conversion['w'] ?? 0);
         $height = (int) ($conversion['h'] ?? 0);
+        $editorHelpText = trim((string) ($conversion['editor_help_text'] ?? ''));
+        $usageContext = trim((string) ($conversion['usage_context'] ?? ''));
+        $manualCropRequired = (bool) ($conversion['manual_crop_required'] ?? false);
 
         if ($conversionName === '' || $width <= 0 || $height <= 0) {
             return null;
@@ -156,28 +176,22 @@ class EditMedia extends EditRecord
             ->visible(fn (): bool => $this->getRecord()->isImage())
             ->modalWidth('3xl')
             ->modalHeading('Upravit konverzi: '.$conversionLabel)
-            ->modalDescription("Poměr je uzamčen na {$ratio}. Výstup bude {$width} × {$height} px.")
+            ->modalDescription($this->conversionCropperDescription($ratio, $width, $height, $editorHelpText, $usageContext, $manualCropRequired))
             ->modalSubmitActionLabel('Uložit konverzi')
-            ->fillForm(function (): array {
+            ->fillForm(function () use ($conversionName): array {
                 $record = $this->getRecord();
 
                 if (! $record instanceof Media || ! $record->isImage()) {
                     return [];
                 }
 
-                $disk = MediaConfig::disk();
-                $storage = Storage::disk($disk);
-                $originalPath = ltrim((string) $record->getPathRelativeToRoot(), '/');
+                $temporaryPath = $this->createTemporaryEditorCopy($record, 'crop_'.$conversionName);
 
-                if (! $storage->exists($originalPath)) {
+                if ($temporaryPath === null) {
                     return [];
                 }
 
-                $tmpName = 'crop_'.uniqid().'_'.$record->file_name;
-                $tmpPath = 'tmp/resource/'.$tmpName;
-                $storage->copy($originalPath, $tmpPath);
-
-                return ['upload' => [$tmpPath]];
+                return ['upload' => [$temporaryPath]];
             })
             ->schema([
                 FileUpload::make('upload')
@@ -186,11 +200,13 @@ class EditMedia extends EditRecord
                     ->directory('tmp/resource')
                     ->visibility('public')
                     ->preserveFilenames()
+                    ->image()
                     ->imageEditor()
                     ->imageEditorMode(2)
                     ->imageAspectRatio($ratio)
                     ->imageEditorAspectRatioOptions([$ratio])
                     ->imageEditorEmptyFillColor('#ffffff')
+                    ->helperText($editorHelpText !== '' ? $editorHelpText : null)
                     ->acceptedFileTypes(MediaConfig::allowedMimeTypesForGroup('images'))
                     ->maxSize((int) floor(MediaConfig::maxUploadSize() / 1024))
                     ->required(),
@@ -202,9 +218,9 @@ class EditMedia extends EditRecord
                     return;
                 }
 
-                $temporaryPath = data_get($data, 'upload');
+                $temporaryPath = $this->extractTemporaryUploadPath(data_get($data, 'upload'));
 
-                if (! is_string($temporaryPath) || trim($temporaryPath) === '') {
+                if ($temporaryPath === null) {
                     return;
                 }
 
@@ -230,6 +246,70 @@ class EditMedia extends EditRecord
     private function conversionActionName(string $conversionName): string
     {
         return 'editConversion_'.$conversionName;
+    }
+
+    private function conversionCropperDescription(
+        string $ratio,
+        int $width,
+        int $height,
+        string $editorHelpText,
+        string $usageContext,
+        bool $manualCropRequired,
+    ): string {
+        $parts = [
+            "Poměr je uzamčen na {$ratio}. Výstup bude {$width} × {$height} px.",
+        ];
+
+        if ($editorHelpText !== '') {
+            $parts[] = $editorHelpText;
+        }
+
+        if ($usageContext !== '') {
+            $parts[] = 'Použití: '.$usageContext;
+        }
+
+        if ($manualCropRequired) {
+            $parts[] = 'Tato konverze vyžaduje ruční crop.';
+        }
+
+        return implode(' ', $parts);
+    }
+
+    private function createTemporaryEditorCopy(Media $record, string $prefix): ?string
+    {
+        /** @var FilesystemAdapter $storage */
+        $storage = Storage::disk(MediaConfig::disk());
+        $originalPath = ltrim((string) $record->getPathRelativeToRoot(), '/');
+
+        if (! $storage->exists($originalPath)) {
+            return null;
+        }
+
+        $tmpName = $prefix.'_'.uniqid().'_'.basename($record->file_name);
+        $tmpPath = 'tmp/resource/'.$tmpName;
+
+        if (! $storage->copy($originalPath, $tmpPath)) {
+            return null;
+        }
+
+        return $tmpPath;
+    }
+
+    private function extractTemporaryUploadPath(mixed $state): ?string
+    {
+        if (is_string($state)) {
+            $state = trim($state);
+
+            return $state !== '' ? $state : null;
+        }
+
+        if (is_array($state)) {
+            $first = reset($state);
+
+            return $this->extractTemporaryUploadPath($first === false ? null : $first);
+        }
+
+        return null;
     }
 
     /**
@@ -336,6 +416,7 @@ class EditMedia extends EditRecord
     private function replaceImageFromTemporaryUpload(Media $record, string $temporaryPath): bool
     {
         $disk = MediaConfig::disk();
+        /** @var FilesystemAdapter $storage */
         $storage = Storage::disk($disk);
 
         if (! $storage->exists($temporaryPath)) {

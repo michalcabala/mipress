@@ -1,6 +1,6 @@
 {{-- Curator focal-point picker — interactive crosshair image overlay --}}
 @php
-    $record = $getState();
+    $record = $getRecord();
     $isImage = $record && is_media_resizable($record->ext ?? '');
     $imageUrl = $isImage ? $record->url : null;
 @endphp

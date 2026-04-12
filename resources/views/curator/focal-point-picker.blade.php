@@ -13,6 +13,7 @@
             y: $wire.get('data.focal_point_y') ?? 50,
             dragging: false,
             debounceTimer: null,
+            imgRect: { left: 0, top: 0, width: 0, height: 0 },
 
             ratios: [
                 { label: '1:1', w: 1, h: 1 },
@@ -46,12 +47,37 @@
                 $wire.set('data.focal_point_y', this.y)
             },
 
+            calcImgRect(img) {
+                if (!img || !img.naturalWidth) return
+                const cRect = img.parentElement.getBoundingClientRect()
+                const cW = cRect.width, cH = cRect.height
+                const iRatio = img.naturalWidth / img.naturalHeight
+                const cRatio = cW / cH
+                let rW, rH
+                if (iRatio > cRatio) { rW = cW; rH = cW / iRatio }
+                else { rH = cH; rW = cH * iRatio }
+                this.imgRect = {
+                    left: (cW - rW) / 2,
+                    top: (cH - rH) / 2,
+                    width: rW,
+                    height: rH,
+                }
+            },
+
             updateFromPointer(event) {
-                const rect = event.currentTarget.getBoundingClientRect()
+                const img = event.currentTarget.querySelector('img')
+                if (img) this.calcImgRect(img)
+                const cRect = event.currentTarget.getBoundingClientRect()
+                const px = event.clientX - cRect.left - this.imgRect.left
+                const py = event.clientY - cRect.top - this.imgRect.top
                 this.setPoint(
-                    ((event.clientX - rect.left) / rect.width) * 100,
-                    ((event.clientY - rect.top) / rect.height) * 100,
+                    (px / this.imgRect.width) * 100,
+                    (py / this.imgRect.height) * 100,
                 )
+            },
+
+            crosshairStyle() {
+                return `left:${this.imgRect.left + (this.x / 100) * this.imgRect.width}px;top:${this.imgRect.top + (this.y / 100) * this.imgRect.height}px;width:${this.imgRect.width}px;height:${this.imgRect.height}px`
             },
 
             reset() {
@@ -61,6 +87,10 @@
             openModal() {
                 this.open = true
                 document.body.style.overflow = 'hidden'
+                this.$nextTick(() => {
+                    const img = this.$refs.pickerImg
+                    if (img && img.complete) this.calcImgRect(img)
+                })
             },
 
             closeModal() {
@@ -76,12 +106,11 @@
     >
         {{-- Inline compact preview + open button --}}
         <div class="flex items-center gap-4">
-            <div class="relative size-20 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-white/10 dark:bg-gray-800">
+            <div class="relative h-20 max-w-32 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100 dark:border-white/10 dark:bg-gray-800">
                 <img
                     src="{{ $imageUrl }}"
                     alt=""
-                    class="size-full select-none object-cover"
-                    :style="`object-position:${x}% ${y}%`"
+                    class="h-full w-auto select-none object-contain"
                     draggable="false"
                 >
                 <div class="pointer-events-none absolute inset-0">
@@ -158,27 +187,29 @@
 
                             {{-- Interactive image --}}
                             <div
-                                class="relative cursor-crosshair overflow-hidden rounded-xl border border-gray-200 bg-gray-100 dark:border-white/10 dark:bg-gray-800"
+                                class="relative flex cursor-crosshair items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-100 dark:border-white/10 dark:bg-gray-800"
+                                style="max-height: calc(100vh - 16rem);"
                                 x-on:pointerdown="dragging = true; updateFromPointer($event)"
                                 x-on:pointermove="if (dragging) updateFromPointer($event)"
                                 x-on:pointerup.window="dragging = false"
                                 x-on:pointerleave="dragging = false"
                             >
                                 <img
+                                    x-ref="pickerImg"
+                                    x-on:load="calcImgRect($event.target)"
                                     src="{{ $imageUrl }}"
                                     alt="{{ $record->alt ?? $record->name }}"
-                                    class="w-full select-none"
-                                    :style="`object-position:${x}% ${y}%`"
+                                    class="max-h-full max-w-full select-none object-contain"
                                     draggable="false"
                                 >
 
-                                {{-- Crosshair overlay --}}
-                                <div class="pointer-events-none absolute inset-0">
-                                    <div class="absolute h-full w-px bg-white/90 shadow-sm" :style="`left:${x}%`"></div>
-                                    <div class="absolute h-px w-full bg-white/90 shadow-sm" :style="`top:${y}%`"></div>
+                                {{-- Crosshair overlay — positioned relative to actual image bounds --}}
+                                <div class="pointer-events-none absolute inset-0" x-show="imgRect.width > 0">
+                                    <div class="absolute h-px bg-white/90 shadow-sm" :style="`top:${imgRect.top + (y / 100) * imgRect.height}px;left:${imgRect.left}px;width:${imgRect.width}px`"></div>
+                                    <div class="absolute w-px bg-white/90 shadow-sm" :style="`left:${imgRect.left + (x / 100) * imgRect.width}px;top:${imgRect.top}px;height:${imgRect.height}px`"></div>
                                     <div
                                         class="absolute size-6 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-primary-500 shadow-lg ring-4 ring-primary-500/25"
-                                        :style="`left:${x}%;top:${y}%`"
+                                        :style="`left:${imgRect.left + (x / 100) * imgRect.width}px;top:${imgRect.top + (y / 100) * imgRect.height}px`"
                                     ></div>
                                 </div>
                             </div>

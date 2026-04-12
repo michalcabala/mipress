@@ -17,7 +17,6 @@
         "mipress/core": "@dev",
         "mipress/forms": "@dev",
         "mipress/social-feeds": "@dev",
-        "spatie/laravel-medialibrary": "^11.17",
         "spatie/laravel-permission": "^7.2",
         "spatie/laravel-sluggable": "^3.8"
     },

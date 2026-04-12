@@ -122,7 +122,7 @@ class EditMedia extends EditRecord
     {
         $actions = [];
 
-        foreach (MediaConfig::cropConversions() as $conversion) {
+        foreach (MediaConfig::editorCropConversions() as $conversion) {
             $action = $this->makeConversionCropperAction($conversion);
 
             if ($action instanceof Action) {
@@ -134,7 +134,7 @@ class EditMedia extends EditRecord
     }
 
     /**
-     * @param  array{name: string, label: string, w: int, h: int|null, mode: 'crop'|'resize'}  $conversion
+     * @param  array{name: string, label: string, w: int, h: int|null, mode: 'crop'|'resize'|'crop_resize'}  $conversion
      */
     private function makeConversionCropperAction(array $conversion): ?Action
     {
@@ -239,7 +239,7 @@ class EditMedia extends EditRecord
     {
         $options = [null]; // volný ořez
 
-        foreach (MediaConfig::cropConversions() as $conversion) {
+        foreach (MediaConfig::editorCropConversions() as $conversion) {
             $w = (int) ($conversion['w'] ?? 0);
             $h = (int) ($conversion['h'] ?? 0);
 

@@ -94,7 +94,7 @@ class EditCuratorMedia extends EditMedia
         }
 
         if ($redirect) {
-            $this->redirect($this->getUrl());
+            $this->redirect(static::getResource()::getUrl('edit', ['record' => $record]));
         }
     }
 }

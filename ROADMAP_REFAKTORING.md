@@ -1,6 +1,6 @@
 # ROADMAP_REFAKTORING
 
-Aktualizováno: 13. dubna 2026
+Aktualizováno: 14. dubna 2026
 Owner: průběžně (tým + agent)
 Primární cíl: dovést miPress k první produkční verzi bez zbytečného architektonického přepisu
 
@@ -25,16 +25,19 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 9. `DONE` AuditLog model a tabulka `audit_logs` odstraněny (13. 4.).
 10. `DONE` Resource Lock tabulky odstraněny (11. 4.).
 11. `DONE` CuratorMedia: vlastní list/grid view, filtry, curations, grouped actions, ownership policy (12. 4.).
+12. `DONE` Test infra: doplněna chybějící curator table migrace, opravena avatar FK reference, SQLite-kompatibilní hasForeignKey (13. 4.).
 
 ## P0 - blokery před první produkční verzí
 
 1. `DONE` CI pipeline v `.github/workflows/ci.yml`: Pint lint, full test suite, smoke gate (13. 4.).
 2. `DONE` Instalační bootstrap: `DatabaseSeeder` volá `PermissionSeeder` + `GlobalSetSeeder` + vytvoří default super admina (13. 4.).
 3. `DONE` Scheduler pro Pages: `PublishScheduledPages` command + registrace v scheduleru (13. 4.).
-4. `TODO` Zdokumentovat povinné produkční cron/queue procesy:
+4. `DONE` Zdokumentovat povinné produkční cron/queue procesy:
    scheduler, queue worker, social feed refresh, sitemap strategie.
-5. `TODO` Připravit produkční env baseline:
+   Viz `DEPLOYMENT.md` (13. 4.).
+5. `DONE` Připravit produkční env baseline:
    `APP_DEBUG=false`, async queue, mail provider, secret management, cache režim.
+   Viz `DEPLOYMENT.md` + `config/mipress.php` (13. 4.).
 6. `TODO` Rozhodnout scope social-feeds pro v1:
    buď modul produkčně dotestovat, nebo ho z launch scope vědomě vyřadit.
 
@@ -42,9 +45,9 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 
 1. `TODO` Dopsat integrační testy social-feeds workflow:
    redirect/callback, refresh jobs, error handling, cache fallback.
-2. `TODO` Přidat regresní test pro scheduler-level publikaci pages.
-3. `TODO` Srovnat `RELEASE_CHECKLIST.md` s reálným stavem repozitáře:
-   zejména CI workflow a release gates.
+2. `DONE` Přidat regresní test pro scheduler-level publikaci pages (3 testy v PageResourceTest, 13. 4.).
+3. `DONE` Srovnat `RELEASE_CHECKLIST.md` s reálným stavem repozitáře:
+   zejména CI workflow a release gates (13. 4.).
 4. `TODO` Ověřit staging běh v produkčnějším režimu:
    queue mimo `sync`, cron aktivní, assets build, mail delivery.
 5. `TODO` Rozhodnout package test strategy:

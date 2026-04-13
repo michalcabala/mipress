@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use MiPress\Core\Console\Commands\PublishScheduledEntries;
+use MiPress\Core\Console\Commands\PublishScheduledPages;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command(PublishScheduledEntries::class)->everyMinute();
+        $schedule->command(PublishScheduledPages::class)->everyMinute();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         //

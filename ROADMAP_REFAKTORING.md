@@ -28,12 +28,9 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 
 ## P0 - blokery před první produkční verzí
 
-1. `TODO` Zavést reálnou CI pipeline v `.github/workflows`:
-   minimálně Pint, `php artisan test --compact` a smoke gate.
-2. `TODO` Dopsat instalační bootstrap nové instance:
-   permissions, role, první super admin a baseline settings flow.
-3. `TODO` Uzavřít scheduler orchestrace pro publikaci:
-   potvrdit a doplnit automatické publikování `Page`, nejen `Entry`.
+1. `DONE` CI pipeline v `.github/workflows/ci.yml`: Pint lint, full test suite, smoke gate (13. 4.).
+2. `DONE` Instalační bootstrap: `DatabaseSeeder` volá `PermissionSeeder` + `GlobalSetSeeder` + vytvoří default super admina (13. 4.).
+3. `DONE` Scheduler pro Pages: `PublishScheduledPages` command + registrace v scheduleru (13. 4.).
 4. `TODO` Zdokumentovat povinné produkční cron/queue procesy:
    scheduler, queue worker, social feed refresh, sitemap strategie.
 5. `TODO` Připravit produkční env baseline:

@@ -51,8 +51,8 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    zejména CI workflow a release gates (13. 4.).
 4. `TODO` Ověřit staging běh v produkčnějším režimu:
    queue mimo `sync`, cron aktivní, assets build, mail delivery.
-5. `TODO` Rozhodnout package test strategy:
-   přidat testy do balíčků, nebo explicitně potvrdit root suite jako canonical.
+5. `DONE` Package test strategy: root suite je canonical, balíčky nemají vlastní testy.
+   Local path packages nemají důvod duplikovat test infra. Core `autoload-dev` nechán jako příprava (14. 4.).
 6. `DONE` Doplnit `declare(strict_types=1)` do 30 souborů (social-feeds: 26, host app: 4, forms: 0 — již měly) (14. 4.).
 7. `DONE` Duplikátní `HasContextualCrudNotifications` v social-feeds již neexistuje (ověřeno 13. 4.).
 8. `DONE` Return types doplněny na `SocialAuthController::redirect()`, `callback()` a `handleFacebookPages()` (13. 4.).
@@ -60,14 +60,15 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 ## P2 - refaktoring a dlouhodobé zlepšení
 
 1. `DONE` Stale `$auditExclude` odstraněn z `Entry.php` a `Page.php` (13. 4.).
-2. `TODO` Rozhodnout stav lokalizačních scopů (`scopeForLocale`, `scopeOriginals`) v Entry, Page, Term:
-   buď nechat jako @future, nebo smazat pokud multi-lang nebude v dohlednu.
+2. `DONE` Lokalizační scopy (`scopeForLocale`, `scopeOriginals`) + vztahy (`origin`, `translations`)
+   v Entry, Page, Term označeny `@future multi-lang`. Infra zůstává, ale je jasně dokumentována jako neaktivní (14. 4.).
 3. `DONE` `json_encode()` v `SocialPost::upsertFromApi()` je korektní — `upsert()` obchází Eloquent casty, json_encode je nutný (ověřeno 13. 4.).
 4. `DONE` Logging doplněn do tichých `catch` bloků v `SelectFacebookPages` a `SocialFeedManager` (14. 4.).
 5. `TODO` Vytáhnout společné workflow/action UI z Entry/Page formulářů do sdíleného concernu, pokud to dál dává smysl.
 6. `TODO` Sjednotit naming slovník `name` vs `title` tam, kde to zjednoduší API a formuláře.
-7. `TODO` Doplnit základní observability workflow:
-   failed jobs, log review, jednoduché health checks.
+7. `DONE` Základní observability: `app:health-check` command (DB, cache, queue, storage, scheduler marker),
+   scheduler housekeeping (`queue:prune-failed` 7d, `queue:prune-batches` 48h),
+   scheduler health marker každých 5 minut (14. 4.).
 8. `TODO` Průběžně čistit historické dokumentační stopy, aby nevznikaly nové paralelní zdroje pravdy.
 9. `DONE` Odstraněn `app/Models/CuratorMedia.php` alias — potvrzeno nulové využití (14. 4.).
 10. `DONE` Avatar factory states (`withAvatarPath`, `withAvatarId`) a `declare(strict_types)` v `UserFactory.php` (14. 4.).

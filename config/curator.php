@@ -11,6 +11,7 @@ use MiPress\Core\Filament\Resources\CuratorMediaResource\Pages\EditCuratorMedia;
 use MiPress\Core\Filament\Resources\CuratorMediaResource\Pages\ListCuratorMedia;
 use MiPress\Core\Filament\Resources\CuratorMediaResource\Schemas\CuratorMediaForm;
 use MiPress\Core\Models\CuratorMedia;
+use MiPress\Core\PathGenerators\MediaPathGenerator;
 
 return [
     'curation_formats' => PreviewableExtensions::toArray(),
@@ -29,7 +30,7 @@ return [
     ],
     'glide_token' => env('CURATOR_GLIDE_TOKEN'),
     'model' => CuratorMedia::class,
-    'path_generator' => null,
+    'path_generator' => MediaPathGenerator::class,
     'resource' => [
         'label' => 'Médium',
         'plural_label' => 'Média',

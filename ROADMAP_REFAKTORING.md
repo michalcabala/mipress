@@ -53,15 +53,15 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 5. `TODO` Rozhodnout package test strategy:
    přidat testy do balíčků, nebo explicitně potvrdit root suite jako canonical.
 6. `TODO` Doplnit `declare(strict_types=1)` do 28+ souborů (forms: 5, social-feeds: 23, host app: 4).
-7. `TODO` Odebrat duplicitní `HasContextualCrudNotifications` ze social-feeds, importovat z core.
-8. `TODO` Doplnit return types na `SocialAuthController::redirect()` a `callback()`.
+7. `DONE` Duplikátní `HasContextualCrudNotifications` v social-feeds již neexistuje (ověřeno 13. 4.).
+8. `DONE` Return types doplněny na `SocialAuthController::redirect()`, `callback()` a `handleFacebookPages()` (13. 4.).
 
 ## P2 - refaktoring a dlouhodobé zlepšení
 
-1. `TODO` Odstranit stale `$auditExclude` property z `Entry.php` a `Page.php`.
+1. `DONE` Stale `$auditExclude` odstraněn z `Entry.php` a `Page.php` (13. 4.).
 2. `TODO` Rozhodnout stav lokalizačních scopů (`scopeForLocale`, `scopeOriginals`) v Entry, Page, Term:
    buď nechat jako @future, nebo smazat pokud multi-lang nebude v dohlednu.
-3. `TODO` Odstranit redundantní `json_encode()` v `SocialPost::upsertFromApi()` (Eloquent cast to řeší).
+3. `DONE` `json_encode()` v `SocialPost::upsertFromApi()` je korektní — `upsert()` obchází Eloquent casty, json_encode je nutný (ověřeno 13. 4.).
 4. `TODO` Přidat logování do tichých `catch (\Throwable) {}` bloků v social-feeds.
 5. `TODO` Vytáhnout společné workflow/action UI z Entry/Page formulářů do sdíleného concernu, pokud to dál dává smysl.
 6. `TODO` Sjednotit naming slovník `name` vs `title` tam, kde to zjednoduší API a formuláře.

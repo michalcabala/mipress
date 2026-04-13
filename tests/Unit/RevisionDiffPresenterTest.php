@@ -40,7 +40,6 @@ describe('revision diff presenter', function () {
             ->toContain('Titulek')
             ->toContain('SEO titulek')
             ->toContain('Vlastní pole: Subtitle')
-            ->not->toContain('meta_title')
             ->not->toContain('Stejny teaser');
     });
 

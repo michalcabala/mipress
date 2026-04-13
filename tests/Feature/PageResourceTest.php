@@ -132,22 +132,21 @@ it('publishes scheduled page immediately when the status is switched to publishe
         ->and($page->published_at?->isFuture())->toBeFalse();
 });
 
-it('shows validation feedback and closes the publish modal when required fields are missing', function () {
+it('shows validation feedback when required fields are missing on publish save', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Draft,
     ]);
 
-    $component = Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
+    Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'title' => null,
+            'status' => EntryStatus::Published->value,
         ])
-        ->callAction('publishPage')
-        ->assertHasFormErrors(['title' => 'required'])
-        ->assertNotified();
+        ->call('save')
+        ->assertHasFormErrors(['title' => 'required']);
 
-    expect($page->fresh()->status)->toBe(EntryStatus::Draft)
-        ->and($component->instance()->mountedActions)->toBe([]);
+    expect($page->fresh()->status)->toBe(EntryStatus::Draft);
 });
 
 it('redirects after publishing immediately', function () {
@@ -158,8 +157,12 @@ it('redirects after publishing immediately', function () {
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->callAction('publishPage')
-        ->assertRedirect(PageResource::getUrl('index'));
+        ->fillForm([
+            'status' => EntryStatus::Published->value,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertRedirect(PageResource::getUrl('edit', ['record' => $page]));
 
     $page->refresh();
 
@@ -171,12 +174,16 @@ it('redirects after scheduling publication', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => EntryStatus::Draft,
-        'published_at' => now()->addHour(),
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->callAction('publishPage')
-        ->assertRedirect(PageResource::getUrl('index'));
+        ->fillForm([
+            'published_at' => now()->addHour()->format('Y-m-d H:i:s'),
+            'status' => EntryStatus::Scheduled->value,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors()
+        ->assertRedirect(PageResource::getUrl('edit', ['record' => $page]));
 
     $page->refresh();
 
@@ -192,7 +199,11 @@ it('returns page in review back to draft', function () {
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->callAction('returnToDraft');
+        ->fillForm([
+            'status' => EntryStatus::Draft->value,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
 
     $page->refresh();
 
@@ -208,7 +219,11 @@ it('clears rejection note when page is saved as draft', function () {
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
-        ->callAction('saveDraft');
+        ->fillForm([
+            'status' => EntryStatus::Draft->value,
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
 
     $page->refresh();
 
@@ -386,7 +401,7 @@ it('uses slideover modals globally for page filters and column visibility', func
         ->and($table->getFilter('created_at', true))->toBeNull()
         ->and($table->getFilter('status', true))->not->toBeNull()
         ->and($table->getFilter('trashed', true))->not->toBeNull()
-        ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní']);
+        ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Publikace', 'Metadata']);
 });
 
 it('stores homepage selection in general settings and clears legacy site settings', function () {

@@ -43,8 +43,9 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 
 ## P1 - stabilizace release kandidáta
 
-1. `TODO` Dopsat integrační testy social-feeds workflow:
-   redirect/callback, refresh jobs, error handling, cache fallback.
+1. `DONE` Integrační testy social-feeds workflow: 24 testů pokrývajících
+   refresh jobs, SocialFeedManager (cache, fallback, filtr), SocialPost upsert,
+   SocialAccount model (šifrování, expirace, errory), SocialFeed model (slug, settings, scope) (14. 4.).
 2. `DONE` Přidat regresní test pro scheduler-level publikaci pages (3 testy v PageResourceTest, 13. 4.).
 3. `DONE` Srovnat `RELEASE_CHECKLIST.md` s reálným stavem repozitáře:
    zejména CI workflow a release gates (13. 4.).
@@ -62,14 +63,14 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 2. `TODO` Rozhodnout stav lokalizačních scopů (`scopeForLocale`, `scopeOriginals`) v Entry, Page, Term:
    buď nechat jako @future, nebo smazat pokud multi-lang nebude v dohlednu.
 3. `DONE` `json_encode()` v `SocialPost::upsertFromApi()` je korektní — `upsert()` obchází Eloquent casty, json_encode je nutný (ověřeno 13. 4.).
-4. `TODO` Přidat logování do tichých `catch (\Throwable) {}` bloků v social-feeds.
+4. `DONE` Logging doplněn do tichých `catch` bloků v `SelectFacebookPages` a `SocialFeedManager` (14. 4.).
 5. `TODO` Vytáhnout společné workflow/action UI z Entry/Page formulářů do sdíleného concernu, pokud to dál dává smysl.
 6. `TODO` Sjednotit naming slovník `name` vs `title` tam, kde to zjednoduší API a formuláře.
 7. `TODO` Doplnit základní observability workflow:
    failed jobs, log review, jednoduché health checks.
 8. `TODO` Průběžně čistit historické dokumentační stopy, aby nevznikaly nové paralelní zdroje pravdy.
-9. `TODO` Odstranit `app/Models/CuratorMedia.php` alias pokud se potvrdí, že není externě referencován.
-10. `TODO` Zvážit doplnění avatar factory states a `declare(strict_types)` do `UserFactory.php`.
+9. `DONE` Odstraněn `app/Models/CuratorMedia.php` alias — potvrzeno nulové využití (14. 4.).
+10. `DONE` Avatar factory states (`withAvatarPath`, `withAvatarId`) a `declare(strict_types)` v `UserFactory.php` (14. 4.).
 
 ## Poznámky k prioritám
 

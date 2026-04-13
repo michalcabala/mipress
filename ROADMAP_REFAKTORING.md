@@ -1,6 +1,6 @@
 # ROADMAP_REFAKTORING
 
-Aktualizováno: 12. dubna 2026
+Aktualizováno: 13. dubna 2026
 Owner: průběžně (tým + agent)
 Primární cíl: dovést miPress k první produkční verzi bez zbytečného architektonického přepisu
 
@@ -19,6 +19,12 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 3. `DONE` Taxonomy resource má základní feature test coverage.
 4. `DONE` Revisions UI a základní revision testy jsou v root suite.
 5. `DONE` Produkční smoke testy pro klíčové public/admin endpointy a public form submit existují.
+6. `DONE` Entry/Page list publication akce přepsány na workflow modal s `ToggleButtons` + `DateTimePicker` (13. 4.).
+7. `DONE` Grouped actions konzistentně na všech resource listech (core, forms, social-feeds) (13. 4.).
+8. `DONE` User resource: inline editace hesel odstraněna, nahrazena admin password reset + invitation flow (13. 4.).
+9. `DONE` AuditLog model a tabulka `audit_logs` odstraněny (13. 4.).
+10. `DONE` Resource Lock tabulky odstraněny (11. 4.).
+11. `DONE` CuratorMedia: vlastní list/grid view, filtry, curations, grouped actions, ownership policy (12. 4.).
 
 ## P0 - blokery před první produkční verzí
 
@@ -46,18 +52,29 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    queue mimo `sync`, cron aktivní, assets build, mail delivery.
 5. `TODO` Rozhodnout package test strategy:
    přidat testy do balíčků, nebo explicitně potvrdit root suite jako canonical.
+6. `TODO` Doplnit `declare(strict_types=1)` do 28+ souborů (forms: 5, social-feeds: 23, host app: 4).
+7. `TODO` Odebrat duplicitní `HasContextualCrudNotifications` ze social-feeds, importovat z core.
+8. `TODO` Doplnit return types na `SocialAuthController::redirect()` a `callback()`.
 
 ## P2 - refaktoring a dlouhodobé zlepšení
 
-1. `TODO` Vytáhnout společné workflow/action UI z Entry/Page formulářů do sdíleného concernu, pokud to dál dává smysl.
-2. `TODO` Sjednotit naming slovník `name` vs `title` tam, kde to zjednoduší API a formuláře.
-3. `TODO` Doplnit základní observability workflow:
+1. `TODO` Odstranit stale `$auditExclude` property z `Entry.php` a `Page.php`.
+2. `TODO` Rozhodnout stav lokalizačních scopů (`scopeForLocale`, `scopeOriginals`) v Entry, Page, Term:
+   buď nechat jako @future, nebo smazat pokud multi-lang nebude v dohlednu.
+3. `TODO` Odstranit redundantní `json_encode()` v `SocialPost::upsertFromApi()` (Eloquent cast to řeší).
+4. `TODO` Přidat logování do tichých `catch (\Throwable) {}` bloků v social-feeds.
+5. `TODO` Vytáhnout společné workflow/action UI z Entry/Page formulářů do sdíleného concernu, pokud to dál dává smysl.
+6. `TODO` Sjednotit naming slovník `name` vs `title` tam, kde to zjednoduší API a formuláře.
+7. `TODO` Doplnit základní observability workflow:
    failed jobs, log review, jednoduché health checks.
-4. `TODO` Průběžně čistit historické dokumentační stopy, aby nevznikaly nové paralelní zdroje pravdy.
+8. `TODO` Průběžně čistit historické dokumentační stopy, aby nevznikaly nové paralelní zdroje pravdy.
+9. `TODO` Odstranit `app/Models/CuratorMedia.php` alias pokud se potvrdí, že není externě referencován.
+10. `TODO` Zvážit doplnění avatar factory states a `declare(strict_types)` do `UserFactory.php`.
 
 ## Poznámky k prioritám
 
 - Největší riziko pro v1 už není CRUD vrstva, ale provozní spolehlivost a opakovatelnost release.
+- Code quality záležitosti (strict_types, dead code, trait duplikáty) jsou P1/P2, neblokují launch.
 - Pokud bude termín krátký, doporučený kompromis je:
   dokončit CI + bootstrap + scheduler + staging ověření a social-feeds případně odložit mimo launch scope.
 - Bez uzavření P0 bodů bude release možný jen ručně a s vyšším rizikem regresí.

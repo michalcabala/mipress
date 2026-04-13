@@ -52,7 +52,7 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    queue mimo `sync`, cron aktivní, assets build, mail delivery.
 5. `TODO` Rozhodnout package test strategy:
    přidat testy do balíčků, nebo explicitně potvrdit root suite jako canonical.
-6. `TODO` Doplnit `declare(strict_types=1)` do 28+ souborů (forms: 5, social-feeds: 23, host app: 4).
+6. `DONE` Doplnit `declare(strict_types=1)` do 30 souborů (social-feeds: 26, host app: 4, forms: 0 — již měly) (14. 4.).
 7. `DONE` Duplikátní `HasContextualCrudNotifications` v social-feeds již neexistuje (ověřeno 13. 4.).
 8. `DONE` Return types doplněny na `SocialAuthController::redirect()`, `callback()` a `handleFacebookPages()` (13. 4.).
 

@@ -408,3 +408,52 @@ it('stores homepage selection in general settings and clears legacy site setting
         ->and(Setting::getValue('site.homepage_page_id'))->toBeNull()
         ->and(Setting::getValue('site.homepage_entry_id'))->toBeNull();
 });
+
+it('publishes scheduled page via command when time is due', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Scheduled,
+        'scheduled_at' => now()->subMinute(),
+        'published_at' => now()->subMinute(),
+    ]);
+
+    $this->artisan('pages:publish-scheduled')
+        ->assertSuccessful();
+
+    $page->refresh();
+
+    expect($page->status)->toBe(EntryStatus::Published)
+        ->and($page->scheduled_at)->toBeNull();
+});
+
+it('does not publish page scheduled in the future', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Scheduled,
+        'scheduled_at' => now()->addHour(),
+        'published_at' => now()->addHour(),
+    ]);
+
+    $this->artisan('pages:publish-scheduled')
+        ->assertSuccessful();
+
+    $page->refresh();
+
+    expect($page->status)->toBe(EntryStatus::Scheduled);
+});
+
+it('publishes scheduled page with legacy published_at fallback', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Scheduled,
+        'scheduled_at' => null,
+        'published_at' => now()->subMinutes(5),
+    ]);
+
+    $this->artisan('pages:publish-scheduled')
+        ->assertSuccessful();
+
+    $page->refresh();
+
+    expect($page->status)->toBe(EntryStatus::Published);
+});

@@ -64,7 +64,9 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    v Entry, Page, Term označeny `@future multi-lang`. Infra zůstává, ale je jasně dokumentována jako neaktivní (14. 4.).
 3. `DONE` `json_encode()` v `SocialPost::upsertFromApi()` je korektní — `upsert()` obchází Eloquent casty, json_encode je nutný (ověřeno 13. 4.).
 4. `DONE` Logging doplněn do tichých `catch` bloků v `SelectFacebookPages` a `SocialFeedManager` (14. 4.).
-5. `TODO` Vytáhnout společné workflow/action UI z Entry/Page formulářů do sdíleného concernu, pokud to dál dává smysl.
+5. `DONE` Vytažen `HasPublicationTableWorkflow` trait do `Concerns/`, deduplikováno ~320 řádků
+   z `EntriesTable` a `PagesTable`. Sdílené: publication actions, workflow schema, status logic,
+   notification helpers. Specifika řešena přes abstract config metody (15. 4.).
 6. `TODO` Sjednotit naming slovník `name` vs `title` tam, kde to zjednoduší API a formuláře.
 7. `DONE` Základní observability: `app:health-check` command (DB, cache, queue, storage, scheduler marker),
    scheduler housekeeping (`queue:prune-failed` 7d, `queue:prune-batches` 48h),

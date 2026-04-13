@@ -4050,7 +4050,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/core",
-                "reference": "73786c90a5ea0ea287d80a8e384bcf650d5beaed"
+                "reference": "3487bfde7c170bef9d11aa0cbd1a91e919459c9a"
             },
             "require": {
                 "awcodes/botly": "^1.0",
@@ -4098,7 +4098,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/forms",
-                "reference": "b095ee78da761ec791e7a69c95b185d95d0fe96d"
+                "reference": "ce3dc0a32e500615d1b7056a976b4073b36a983a"
             },
             "require": {
                 "mipress/core": "@dev",
@@ -4132,7 +4132,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/social-feeds",
-                "reference": "c71c350b593e60b396a0e6fd2693a431dd462124"
+                "reference": "45cb8c62cc8dae0d1755193b1b722972f703700f"
             },
             "require": {
                 "filament/filament": "^5.0",

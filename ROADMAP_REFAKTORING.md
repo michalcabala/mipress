@@ -96,7 +96,9 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    v `EntryPolicy`/`PagePolicy` je sjednocena přes shared helper trait; doplněna přímá PagePolicy regrese (15. 4.).
 6. `DONE` PR6: `EntryForm`, `PageForm`, `EntrySeoForm` a `PageSeoForm` sdílí buildery pro SEO, publikaci,
    featured image a status metadata přes `EntryLikeFormBuilders`; doplněny přímé render regrese pro SEO edit stránky (15. 4.).
-7. `TODO` PR7: rozsekat `EntriesTable` a `PagesTable` na shared table builders/helpery pro common columns, filters a workflow UI.
+7. `DONE` PR7: `EntriesTable` a `PagesTable` sdílí `EntryLikeTableBuilders` pro common columns,
+   metadata filters a shared filter sections; taxonomy, blueprint a page hierarchy zůstaly oddělené.
+   Doplněny přímé regrese pro `created_month` filtr v Entry/Page resource testech (15. 4.).
 8. `TODO` PR8: dokončit naming cleanup (`EntryStatus` → neutrální název apod.) až po stabilizaci behavior změn.
 
 ### Invarianty tohoto směru

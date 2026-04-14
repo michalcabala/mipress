@@ -348,6 +348,31 @@ it('shows only author names in the multi author filter indicator', function () {
         ->and($indicatorLabel)->not->toContain('<span');
 });
 
+it('can filter pages by created month', function () {
+    $previousMonth = now()->subMonth()->startOfMonth()->addDays(4)->setTime(9, 0);
+    $currentMonth = now()->startOfMonth()->addDays(1)->setTime(14, 0);
+
+    $olderPage = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'title' => 'Starší stránka',
+        'created_at' => $previousMonth,
+        'updated_at' => $previousMonth,
+    ]);
+
+    $newerPage = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'title' => 'Novější stránka',
+        'created_at' => $currentMonth,
+        'updated_at' => $currentMonth,
+    ]);
+
+    Livewire::test(ListPages::class)
+        ->assertTableFilterExists('created_month')
+        ->filterTable('created_month', $currentMonth->format('Y-m'))
+        ->assertCanSeeTableRecords([$newerPage])
+        ->assertCanNotSeeTableRecords([$olderPage]);
+});
+
 it('uses the title column for resource lock indicators in the pages list', function () {
     Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,

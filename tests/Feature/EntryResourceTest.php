@@ -187,6 +187,33 @@ describe('list page', function () {
             ->assertCanNotSeeTableRecords([$activeEntry]);
     });
 
+    it('can filter entries by created month', function () {
+        $previousMonth = now()->subMonth()->startOfMonth()->addDays(3)->setTime(10, 0);
+        $currentMonth = now()->startOfMonth()->addDays(2)->setTime(11, 0);
+
+        $olderEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Starší záznam',
+            'created_at' => $previousMonth,
+            'updated_at' => $previousMonth,
+        ]);
+
+        $newerEntry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'title' => 'Novější záznam',
+            'created_at' => $currentMonth,
+            'updated_at' => $currentMonth,
+        ]);
+
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
+            ->assertTableFilterExists('created_month')
+            ->filterTable('created_month', $currentMonth->format('Y-m'))
+            ->assertCanSeeTableRecords([$newerEntry])
+            ->assertCanNotSeeTableRecords([$olderEntry]);
+    });
+
     it('ignores a stale generic page query string on first load', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,

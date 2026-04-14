@@ -10,7 +10,7 @@ use Filament\Tables\Enums\FiltersLayout;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Resources\PageResource;
 use MiPress\Core\Filament\Resources\PageResource\Pages\CreatePage;
@@ -62,7 +62,7 @@ it('auto-switches page status to scheduled when a future publish date is selecte
             'published_at' => $futurePublishAt->format('Y-m-d H:i:s'),
         ])
         ->assertFormSet([
-            'status' => EntryStatus::Scheduled->value,
+            'status' => ContentStatus::Scheduled->value,
         ]);
 });
 
@@ -95,7 +95,7 @@ it('can cancel page creation and return to the pages index', function () {
 it('switches scheduled page status to published when the publish date is moved into the past', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Scheduled,
+        'status' => ContentStatus::Scheduled,
         'published_at' => now()->addHour(),
         'scheduled_at' => now()->addHour(),
     ]);
@@ -105,21 +105,21 @@ it('switches scheduled page status to published when the publish date is moved i
             'published_at' => now()->subMinute()->format('Y-m-d H:i:s'),
         ])
         ->assertFormSet([
-            'status' => EntryStatus::Published->value,
+            'status' => ContentStatus::Published->value,
         ]);
 });
 
 it('publishes scheduled page immediately when the status is switched to published in the form', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Scheduled,
+        'status' => ContentStatus::Scheduled,
         'published_at' => now()->addHour(),
         'scheduled_at' => now()->addHour(),
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'status' => EntryStatus::Published->value,
+            'status' => ContentStatus::Published->value,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -127,7 +127,7 @@ it('publishes scheduled page immediately when the status is switched to publishe
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Published)
+    expect($page->status)->toBe(ContentStatus::Published)
         ->and($page->scheduled_at)->toBeNull()
         ->and($page->published_at)->not->toBeNull()
         ->and($page->published_at?->isFuture())->toBeFalse();
@@ -136,30 +136,30 @@ it('publishes scheduled page immediately when the status is switched to publishe
 it('shows validation feedback when required fields are missing on publish save', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'title' => null,
-            'status' => EntryStatus::Published->value,
+            'status' => ContentStatus::Published->value,
         ])
         ->call('save')
         ->assertHasFormErrors(['title' => 'required']);
 
-    expect($page->fresh()->status)->toBe(EntryStatus::Draft);
+    expect($page->fresh()->status)->toBe(ContentStatus::Draft);
 });
 
 it('redirects after publishing immediately', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
         'published_at' => null,
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'status' => EntryStatus::Published->value,
+            'status' => ContentStatus::Published->value,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -167,14 +167,14 @@ it('redirects after publishing immediately', function () {
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Published)
+    expect($page->status)->toBe(ContentStatus::Published)
         ->and($page->published_at)->not->toBeNull();
 });
 
 it('renders valid signed preview for unpublished page', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
         'slug' => 'draft-page-preview',
         'title' => 'Náhled stránky',
     ]);
@@ -189,7 +189,7 @@ it('renders valid signed preview for unpublished page', function () {
 it('redirects published page preview to live URL', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'slug' => 'live-page-preview',
         'published_at' => now()->subMinute(),
     ]);
@@ -214,13 +214,13 @@ it('can render seo edit page for page resource', function () {
 it('redirects after scheduling publication', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
             'published_at' => now()->addHour()->format('Y-m-d H:i:s'),
-            'status' => EntryStatus::Scheduled->value,
+            'status' => ContentStatus::Scheduled->value,
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -228,83 +228,83 @@ it('redirects after scheduling publication', function () {
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Scheduled)
+    expect($page->status)->toBe(ContentStatus::Scheduled)
         ->and($page->published_at)->not->toBeNull();
 });
 
 it('returns page in review back to draft', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::InReview,
+        'status' => ContentStatus::InReview,
         'review_note' => 'Doplnit titulek.',
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'status' => EntryStatus::Draft->value,
+            'status' => ContentStatus::Draft->value,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Draft)
+    expect($page->status)->toBe(ContentStatus::Draft)
         ->and($page->review_note)->toBeNull();
 });
 
 it('clears rejection note when page is saved as draft', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Rejected,
+        'status' => ContentStatus::Rejected,
         'review_note' => 'Upravit SEO metadata.',
     ]);
 
     Livewire::test(EditPage::class, ['record' => $page->getRouteKey()])
         ->fillForm([
-            'status' => EntryStatus::Draft->value,
+            'status' => ContentStatus::Draft->value,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Draft)
+    expect($page->status)->toBe(ContentStatus::Draft)
         ->and($page->review_note)->toBeNull();
 });
 
 it('loads pages by default and can filter them by status', function () {
     $draftPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
     ]);
 
     $publishedPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
     $scheduledPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Scheduled,
+        'status' => ContentStatus::Scheduled,
         'published_at' => now()->addHour(),
     ]);
 
     $reviewPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::InReview,
+        'status' => ContentStatus::InReview,
     ]);
 
     $rejectedPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Rejected,
+        'status' => ContentStatus::Rejected,
     ]);
 
     Livewire::test(ListPages::class)
         ->assertCanSeeTableRecords([$draftPage, $publishedPage, $scheduledPage, $reviewPage, $rejectedPage])
         ->assertTableFilterExists('status')
         ->assertTableFilterExists('trashed')
-        ->filterTable('status', EntryStatus::Published)
+        ->filterTable('status', ContentStatus::Published)
         ->assertCanSeeTableRecords([$publishedPage])
         ->assertCanNotSeeTableRecords([$draftPage, $scheduledPage, $reviewPage, $rejectedPage]);
 });
@@ -386,18 +386,18 @@ it('uses the title column for resource lock indicators in the pages list', funct
 it('renders the publication status overview buttons for pages', function () {
     Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
     ]);
 
     Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
     $trashedPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
@@ -405,22 +405,22 @@ it('renders the publication status overview buttons for pages', function () {
 
     Livewire::test(ListPages::class)
         ->assertSee('Vše')
-        ->assertSee(EntryStatus::Draft->getLabel())
-        ->assertSee(EntryStatus::Published->getLabel())
+        ->assertSee(ContentStatus::Draft->getLabel())
+        ->assertSee(ContentStatus::Published->getLabel())
         ->assertSee('Koš')
-        ->assertDontSee(EntryStatus::Scheduled->getLabel());
+        ->assertDontSee(ContentStatus::Scheduled->getLabel());
 });
 
 it('does not render record state tabs or the legacy record state links row', function () {
     Page::factory()->count(2)->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
     $trashedPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
     ]);
 
     $trashedPage->delete();
@@ -457,7 +457,7 @@ it('shows deleted pages through the trashed table filter', function () {
 it('ignores an unrelated tab query string on first load', function () {
     $draftPage = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
     ]);
 
     $component = Livewire::withQueryParams(['tab' => 'unknown'])
@@ -469,7 +469,7 @@ it('ignores an unrelated tab query string on first load', function () {
 it('ignores a stale generic page query string on first load', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now(),
     ]);
 
@@ -502,7 +502,7 @@ it('stores homepage selection in general settings and clears legacy site setting
     $page = Page::factory()->create([
         'title' => 'Domovská stránka',
         'slug' => 'domovska-stranka',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now(),
         'blueprint_id' => $this->blueprint->id,
     ]);
@@ -521,7 +521,7 @@ it('stores homepage selection in general settings and clears legacy site setting
 it('publishes scheduled page via command when time is due', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Scheduled,
+        'status' => ContentStatus::Scheduled,
         'scheduled_at' => now()->subMinute(),
         'published_at' => now()->subMinute(),
     ]);
@@ -531,14 +531,14 @@ it('publishes scheduled page via command when time is due', function () {
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Published)
+    expect($page->status)->toBe(ContentStatus::Published)
         ->and($page->scheduled_at)->toBeNull();
 });
 
 it('does not publish page scheduled in the future', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Scheduled,
+        'status' => ContentStatus::Scheduled,
         'scheduled_at' => now()->addHour(),
         'published_at' => now()->addHour(),
     ]);
@@ -548,13 +548,13 @@ it('does not publish page scheduled in the future', function () {
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Scheduled);
+    expect($page->status)->toBe(ContentStatus::Scheduled);
 });
 
 it('publishes scheduled page with legacy published_at fallback', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Scheduled,
+        'status' => ContentStatus::Scheduled,
         'scheduled_at' => null,
         'published_at' => now()->subMinutes(5),
     ]);
@@ -564,5 +564,5 @@ it('publishes scheduled page with legacy published_at fallback', function () {
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Published);
+    expect($page->status)->toBe(ContentStatus::Published);
 });

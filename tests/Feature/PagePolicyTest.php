@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Models\Page;
 use MiPress\Core\Policies\PagePolicy;
@@ -19,7 +19,7 @@ it('allows contributor to update own published page', function () {
 
     $page = Page::factory()->create([
         'author_id' => $contributor->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
     ]);
 
     $policy = app(PagePolicy::class);
@@ -33,7 +33,7 @@ it('prevents contributor from updating another users page', function () {
 
     $page = Page::factory()->create([
         'author_id' => User::factory()->create()->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
     ]);
 
     $policy = app(PagePolicy::class);
@@ -46,7 +46,7 @@ it('requires publish permission for deleting published pages', function () {
     $user->givePermissionTo(['entry.view', 'entry.update', 'entry.delete']);
 
     $page = Page::factory()->create([
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
     ]);
 
     $policy = app(PagePolicy::class);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Models\Collection;
 use MiPress\Core\Models\Entry;
 use MiPress\Core\Models\Page;
@@ -18,14 +18,14 @@ it('keeps the approved entry route public while an updated slug is in review', f
         'blueprint_id' => $collection->blueprint_id,
         'title' => 'Původní článek',
         'slug' => 'puvodni-clanek',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
     $entry->update([
         'title' => 'Rozpracovaný článek',
         'slug' => 'rozpracovany-clanek',
-        'status' => EntryStatus::InReview,
+        'status' => ContentStatus::InReview,
     ]);
 
     $this->get('/blog/puvodni-clanek')
@@ -43,14 +43,14 @@ it('keeps the approved page route public while an updated slug is in review', fu
     $page = Page::factory()->create([
         'title' => 'Původní stránka',
         'slug' => 'puvodni-stranka',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
     $page->update([
         'title' => 'Rozpracovaná stránka',
         'slug' => 'rozpracovana-stranka',
-        'status' => EntryStatus::InReview,
+        'status' => ContentStatus::InReview,
     ]);
 
     $this->get('/puvodni-stranka')

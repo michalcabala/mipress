@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Resources\PageResource;
 use MiPress\Core\Models\Blueprint;
@@ -30,7 +30,7 @@ it('publishes page through the browser', function () {
 
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
         'published_at' => null,
     ]);
 
@@ -65,6 +65,6 @@ JS);
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::Published)
+    expect($page->status)->toBe(ContentStatus::Published)
         ->and($page->published_at)->not->toBeNull();
 });

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Models\Blueprint;
 use MiPress\Core\Models\Collection;
@@ -41,7 +41,7 @@ it('prepares review create data with cleared review state', function () {
         'review_note' => 'Old note',
     ], 'review');
 
-    expect($data['status'])->toBe(EntryStatus::InReview)
+    expect($data['status'])->toBe(ContentStatus::InReview)
         ->and($data['scheduled_at'])->toBeNull()
         ->and($data['review_note'])->toBeNull();
 });
@@ -54,7 +54,7 @@ it('prepares scheduled publish data when publish date is in the future', functio
         'published_at' => $publishAt,
     ], 'publish');
 
-    expect($data['status'])->toBe(EntryStatus::Scheduled)
+    expect($data['status'])->toBe(ContentStatus::Scheduled)
         ->and($data['published_at']?->format('Y-m-d H:i:s'))->toBe($publishAt->format('Y-m-d H:i:s'))
         ->and($data['scheduled_at']?->format('Y-m-d H:i:s'))->toBe($publishAt->format('Y-m-d H:i:s'));
 });
@@ -62,7 +62,7 @@ it('prepares scheduled publish data when publish date is in the future', functio
 it('publishes immediately when no future schedule is present', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
         'published_at' => null,
         'review_note' => 'Needs cleanup',
     ]);
@@ -71,9 +71,9 @@ it('publishes immediately when no future schedule is present', function () {
 
     $page->refresh();
 
-    expect($transition->oldStatus)->toBe(EntryStatus::Draft)
-        ->and($transition->newStatus)->toBe(EntryStatus::Published)
-        ->and($page->status)->toBe(EntryStatus::Published)
+    expect($transition->oldStatus)->toBe(ContentStatus::Draft)
+        ->and($transition->newStatus)->toBe(ContentStatus::Published)
+        ->and($page->status)->toBe(ContentStatus::Published)
         ->and($page->published_at)->not->toBeNull()
         ->and($page->scheduled_at)->toBeNull()
         ->and($page->review_note)->toBeNull();
@@ -85,7 +85,7 @@ it('schedules publication when future publish date is already set on the record'
     $entry = Entry::factory()->create([
         'collection_id' => $this->collection->id,
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
         'published_at' => $publishAt,
     ]);
 
@@ -93,9 +93,9 @@ it('schedules publication when future publish date is already set on the record'
 
     $entry->refresh();
 
-    expect($transition->newStatus)->toBe(EntryStatus::Scheduled)
+    expect($transition->newStatus)->toBe(ContentStatus::Scheduled)
         ->and($transition->scheduledFor?->format('Y-m-d H:i:s'))->toBe($publishAt->format('Y-m-d H:i:s'))
-        ->and($entry->status)->toBe(EntryStatus::Scheduled)
+        ->and($entry->status)->toBe(ContentStatus::Scheduled)
         ->and($entry->scheduled_at?->format('Y-m-d H:i:s'))->toBe($publishAt->format('Y-m-d H:i:s'));
 });
 
@@ -103,7 +103,7 @@ it('returns rejected content to draft and clears the rejection note', function (
     $entry = Entry::factory()->create([
         'collection_id' => $this->collection->id,
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Rejected,
+        'status' => ContentStatus::Rejected,
         'review_note' => 'Doplnit zdroje.',
     ]);
 
@@ -111,8 +111,8 @@ it('returns rejected content to draft and clears the rejection note', function (
 
     $entry->refresh();
 
-    expect($transition->oldStatus)->toBe(EntryStatus::Rejected)
-        ->and($transition->newStatus)->toBe(EntryStatus::Draft)
-        ->and($entry->status)->toBe(EntryStatus::Draft)
+    expect($transition->oldStatus)->toBe(ContentStatus::Rejected)
+        ->and($transition->newStatus)->toBe(ContentStatus::Draft)
+        ->and($entry->status)->toBe(ContentStatus::Draft)
         ->and($entry->review_note)->toBeNull();
 });

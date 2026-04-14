@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Models\User;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Resources\EntryResource;
 use MiPress\Core\Filament\Resources\EntryResource\Pages\EditEntry;
@@ -43,14 +43,14 @@ it('shows a richer revision table for entry history', function () {
     $entry = Entry::factory()->create([
         'collection_id' => $this->collection->id,
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
         'title' => 'Původní titulek',
         'slug' => 'puvodni-titulek',
     ]);
 
     $entry->update([
         'title' => 'Upravený titulek',
-        'status' => EntryStatus::InReview,
+        'status' => ContentStatus::InReview,
     ]);
 
     $revision = $entry->revisions()->firstOrFail();
@@ -67,14 +67,14 @@ it('shows a richer revision table for entry history', function () {
 it('shows a richer revision table for page history', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
-        'status' => EntryStatus::Draft,
+        'status' => ContentStatus::Draft,
         'title' => 'Původní stránka',
         'slug' => 'puvodni-stranka',
     ]);
 
     $page->update([
         'title' => 'Upravená stránka',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
     ]);
 
     $revision = $page->revisions()->firstOrFail();

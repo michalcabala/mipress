@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Resources\EntryResource;
 use MiPress\Core\Filament\Resources\EntryResource\Pages\CreateEntry;
@@ -124,40 +124,40 @@ describe('list page', function () {
         $draftEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
         ]);
 
         $publishedEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Published,
+            'status' => ContentStatus::Published,
             'published_at' => now()->subMinute(),
         ]);
 
         $scheduledEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Scheduled,
+            'status' => ContentStatus::Scheduled,
             'published_at' => now()->addHour(),
         ]);
 
         $reviewEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::InReview,
+            'status' => ContentStatus::InReview,
         ]);
 
         $rejectedEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Rejected,
+            'status' => ContentStatus::Rejected,
         ]);
 
         $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'blog']);
 
         $component
             ->assertCanSeeTableRecords([$draftEntry, $publishedEntry, $scheduledEntry, $reviewEntry, $rejectedEntry])
-            ->filterTable('status', EntryStatus::Published)
+            ->filterTable('status', ContentStatus::Published)
             ->assertCanSeeTableRecords([$publishedEntry])
             ->assertCanNotSeeTableRecords([$draftEntry, $scheduledEntry, $reviewEntry, $rejectedEntry]);
     });
@@ -218,7 +218,7 @@ describe('list page', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Published,
+            'status' => ContentStatus::Published,
             'published_at' => now(),
         ]);
 
@@ -454,7 +454,7 @@ describe('list page', function () {
 
         Entry::factory()->create([
             'collection_id' => $blogCollection->id,
-            'status' => EntryStatus::InReview,
+            'status' => ContentStatus::InReview,
         ]);
 
         $items = EntryResource::getNavigationItems();
@@ -472,7 +472,7 @@ describe('list page', function () {
 
         Entry::factory()->create([
             'collection_id' => $blogCollection->id,
-            'status' => EntryStatus::InReview,
+            'status' => ContentStatus::InReview,
         ]);
 
         $contributor = User::factory()->create();
@@ -716,7 +716,7 @@ describe('create entry', function () {
 
         $entry = Entry::where('slug', 'draft-test')->first();
 
-        expect($entry->status)->toBe(EntryStatus::Draft);
+        expect($entry->status)->toBe(ContentStatus::Draft);
     });
 
     it('auto-switches entry status to scheduled when a future publish date is selected on create', function () {
@@ -728,7 +728,7 @@ describe('create entry', function () {
                 'published_at' => $futurePublishAt->format('Y-m-d H:i:s'),
             ])
             ->assertFormSet([
-                'status' => EntryStatus::Scheduled->value,
+                'status' => ContentStatus::Scheduled->value,
             ]);
     });
 
@@ -855,7 +855,7 @@ describe('edit entry', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
         ]);
 
         Livewire::test(EditEntry::class, ['record' => $entry->getKey()])
@@ -910,7 +910,7 @@ describe('status workflow', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'author_id' => $contributor->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
         ]);
 
         Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
@@ -922,13 +922,13 @@ describe('status workflow', function () {
     it('creates entries as draft by default', function () {
         $entry = Entry::factory()->create();
 
-        expect($entry->status)->toBe(EntryStatus::Draft);
+        expect($entry->status)->toBe(ContentStatus::Draft);
     });
 
     it('can have published status with published_at date', function () {
         $entry = Entry::factory()->published()->create();
 
-        expect($entry->status)->toBe(EntryStatus::Published)
+        expect($entry->status)->toBe(ContentStatus::Published)
             ->and($entry->published_at)->not->toBeNull();
     });
 
@@ -957,7 +957,7 @@ describe('status workflow', function () {
     it('returns entry in review back to draft', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
-            'status' => EntryStatus::InReview,
+            'status' => ContentStatus::InReview,
             'review_note' => 'Zkontrolujte perex.',
         ]);
 
@@ -966,7 +966,7 @@ describe('status workflow', function () {
 
         $entry->refresh();
 
-        expect($entry->status)->toBe(EntryStatus::Draft)
+        expect($entry->status)->toBe(ContentStatus::Draft)
             ->and($entry->review_note)->toBeNull();
     });
 
@@ -974,7 +974,7 @@ describe('status workflow', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Scheduled,
+            'status' => ContentStatus::Scheduled,
             'published_at' => now()->addHour(),
             'scheduled_at' => now()->addHour(),
         ]);
@@ -984,7 +984,7 @@ describe('status workflow', function () {
                 'published_at' => now()->subMinute()->format('Y-m-d H:i:s'),
             ])
             ->assertFormSet([
-                'status' => EntryStatus::Published->value,
+                'status' => ContentStatus::Published->value,
             ]);
     });
 
@@ -992,21 +992,21 @@ describe('status workflow', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Scheduled,
+            'status' => ContentStatus::Scheduled,
             'published_at' => now()->addHour(),
             'scheduled_at' => now()->addHour(),
         ]);
 
         Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
             ->fillForm([
-                'status' => EntryStatus::Published->value,
+                'status' => ContentStatus::Published->value,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $entry->refresh();
 
-        expect($entry->status)->toBe(EntryStatus::Published)
+        expect($entry->status)->toBe(ContentStatus::Published)
             ->and($entry->scheduled_at)->toBeNull()
             ->and($entry->published_at)->not->toBeNull()
             ->and($entry->published_at?->isFuture())->toBeFalse();
@@ -1016,7 +1016,7 @@ describe('status workflow', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
             'published_at' => now()->addHour(),
         ]);
 
@@ -1026,14 +1026,14 @@ describe('status workflow', function () {
 
         $entry->refresh();
 
-        expect($entry->status)->toBe(EntryStatus::Scheduled)
+        expect($entry->status)->toBe(ContentStatus::Scheduled)
             ->and($entry->published_at)->not->toBeNull();
     });
 
     it('publishes scheduled entry via command when time is due', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
-            'status' => EntryStatus::Scheduled,
+            'status' => ContentStatus::Scheduled,
             'published_at' => now()->subMinute(),
         ]);
 
@@ -1042,14 +1042,14 @@ describe('status workflow', function () {
 
         $entry->refresh();
 
-        expect($entry->status)->toBe(EntryStatus::Published);
+        expect($entry->status)->toBe(ContentStatus::Published);
     });
 
     it('publishes immediately when publish date is empty', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
             'published_at' => null,
         ]);
 
@@ -1059,7 +1059,7 @@ describe('status workflow', function () {
 
         $entry->refresh();
 
-        expect($entry->status)->toBe(EntryStatus::Published)
+        expect($entry->status)->toBe(ContentStatus::Published)
             ->and($entry->published_at)->not->toBeNull();
     });
 
@@ -1067,7 +1067,7 @@ describe('status workflow', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'blueprint_id' => $this->blueprint->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
         ]);
 
         $component = Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
@@ -1078,7 +1078,7 @@ describe('status workflow', function () {
             ->assertHasFormErrors(['title' => 'required'])
             ->assertNotified();
 
-        expect($entry->fresh()->status)->toBe(EntryStatus::Draft)
+        expect($entry->fresh()->status)->toBe(ContentStatus::Draft)
             ->and($component->instance()->mountedActions)->toBe([]);
     });
 
@@ -1087,7 +1087,7 @@ describe('status workflow', function () {
 
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
             'published_at' => $pastDate,
         ]);
 
@@ -1096,14 +1096,14 @@ describe('status workflow', function () {
 
         $entry->refresh();
 
-        expect($entry->status)->toBe(EntryStatus::Published)
+        expect($entry->status)->toBe(ContentStatus::Published)
             ->and($entry->published_at?->format('Y-m-d H:i:s'))->toBe($pastDate->format('Y-m-d H:i:s'));
     });
 
     it('clears rejection note when saved as draft', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
-            'status' => EntryStatus::Rejected,
+            'status' => ContentStatus::Rejected,
             'review_note' => 'Nutné doplnit zdroje.',
         ]);
 
@@ -1112,7 +1112,7 @@ describe('status workflow', function () {
 
         $entry->refresh();
 
-        expect($entry->status)->toBe(EntryStatus::Draft)
+        expect($entry->status)->toBe(ContentStatus::Draft)
             ->and($entry->review_note)->toBeNull();
     });
 });
@@ -1123,7 +1123,7 @@ describe('preview', function () {
     it('renders valid signed preview for unpublished entry', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
             'slug' => 'draft-preview',
             'title' => 'Náhled článku',
         ]);
@@ -1138,7 +1138,7 @@ describe('preview', function () {
     it('returns 403 for expired preview URL', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
             'slug' => 'expired-preview',
         ]);
 
@@ -1151,7 +1151,7 @@ describe('preview', function () {
     it('redirects published entry preview to live URL', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
-            'status' => EntryStatus::Published,
+            'status' => ContentStatus::Published,
             'slug' => 'live-article',
             'published_at' => now()->subMinute(),
         ]);
@@ -1168,7 +1168,7 @@ describe('preview', function () {
 describe('header action matrix', function () {
     it('shows expected header actions by role and status', function (
         string $role,
-        EntryStatus $status,
+        ContentStatus $status,
         bool $asAuthor,
         array $expectedVisible,
         array $expectedHidden,
@@ -1182,9 +1182,9 @@ describe('header action matrix', function () {
             'author_id' => $asAuthor ? $user->id : $this->admin->id,
             'status' => $status,
             'slug' => 'workflow-matrix-'.str()->random(8),
-            'published_at' => $status === EntryStatus::Scheduled
+            'published_at' => $status === ContentStatus::Scheduled
                 ? now()->addHour()
-                : ($status === EntryStatus::Published ? now()->subMinute() : null),
+                : ($status === ContentStatus::Published ? now()->subMinute() : null),
         ]);
 
         $response = $this->get(EntryResource::getUrl('edit', ['record' => $entry]));
@@ -1201,56 +1201,56 @@ describe('header action matrix', function () {
     })->with([
         'contributor draft own' => [
             UserRole::Contributor->value,
-            EntryStatus::Draft,
+            ContentStatus::Draft,
             true,
             ['Náhled', 'Odeslat ke schválení', 'Uložit koncept'],
             ['Publikovat', 'Schválit a publikovat', 'Zamítnout', 'Zrušit publikaci'],
         ],
         'editor draft own' => [
             UserRole::Editor->value,
-            EntryStatus::Draft,
+            ContentStatus::Draft,
             true,
             ['Náhled', 'Publikovat', 'Uložit koncept'],
             ['Odeslat ke schválení', 'Schválit a publikovat', 'Zamítnout'],
         ],
         'contributor in_review own' => [
             UserRole::Contributor->value,
-            EntryStatus::InReview,
+            ContentStatus::InReview,
             true,
             ['Náhled'],
             ['Schválit a publikovat', 'Zamítnout', 'Uložit koncept', 'Publikovat'],
         ],
         'editor in_review own' => [
             UserRole::Editor->value,
-            EntryStatus::InReview,
+            ContentStatus::InReview,
             true,
             ['Náhled', 'Schválit a publikovat', 'Zamítnout', 'Uložit koncept'],
             ['Odeslat ke schválení', 'Upravit a znovu odeslat'],
         ],
         'editor published own' => [
             UserRole::Editor->value,
-            EntryStatus::Published,
+            ContentStatus::Published,
             true,
             ['Zobrazit na webu', 'Aktualizovat', 'Zrušit publikaci'],
             ['Náhled', 'Publikovat ihned', 'Zrušit plánování'],
         ],
         'editor scheduled own' => [
             UserRole::Editor->value,
-            EntryStatus::Scheduled,
+            ContentStatus::Scheduled,
             true,
             ['Náhled', 'Aktualizovat', 'Zrušit plánování', 'Publikovat ihned'],
             ['Zobrazit na webu', 'Zrušit publikaci'],
         ],
         'contributor rejected own' => [
             UserRole::Contributor->value,
-            EntryStatus::Rejected,
+            ContentStatus::Rejected,
             true,
             ['Náhled', 'Upravit a znovu odeslat', 'Uložit koncept'],
             ['Publikovat', 'Schválit a publikovat', 'Zamítnout'],
         ],
         'editor rejected own' => [
             UserRole::Editor->value,
-            EntryStatus::Rejected,
+            ContentStatus::Rejected,
             true,
             ['Náhled', 'Publikovat', 'Uložit koncept'],
             ['Upravit a znovu odeslat', 'Schválit a publikovat'],
@@ -1321,7 +1321,7 @@ describe('authorization', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'author_id' => $contributor->id,
-            'status' => EntryStatus::Published,
+            'status' => ContentStatus::Published,
         ]);
 
         $this->get(EntryResource::getUrl('edit', ['record' => $entry]))
@@ -1334,7 +1334,7 @@ describe('authorization', function () {
 
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
-            'status' => EntryStatus::Published,
+            'status' => ContentStatus::Published,
         ]);
 
         $policy = app(EntryPolicy::class);

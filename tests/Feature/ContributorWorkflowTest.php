@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Resources\EntryResource;
 use MiPress\Core\Filament\Resources\EntryResource\Pages\EditEntry;
@@ -63,7 +63,7 @@ it('allows contributor to edit own published entry and submit changes for review
         'collection_id' => $collection->id,
         'blueprint_id' => $blueprint->id,
         'author_id' => $contributor->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
@@ -77,7 +77,7 @@ it('allows contributor to edit own published entry and submit changes for review
 
     $entry->refresh();
 
-    expect($entry->status)->toBe(EntryStatus::InReview);
+    expect($entry->status)->toBe(ContentStatus::InReview);
 });
 
 it('blocks contributor from editing another authors published entry', function () {
@@ -92,7 +92,7 @@ it('blocks contributor from editing another authors published entry', function (
         'collection_id' => $collection->id,
         'blueprint_id' => $blueprint->id,
         'author_id' => $otherAuthor->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
@@ -105,7 +105,7 @@ it('allows contributor to edit own published page and submit changes for review'
 
     $page = Page::factory()->create([
         'author_id' => $contributor->id,
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
@@ -119,7 +119,7 @@ it('allows contributor to edit own published page and submit changes for review'
 
     $page->refresh();
 
-    expect($page->status)->toBe(EntryStatus::InReview);
+    expect($page->status)->toBe(ContentStatus::InReview);
 });
 
 it('renders the last approved entry version on frontend when contributor changes are in review', function () {
@@ -135,7 +135,7 @@ it('renders the last approved entry version on frontend when contributor changes
         'author_id' => $contributor->id,
         'title' => 'Schválený článek',
         'slug' => 'schvaleny-clanek',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
@@ -149,7 +149,7 @@ it('renders the last approved entry version on frontend when contributor changes
 
     expect($entry->revisions()->count())->toBeGreaterThan(0)
         ->and($entry->latestPublishedRevisionSnapshot())->not->toBeNull()
-        ->and($entry->resolvePublicVersion()->status)->toBe(EntryStatus::Published)
+        ->and($entry->resolvePublicVersion()->status)->toBe(ContentStatus::Published)
         ->and($entry->resolvePublicVersion()->title)->toBe('Schválený článek');
 
     expect(Entry::query()->publiclyVisible()->whereKey($entry->getKey())->exists())->toBeTrue();
@@ -169,7 +169,7 @@ it('renders the last approved page version on frontend when contributor changes 
         'author_id' => $contributor->id,
         'title' => 'Schválená stránka',
         'slug' => 'schvalena-stranka',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now()->subMinute(),
     ]);
 
@@ -183,7 +183,7 @@ it('renders the last approved page version on frontend when contributor changes 
 
     expect($page->revisions()->count())->toBeGreaterThan(0)
         ->and($page->latestPublishedRevisionSnapshot())->not->toBeNull()
-        ->and($page->resolvePublicVersion()->status)->toBe(EntryStatus::Published)
+        ->and($page->resolvePublicVersion()->status)->toBe(ContentStatus::Published)
         ->and($page->resolvePublicVersion()->title)->toBe('Schválená stránka');
 
     expect(Page::query()->publiclyVisible()->whereKey($page->getKey())->exists())->toBeTrue();

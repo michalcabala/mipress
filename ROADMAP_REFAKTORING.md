@@ -99,7 +99,8 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 7. `DONE` PR7: `EntriesTable` a `PagesTable` sdílí `EntryLikeTableBuilders` pro common columns,
    metadata filters a shared filter sections; taxonomy, blueprint a page hierarchy zůstaly oddělené.
    Doplněny přímé regrese pro `created_month` filtr v Entry/Page resource testech (15. 4.).
-8. `TODO` PR8: dokončit naming cleanup (`EntryStatus` → neutrální název apod.) až po stabilizaci behavior změn.
+8. `DONE` PR8: interní kód a testy převedeny na neutrální enum `ContentStatus`,
+   původní `EntryStatus` zůstává jako backward-compatible alias; doplněna přímá kompatibilitní regrese (15. 4.).
 
 ### Invarianty tohoto směru
 

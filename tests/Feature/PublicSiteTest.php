@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Models\Collection;
 use MiPress\Core\Models\Entry;
 use MiPress\Core\Models\Page;
@@ -18,7 +18,7 @@ test('the homepage renders the configured published entry', function () {
     $page = Page::factory()->create([
         'title' => 'Home Page',
         'slug' => 'home-page',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now(),
     ]);
 
@@ -33,7 +33,7 @@ test('the homepage still resolves the legacy site homepage setting during the tr
     $page = Page::factory()->create([
         'title' => 'Legacy homepage',
         'slug' => 'legacy-homepage',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now(),
     ]);
 
@@ -55,7 +55,7 @@ test('the homepage still resolves the legacy homepage entry setting during the t
         'blueprint_id' => $collection->blueprint_id,
         'title' => 'Legacy homepage entry',
         'slug' => 'legacy-homepage-entry',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now(),
     ]);
 
@@ -90,7 +90,7 @@ test('public collection routes support multiple placeholders and resolve the slu
         'blueprint_id' => $collection->blueprint_id,
         'title' => 'Hello World',
         'slug' => 'hello-world',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now(),
     ]);
 
@@ -110,7 +110,7 @@ test('simple page routes using a root slug are publicly reachable', function () 
         'blueprint_id' => $collection->blueprint_id,
         'title' => 'About MiPress',
         'slug' => 'about-mipress',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now(),
         'data' => [
             'perex' => 'About page for the MiPress project.',
@@ -137,7 +137,7 @@ test('archive routes render published entries for public collections', function 
         'blueprint_id' => $collection->blueprint_id,
         'title' => 'First Story',
         'slug' => 'first-story',
-        'status' => EntryStatus::Published,
+        'status' => ContentStatus::Published,
         'published_at' => now(),
         'data' => [
             'excerpt' => 'Preview text for the archive card.',

@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
-use MiPress\Core\Enums\EntryStatus;
+use MiPress\Core\Enums\ContentStatus;
 use MiPress\Core\Enums\UserRole;
 use MiPress\Core\Filament\Pages\GlobalSeoSettings;
 use MiPress\Core\Models\Page;
@@ -111,7 +111,7 @@ describe('frontend seo rendering', function () {
         Page::factory()->create([
             'title' => 'Kontakt',
             'slug' => 'kontakt',
-            'status' => EntryStatus::Published,
+            'status' => ContentStatus::Published,
             'published_at' => now(),
             'meta_description' => null,
             'data' => [
@@ -150,7 +150,7 @@ describe('frontend seo rendering', function () {
         $page = Page::factory()->create([
             'title' => 'Návrh stránky',
             'slug' => 'navrh-stranky',
-            'status' => EntryStatus::Draft,
+            'status' => ContentStatus::Draft,
             'meta_description' => null,
             'data' => [
                 'excerpt' => 'Krátký pracovní náhled připravované stránky.',

@@ -44,6 +44,28 @@ test('the homepage still resolves the legacy site homepage setting during the tr
         ->assertSee('Legacy homepage');
 });
 
+test('the homepage still resolves the legacy homepage entry setting during the transition', function () {
+    $collection = Collection::factory()->create([
+        'route' => '/blog/{slug}',
+        'slugs' => true,
+    ]);
+
+    $entry = Entry::factory()->create([
+        'collection_id' => $collection->id,
+        'blueprint_id' => $collection->blueprint_id,
+        'title' => 'Legacy homepage entry',
+        'slug' => 'legacy-homepage-entry',
+        'status' => EntryStatus::Published,
+        'published_at' => now(),
+    ]);
+
+    Setting::putValue('site.homepage_entry_id', (string) $entry->getKey());
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('Legacy homepage entry');
+});
+
 test('theme assets are served without requiring a published public symlink', function () {
     $this->get('/theme-files/default/assets/css/theme.css')
         ->assertOk()

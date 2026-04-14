@@ -7,6 +7,7 @@ use Filament\Actions\Testing\TestAction;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Enums\ColumnManagerLayout;
 use Filament\Tables\Enums\FiltersLayout;
+use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
 use MiPress\Core\Enums\EntryStatus;
@@ -168,6 +169,35 @@ it('redirects after publishing immediately', function () {
 
     expect($page->status)->toBe(EntryStatus::Published)
         ->and($page->published_at)->not->toBeNull();
+});
+
+it('renders valid signed preview for unpublished page', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Draft,
+        'slug' => 'draft-page-preview',
+        'title' => 'Náhled stránky',
+    ]);
+
+    $url = URL::temporarySignedRoute('preview.page', now()->addHour(), ['page' => $page->id]);
+
+    $this->get($url)
+        ->assertSuccessful()
+        ->assertSee('Náhled stránky (nepublikovaná verze)');
+});
+
+it('redirects published page preview to live URL', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Published,
+        'slug' => 'live-page-preview',
+        'published_at' => now()->subMinute(),
+    ]);
+
+    $url = URL::temporarySignedRoute('preview.page', now()->addHour(), ['page' => $page->id]);
+
+    $this->get($url)
+        ->assertRedirect('/live-page-preview');
 });
 
 it('redirects after scheduling publication', function () {

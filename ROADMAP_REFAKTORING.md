@@ -90,7 +90,8 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 3. `DONE` PR3: public runtime z `EntryController` rozdělen na služby `PublicHomepageService`,
    `PublicContentRenderer` a `PublicContentRouteResolver`; controller je nyní tenký delegátor a public suite
    nově kryje i legacy `site.homepage_entry_id` fallback (15. 4.).
-4. `TODO` PR4: sjednotit preview pipeline pro Entry a Page přes sdílený renderer/service.
+4. `DONE` PR4: preview pipeline pro Entry a Page sjednocena přes `PreviewContentService`; oba controllery
+   jsou tenké delegátory a Page preview má novou přímou regresní coverage pro banner i redirect (15. 4.).
 5. `TODO` PR5: deduplikovat shared admin stavebnice kolem status overview widgetů a policies.
 6. `TODO` PR6: rozsekat `EntryForm` a `PageForm` na shared section/builders pro publikaci, SEO, featured image a stavové boxy.
 7. `TODO` PR7: rozsekat `EntriesTable` a `PagesTable` na shared table builders/helpery pro common columns, filters a workflow UI.

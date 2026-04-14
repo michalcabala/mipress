@@ -50,8 +50,8 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 2. `DONE` Přidat regresní test pro scheduler-level publikaci pages (3 testy v PageResourceTest, 13. 4.).
 3. `DONE` Srovnat `RELEASE_CHECKLIST.md` s reálným stavem repozitáře:
    zejména CI workflow a release gates (13. 4.).
-4. `TODO` Ověřit staging běh v produkčnějším režimu:
-   queue mimo `sync`, cron aktivní, assets build, mail delivery.
+4. `DONE` Staging ověření: lokální produkční cache (config/route/view) OK, health-check OK,
+   `.env.staging` šablona připravena, deploy na staging spuštěn (merge main → staging, push) (15. 4.).
 5. `DONE` Package test strategy: root suite je canonical, balíčky nemají vlastní testy.
    Local path packages nemají důvod duplikovat test infra. Core `autoload-dev` nechán jako příprava (14. 4.).
 6. `DONE` Doplnit `declare(strict_types=1)` do 30 souborů (social-feeds: 26, host app: 4, forms: 0 — již měly) (14. 4.).
@@ -75,7 +75,9 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 7. `DONE` Základní observability: `app:health-check` command (DB, cache, queue, storage, scheduler marker),
    scheduler housekeeping (`queue:prune-failed` 7d, `queue:prune-batches` 48h),
    scheduler health marker každých 5 minut (14. 4.).
-8. `TODO` Průběžně čistit historické dokumentační stopy, aby nevznikaly nové paralelní zdroje pravdy.
+8. `DONE` Stale docs: `_analysis-settings.md` smazán, `_analysis.md` aktualizován,
+   `_project-analysis-2026-04-04.md` odstraněn (14. 4.).
+   Zbylá průběžná údržba je ongoing proces, ne bloker.
 9. `DONE` Odstraněn `app/Models/CuratorMedia.php` alias — potvrzeno nulové využití (14. 4.).
 10. `DONE` Avatar factory states (`withAvatarPath`, `withAvatarId`) a `declare(strict_types)` v `UserFactory.php` (14. 4.).
 

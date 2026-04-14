@@ -92,7 +92,8 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    nově kryje i legacy `site.homepage_entry_id` fallback (15. 4.).
 4. `DONE` PR4: preview pipeline pro Entry a Page sjednocena přes `PreviewContentService`; oba controllery
    jsou tenké delegátory a Page preview má novou přímou regresní coverage pro banner i redirect (15. 4.).
-5. `TODO` PR5: deduplikovat shared admin stavebnice kolem status overview widgetů a policies.
+5. `DONE` PR5: status overview widgety pro Entry/Page sdílí společný base widget a auth logika
+   v `EntryPolicy`/`PagePolicy` je sjednocena přes shared helper trait; doplněna přímá PagePolicy regrese (15. 4.).
 6. `TODO` PR6: rozsekat `EntryForm` a `PageForm` na shared section/builders pro publikaci, SEO, featured image a stavové boxy.
 7. `TODO` PR7: rozsekat `EntriesTable` a `PagesTable` na shared table builders/helpery pro common columns, filters a workflow UI.
 8. `TODO` PR8: dokončit naming cleanup (`EntryStatus` → neutrální název apod.) až po stabilizaci behavior změn.

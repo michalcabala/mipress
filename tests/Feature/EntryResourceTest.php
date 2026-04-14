@@ -274,7 +274,7 @@ describe('list page', function () {
             ->and($table->getColumnManagerTriggerAction()->isModalSlideOver())->toBeTrue()
             ->and($table->getFilter('created_at', true))->toBeNull()
             ->and($table->getFilter('status', true))->not->toBeNull()
-            ->and($table->getFilter('trashed', true))->not->toBeNull()
+            ->and($table->getFilter('trashed', true))->toBeNull()
             ->and(array_map(fn (Section $section): string|\Illuminate\Contracts\Support\Htmlable|null => $section->getHeading(), $schema))->toBe(['Základní']);
     });
 

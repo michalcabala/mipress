@@ -38,8 +38,9 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 5. `DONE` Připravit produkční env baseline:
    `APP_DEBUG=false`, async queue, mail provider, secret management, cache režim.
    Viz `DEPLOYMENT.md` + `config/mipress.php` (13. 4.).
-6. `TODO` Rozhodnout scope social-feeds pro v1:
-   buď modul produkčně dotestovat, nebo ho z launch scope vědomě vyřadit.
+6. `DONE` Social-feeds scope rozhodnut: modul je volitelný per-projekt (instalace záleží
+   na konkrétním webu). Aktuálně Facebook-only, další platformy se doplní postupně.
+   Není bloker pro v1 release (14. 4.).
 
 ## P1 - stabilizace release kandidáta
 
@@ -67,7 +68,10 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 5. `DONE` Vytažen `HasPublicationTableWorkflow` trait do `Concerns/`, deduplikováno ~320 řádků
    z `EntriesTable` a `PagesTable`. Sdílené: publication actions, workflow schema, status logic,
    notification helpers. Specifika řešena přes abstract config metody (15. 4.).
-6. `TODO` Sjednotit naming slovník `name` vs `title` tam, kde to zjednoduší API a formuláře.
+6. `DONE` Naming audit `name` vs `title`: UI labely jsou konzistentní a sémanticky správné
+   (Entry/Page → "Titulek", Taxonomy/Term/Form/GlobalSet → "Název"). Mismatch existuje
+   jen na DB úrovni (některé strukturální entity mají sloupec `title` místo `name`),
+   to je low-priority a nevyžaduje okamžitý zásah (14. 4.).
 7. `DONE` Základní observability: `app:health-check` command (DB, cache, queue, storage, scheduler marker),
    scheduler housekeeping (`queue:prune-failed` 7d, `queue:prune-batches` 48h),
    scheduler health marker každých 5 minut (14. 4.).

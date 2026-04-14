@@ -759,6 +759,18 @@ describe('edit entry', function () {
             ->assertSuccessful();
     });
 
+    it('can render seo edit page', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        $this->get(EntryResource::getUrl('seo', ['record' => $entry]))
+            ->assertSuccessful()
+            ->assertSee('SEO titulek')
+            ->assertSee('OG obrázek');
+    });
+
     it('can fill form with existing entry data', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,

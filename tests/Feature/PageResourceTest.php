@@ -200,6 +200,17 @@ it('redirects published page preview to live URL', function () {
         ->assertRedirect('/live-page-preview');
 });
 
+it('can render seo edit page for page resource', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+    ]);
+
+    $this->get(PageResource::getUrl('seo', ['record' => $page]))
+        ->assertSuccessful()
+        ->assertSee('SEO titulek')
+        ->assertSee('SEO popis');
+});
+
 it('redirects after scheduling publication', function () {
     $page = Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,

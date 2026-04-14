@@ -83,9 +83,10 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 
 ## P2/P3 - oddělení Pages od Collections
 
-1. `IN_PROGRESS` PR1: zakázat nový handle `pages` a nový collection route vzor `/{slug}` v admin validaci,
-   ale dočasně neblokovat edit legacy kolekce, pokud už takto existuje.
-2. `TODO` PR2: odstranit runtime a test kompatibilitu pro page-like entries přes collection `pages`.
+1. `DONE` PR1: zakázat nový handle `pages` a nový collection route vzor `/{slug}` v admin validaci,
+   ale dočasně neblokovat edit legacy kolekce, pokud už takto existuje (15. 4.).
+2. `DONE` PR2: odstranit admin runtime a test kompatibilitu pro page-like entries přes collection `pages`;
+   Entry resource nyní fallbackuje na první platnou collection a suite už nepoužívá legacy `pages` fixture (15. 4.).
 3. `TODO` PR3: rozdělit public runtime z `EntryController` na menší služby pro homepage, archive/detail a route resolution.
 4. `TODO` PR4: sjednotit preview pipeline pro Entry a Page přes sdílený renderer/service.
 5. `TODO` PR5: deduplikovat shared admin stavebnice kolem status overview widgetů a policies.

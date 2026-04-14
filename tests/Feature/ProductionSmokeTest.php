@@ -57,10 +57,10 @@ describe('production smoke', function () {
         ]);
 
         Collection::factory()->create([
-            'name' => 'Stranky',
-            'handle' => 'pages',
+            'name' => 'Blog',
+            'handle' => 'blog',
             'blueprint_id' => $blueprint->id,
-            'route' => '/{slug}',
+            'route' => '/blog/{slug}',
             'slugs' => true,
             'dated' => false,
             'hierarchical' => true,
@@ -78,7 +78,7 @@ describe('production smoke', function () {
         $adminUrls = [
             BlueprintResource::getUrl('index'),
             CollectionResource::getUrl('index'),
-            EntryResource::getUrl('index', ['collection' => 'pages']),
+            EntryResource::getUrl('index', ['collection' => 'blog']),
             PageResource::getUrl('index'),
             TaxonomyResource::getUrl('index'),
             TermResource::getUrl('index'),

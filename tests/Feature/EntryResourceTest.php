@@ -37,10 +37,10 @@ beforeEach(function () {
     ]);
 
     $this->collection = Collection::factory()->create([
-        'name' => 'Stránky',
-        'handle' => 'pages',
+        'name' => 'Blog',
+        'handle' => 'blog',
         'blueprint_id' => $this->blueprint->id,
-        'route' => '/{slug}',
+        'route' => '/blog/{slug}',
         'slugs' => true,
         'dated' => false,
         'hierarchical' => true,
@@ -56,14 +56,14 @@ describe('list page', function () {
     });
 
     it('can render with collection filter', function () {
-        $this->get(EntryResource::getUrl('index', ['collection' => 'pages']))
+        $this->get(EntryResource::getUrl('index', ['collection' => 'blog']))
             ->assertSuccessful();
     });
 
     it('uses path-based collection URL on index', function () {
-        $url = EntryResource::getUrl('index', ['collection' => 'pages']);
+        $url = EntryResource::getUrl('index', ['collection' => 'blog']);
 
-        expect($url)->toEndWith('/mpcp/entries/pages');
+        expect($url)->toEndWith('/mpcp/entries/blog');
     });
 
     it('can list entries for a collection', function () {
@@ -72,7 +72,7 @@ describe('list page', function () {
             'blueprint_id' => $this->blueprint->id,
         ]);
 
-        Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
             ->assertCanSeeTableRecords($entries);
     });
 
@@ -82,7 +82,7 @@ describe('list page', function () {
             'blueprint_id' => $this->blueprint->id,
         ]);
 
-        Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
             ->assertTableColumnExists('title')
             ->assertTableColumnExists('slug');
     });
@@ -97,7 +97,7 @@ describe('list page', function () {
             'title' => 'Jiná stránka',
         ]);
 
-        Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
             ->searchTable('Hledaná')
             ->assertCanSeeTableRecords([$target])
             ->assertCanNotSeeTableRecords([$other]);
@@ -106,7 +106,7 @@ describe('list page', function () {
     it('filters entries by collection', function () {
         $otherCollection = Collection::factory()->create(['handle' => 'articles']);
 
-        $pagesEntry = Entry::factory()->create([
+        $blogEntry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
             'title' => 'Page Entry',
         ]);
@@ -115,8 +115,8 @@ describe('list page', function () {
             'title' => 'Article Entry',
         ]);
 
-        Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
-            ->assertCanSeeTableRecords([$pagesEntry])
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
+            ->assertCanSeeTableRecords([$blogEntry])
             ->assertCanNotSeeTableRecords([$articlesEntry]);
     });
 
@@ -153,7 +153,7 @@ describe('list page', function () {
             'status' => EntryStatus::Rejected,
         ]);
 
-        $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages']);
+        $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'blog']);
 
         $component
             ->assertCanSeeTableRecords([$draftEntry, $publishedEntry, $scheduledEntry, $reviewEntry, $rejectedEntry])
@@ -175,7 +175,7 @@ describe('list page', function () {
 
         $trashedEntry->delete();
 
-        $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages']);
+        $component = Livewire::test(ListEntries::class, ['collectionHandle' => 'blog']);
 
         expect($component->instance()->getTable()->getFilter('trashed', true))->not->toBeNull();
 
@@ -196,15 +196,15 @@ describe('list page', function () {
         ]);
 
         $component = Livewire::withQueryParams(['page' => 2])
-            ->test(ListEntries::class, ['collectionHandle' => 'pages']);
+            ->test(ListEntries::class, ['collectionHandle' => 'blog']);
 
-        expect($component->instance()->getTablePaginationPageName())->toBe('entriesPagesPage');
+        expect($component->instance()->getTablePaginationPageName())->toBe('entriesBlogPage');
 
         $component->assertCanSeeTableRecords([$entry]);
     });
 
     it('uses slideover modals globally for filters and column visibility', function () {
-        $table = Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+        $table = Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
             ->instance()
             ->getTable();
 
@@ -241,7 +241,7 @@ describe('list page', function () {
 
         $entry->terms()->attach($term->id);
 
-        $component = Livewire::test(ListEntries::class, ['collection' => 'pages']);
+        $component = Livewire::test(ListEntries::class, ['collection' => 'blog']);
 
         $component
             ->assertTableColumnExists('taxonomy_'.$taxonomy->id)
@@ -289,7 +289,7 @@ describe('list page', function () {
         $devEntry->terms()->attach($devTerm->id);
         $designEntry->terms()->attach($designTerm->id);
 
-        Livewire::test(ListEntries::class, ['collection' => 'pages'])
+        Livewire::test(ListEntries::class, ['collection' => 'blog'])
             ->assertCanSeeTableRecords([$devEntry, $designEntry])
             ->filterTable('taxonomy_'.$taxonomy->id, [
                 'term_ids_'.$taxonomy->id => [$devTerm->id],
@@ -308,7 +308,7 @@ describe('list page', function () {
             'show_in_entries_filter' => false,
         ]);
 
-        $component = Livewire::test(ListEntries::class, ['collection' => 'pages']);
+        $component = Livewire::test(ListEntries::class, ['collection' => 'blog']);
         $table = $component->instance()->getTable();
 
         expect($table->getColumn('taxonomy_'.$taxonomy->id))->toBeNull()
@@ -354,7 +354,7 @@ describe('list page', function () {
         $devEntry->terms()->attach($devTerm->id);
         $designEntry->terms()->attach($designTerm->id);
 
-        Livewire::test(ListEntries::class, ['collection' => 'pages'])
+        Livewire::test(ListEntries::class, ['collection' => 'blog'])
             ->searchTable('Vyvoj')
             ->assertCanSeeTableRecords([$devEntry])
             ->assertCanNotSeeTableRecords([$designEntry]);
@@ -399,7 +399,7 @@ describe('list page', function () {
         $zuluEntry->terms()->attach($zuluTerm->id);
         $alphaEntry->terms()->attach($alphaTerm->id);
 
-        $component = Livewire::test(ListEntries::class, ['collection' => 'pages']);
+        $component = Livewire::test(ListEntries::class, ['collection' => 'blog']);
         $column = $component->instance()->getTable()->getColumn('taxonomy_'.$taxonomy->id);
 
         expect($column)->not->toBeNull()
@@ -410,6 +410,13 @@ describe('list page', function () {
             ->assertCanSeeTableRecords([$alphaEntry, $zuluEntry], true)
             ->sortTable('taxonomy_'.$taxonomy->id, 'desc')
             ->assertCanSeeTableRecords([$zuluEntry, $alphaEntry], true);
+    });
+
+    it('falls back from the reserved pages handle to the first valid collection', function () {
+        $component = Livewire::withQueryParams(['collection' => 'pages'])
+            ->test(ListEntries::class);
+
+        $component->assertSet('collectionHandle', 'blog');
     });
 
     it('shows in-review badge in navigation for users who can publish', function () {
@@ -453,16 +460,16 @@ describe('list page', function () {
     });
 });
 
-// --- Create Page ---
+// --- Create Entry ---
 
-describe('create page', function () {
+describe('create entry', function () {
     it('can render', function () {
-        $this->get(EntryResource::getUrl('create', ['collection' => 'pages']))
+        $this->get(EntryResource::getUrl('create', ['collection' => 'blog']))
             ->assertSuccessful();
     });
 
     it('shows publish and draft create actions for superadmin', function () {
-        $this->get(EntryResource::getUrl('create', ['collection' => 'pages']))
+        $this->get(EntryResource::getUrl('create', ['collection' => 'blog']))
             ->assertSee('Publikovat')
             ->assertSee('Uložit koncept');
     });
@@ -472,7 +479,7 @@ describe('create page', function () {
         $contributor->assignRole(UserRole::Contributor->value);
         $this->actingAs($contributor);
 
-        $this->get(EntryResource::getUrl('create', ['collection' => 'pages']))
+        $this->get(EntryResource::getUrl('create', ['collection' => 'blog']))
             ->assertSuccessful()
             ->assertSee('Odeslat ke schválení')
             ->assertSee('Uložit koncept')
@@ -480,7 +487,7 @@ describe('create page', function () {
     });
 
     it('can create an entry', function () {
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => 'Nová stránka',
@@ -498,7 +505,7 @@ describe('create page', function () {
     });
 
     it('auto-fills the slug from the title without overwriting a custom slug', function () {
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => 'Prvni navrh',
@@ -516,13 +523,13 @@ describe('create page', function () {
     });
 
     it('can cancel entry creation and return to the collection index', function () {
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => 'Rozpracovaná položka',
             ])
             ->callAction('cancel')
-            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
+            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'blog']));
     });
 
     it('can create a child entry in hierarchical collection', function () {
@@ -533,7 +540,7 @@ describe('create page', function () {
             'slug' => 'nadrzena-stranka',
         ]);
 
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => 'Podstránka',
@@ -571,7 +578,7 @@ describe('create page', function () {
             'parent_id' => $parentTerm->id,
         ]);
 
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => 'Stránka s rubrikou',
@@ -601,7 +608,7 @@ describe('create page', function () {
     });
 
     it('validates required title', function () {
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => null,
@@ -616,7 +623,7 @@ describe('create page', function () {
             'slug' => 'existing-slug',
         ]);
 
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => 'Duplicate',
@@ -632,7 +639,7 @@ describe('create page', function () {
     });
 
     it('auto-assigns collection and blueprint from URL', function () {
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => 'Auto Assign Test',
@@ -671,7 +678,7 @@ describe('create page', function () {
     });
 
     it('creates entry with draft status by default', function () {
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'title' => 'Draft Test',
@@ -688,7 +695,7 @@ describe('create page', function () {
     it('auto-switches entry status to scheduled when a future publish date is selected on create', function () {
         $futurePublishAt = now()->addDay()->startOfHour();
 
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->fillForm([
                 'published_at' => $futurePublishAt->format('Y-m-d H:i:s'),
@@ -699,13 +706,19 @@ describe('create page', function () {
     });
 
     it('keeps collection context during live form updates on create page', function () {
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
-            ->assertSet('collectionHandle', 'pages')
+            ->assertSet('collectionHandle', 'blog')
             ->fillForm([
                 'title' => 'Live Update Test',
             ])
-            ->assertSet('collectionHandle', 'pages');
+            ->assertSet('collectionHandle', 'blog');
+    });
+
+    it('falls back from the reserved pages handle to the first valid create collection', function () {
+        Livewire::withQueryParams(['collection' => 'pages'])
+            ->test(CreateEntry::class)
+            ->assertSet('collectionHandle', 'blog');
     });
 
     it('keeps blueprint fields visible after live slug generation update', function () {
@@ -724,7 +737,7 @@ describe('create page', function () {
             ],
         ]);
 
-        Livewire::withQueryParams(['collection' => 'pages'])
+        Livewire::withQueryParams(['collection' => 'blog'])
             ->test(CreateEntry::class)
             ->assertSee('Perex')
             ->fillForm([
@@ -734,9 +747,9 @@ describe('create page', function () {
     });
 });
 
-// --- Edit Page ---
+// --- Edit Entry ---
 
-describe('edit page', function () {
+describe('edit entry', function () {
     it('can render', function () {
         $entry = Entry::factory()->create([
             'collection_id' => $this->collection->id,
@@ -970,7 +983,7 @@ describe('status workflow', function () {
 
         Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
             ->callAction('publishEntry')
-            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
+            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'blog']));
 
         $entry->refresh();
 
@@ -1003,7 +1016,7 @@ describe('status workflow', function () {
 
         Livewire::test(EditEntry::class, ['record' => $entry->getRouteKey()])
             ->callAction('publishEntry')
-            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'pages']));
+            ->assertRedirect(EntryResource::getUrl('index', ['collection' => 'blog']));
 
         $entry->refresh();
 
@@ -1227,7 +1240,7 @@ describe('authorization', function () {
 
         $this->actingAs($contributor);
 
-        Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
             ->assertCanSeeTableRecords([$ownEntry, $otherEntry]);
     });
 
@@ -1304,7 +1317,7 @@ describe('authorization', function () {
             'author_id' => $this->admin->id,
         ]);
 
-        Livewire::test(ListEntries::class, ['collectionHandle' => 'pages'])
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
             ->assertCanSeeTableRecords([$contributorEntry, $adminEntry]);
     });
 });

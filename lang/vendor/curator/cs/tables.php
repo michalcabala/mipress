@@ -9,11 +9,6 @@ return [
         'ext' => 'Formát',
         'disk' => 'Disk',
         'directory' => 'Adresář',
-        'visibility' => 'Viditelnost',
-        'size' => 'Velikost',
-        'width' => 'Šířka',
-        'height' => 'Výška',
-        'dimensions' => 'Rozměry',
         'created_at' => 'Vytvořeno',
     ],
     'actions' => [

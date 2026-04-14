@@ -10,6 +10,7 @@ use Filament\Auth\MultiFactor\Email\Concerns\InteractsWithEmailAuthentication;
 use Filament\Auth\MultiFactor\Email\Contracts\HasEmailAuthentication;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -29,10 +30,8 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasEmailA
 
     use HasRoles;
     use InteractsWithEmailAuthentication;
+    use MustVerifyEmailTrait;
     use Notifiable;
-
-    /** @var array<int, string> */
-    protected $with = ['roles'];
 
     protected static function booted(): void
     {
@@ -70,7 +69,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, HasEmailA
     public function getFilamentAvatarUrl(): ?string
     {
         if (filled($this->avatar_path)) {
-            return mipress_media_path_url($this->avatar_path, 'avatar');
+            return url(Storage::disk('public')->url($this->avatar_path));
         }
 
         return $this->avatar instanceof Media

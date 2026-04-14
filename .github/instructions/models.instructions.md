@@ -1,82 +1,17 @@
 ---
-applyTo: "src/Models/**"
+applyTo: "packages/mipress/**/src/Models/**"
 ---
 
-# Eloquent Model Instructions
+# Models Wrapper Instructions
 
-## Base Pattern
+Primární pravidla jsou v:
 
-Every model must follow this structure:
+- `.github/instructions/mipress.instructions.md`
 
-```php
-declare(strict_types=1);
+Tento wrapper doplňuje model-specific body:
 
-namespace MiPress\Core\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
-use Spatie\Translatable\HasTranslations;
-
-class Entry extends Model
-{
-    use HasFactory, HasSlug, HasTranslations, SoftDeletes;
-
-    protected $table = 'mipress_entries';
-
-    protected $fillable = [
-        'title',
-        'slug',
-        'content',
-        'status',
-        'collection_id',
-        'published_at',
-    ];
-
-    protected $casts = [
-        'content' => 'array',
-        'status' => EntryStatus::class,
-        'published_at' => 'datetime',
-    ];
-
-    public array $translatable = ['title', 'content'];
-}
-```
-
-## Table Naming
-
-All miPress tables use the `mipress_` prefix to avoid conflicts with the host application:
-- `mipress_entries`
-- `mipress_collections`
-- `mipress_taxonomies`
-- `mipress_terms`
-- `mipress_menus`
-- `mipress_menu_items`
-- `mipress_settings`
-
-## Required Traits
-
-- `HasFactory` — always, for testing
-- `SoftDeletes` — on content models (Entry, Collection, Taxonomy, Term)
-- `HasSlug` — on models with a slug field, implement `getSlugOptions()`
-- `HasTranslations` — on models with translatable content, define `$translatable` array
-
-## Relationships
-
-- Always type-hint return types on relationship methods.
-- Use `->cascadeOnDelete()` on foreign keys for child records.
-- Define inverse relationships on both sides.
-
-## Scopes
-
-Define commonly used query scopes:
-- `scopePublished()` — filter by published status and date
-- `scopeDraft()` — filter drafts
-- `scopeOrdered()` — default ordering
-
-## Factories
-
-Every model must have a corresponding factory in `database/factories/` using realistic Czech fake data where applicable (names, addresses).
+- Používej aktuální tabulky bez `mipress_` prefixu.
+- U modelů drž explicitní `fillable`, `casts`, typed vztahy.
+- U content modelů zachovej trait composition (workflow/seo/revisions/audit/locks/soft-deletes) podle stávající implementace.
+- Při přidání pole vždy synchronizuj: migrace + model casts/fillable + relevantní Filament form/table + test.
+- Nepřepisuj settings přístup na legacy key-value; preferovaný směr je `Setting` + `SettingsManager` + helper `settings()`.

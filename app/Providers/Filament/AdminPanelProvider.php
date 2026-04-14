@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers\Filament;
 
+use App\Filament\Livewire\OptimizedDatabaseNotifications;
 use App\Filament\Pages\EditProfile as UserEditProfile;
 use App\Http\Middleware\SetAdminLocale;
-use Awcodes\Curator\CuratorPlugin;
-use Blendbyte\FilamentResourceLock\ResourceLockPlugin;
 use Filament\Actions\Action;
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -78,41 +79,20 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->spa()
             ->unsavedChangesAlerts()
-            ->databaseNotifications()
+            ->databaseNotifications(livewireComponent: OptimizedDatabaseNotifications::class)
             ->databaseTransactions()
             ->sidebarWidth('16rem')
             ->sidebarCollapsibleOnDesktop()
-            ->breadcrumbs(false)
             ->plugin(MiPressPlugin::make())
             ->plugin(FormsPlugin::make())
             ->plugin(SocialFeedsPlugin::make())
-            ->plugin(
-                ResourceLockPlugin::make()
-                    ->displayResourceLockOwner()
-                    ->usesPollingToDetectPresence()
-                    ->presencePollingInterval(30)
-                    ->pollingVisible()
-                    ->unlockerLimitedAccess()
-                    ->unlockerGate('forceUnlockResourceLock')
-                    ->limitedAccessToResourceLockManager()
-                    ->gate('forceUnlockResourceLock')
-                    ->registerNavigation(false)
-            )
-            ->plugin(
-                CuratorPlugin::make()
-                    ->label('Médium')
-                    ->pluralLabel('Média')
-                    ->navigationGroup('Obsah')
-                    ->navigationSort(99)
-                    ->navigationIcon('fal-photo-film-music')
-            )
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,

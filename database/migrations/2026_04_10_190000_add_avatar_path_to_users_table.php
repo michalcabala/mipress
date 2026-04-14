@@ -18,6 +18,10 @@ return new class extends Migration
                 ->after('avatar_id');
         });
 
+        if (! Schema::hasTable('curator')) {
+            return;
+        }
+
         DB::table('users')
             ->select('users.id', 'curator.path')
             ->join('curator', 'curator.id', '=', 'users.avatar_id')

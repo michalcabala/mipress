@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.staging
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -52,3 +53,6 @@ Thumbs.db
 # Internal analysis docs
 _analysis.md
 _project-analysis-*.md
+
+# Local reference projects (never commit)
+/reference-code/

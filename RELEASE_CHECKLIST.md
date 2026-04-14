@@ -2,38 +2,41 @@
 
 ## 0. Release gates (GitHub)
 
-- [ ] Branch protection je aktivni pro `main`.
-- [ ] Mergovani vyzaduje pull request (zakazat direct push).
-- [ ] Required status checks obsahuji:
-  - [ ] `smoke`
-  - [ ] `test`
-- [ ] Mergovani je povoleno pouze pri zelene CI.
+- [ ] Branch protection je aktivní pro `main`.
+- [ ] Mergování vyžaduje pull request (zakázat direct push).
+- [ ] Required status checks obsahují (viz `.github/workflows/ci.yml`):
+  - [ ] `lint` (Pint code style)
+  - [ ] `tests` (full test suite)
+  - [ ] `smoke` (ProductionSmokeTest)
+- [ ] Mergování je povoleno pouze při zelené CI.
 
-## 1. Pre-release (lokal/staging)
+## 1. Pre-release (lokál/staging)
 
-- [ ] Vsechny zmeny jsou v commitech a pushnute na remote.
-- [ ] CI je zelena pro cilovou branch (build, Pint, testy).
-- [ ] Lokalni smoke test adminu:
-  - [ ] Prihlaseni do admin panelu `/mpcp`.
-  - [ ] Otevreni klicovych sekci (Polozky, Stranky, Formulare, SEO).
-  - [ ] Vytvoreni a ulozeni testovaciho obsahu.
+- [ ] Všechny změny jsou v commitech a pushnuté na remote.
+- [ ] CI je zelená pro cílovou branch (lint, tests, smoke).
+- [ ] Lokální smoke test adminu:
+  - [ ] Přihlášení do admin panelu `/mpcp`.
+  - [ ] Otevření klíčových sekcí (Položky, Stránky, Formuláře, SEO).
+  - [ ] Vytvoření a uložení testovacího obsahu.
 - [ ] Testy projektu:
   - [ ] `composer test:smoke`
   - [ ] `composer test:ci`
 - [ ] Frontend build:
   - [ ] `npm run build`
-- [ ] Migrace bez destruktivnich kroku:
+- [ ] Migrace bez destruktivních kroků:
   - [ ] `php artisan migrate --pretend`
-  - [ ] Kontrola SQL vystupu (bez drop/truncate/reset).
+  - [ ] Kontrola SQL výstupu (bez drop/truncate/reset).
+- [ ] Seed databáze (pokud nová instance):
+  - [ ] `php artisan db:seed` (permissions, role, admin, global sets)
 
 ## 2. Production deploy
 
-- [ ] Aktivovat maintenance mode (pokud je potreba):
+- [ ] Aktivovat maintenance mode (pokud je potřeba):
   - [ ] `php artisan down --render="errors::503"`
-- [ ] Aktualizovat kod na release commit/tag.
-- [ ] Instalace backend zavislosti:
+- [ ] Aktualizovat kód na release commit/tag.
+- [ ] Instalace backend závislostí:
   - [ ] `composer install --no-dev --optimize-autoloader --no-interaction`
-- [ ] Instalace frontend zavislosti + build:
+- [ ] Instalace frontend závislostí + build:
   - [ ] `npm ci`
   - [ ] `npm run build`
 - [ ] Spustit migrace:
@@ -43,27 +46,34 @@
   - [ ] `php artisan config:cache`
   - [ ] `php artisan route:cache`
   - [ ] `php artisan view:cache`
-- [ ] Restart queue workeru:
+  - [ ] `php artisan filament:cache-components`
+- [ ] Restart queue workerů:
   - [ ] `php artisan queue:restart`
 - [ ] Deaktivovat maintenance mode:
   - [ ] `php artisan up`
 
 ## 3. Post-release verifikace
 
-- [ ] Otevrit produkcni homepage a admin panel.
+- [ ] Otevřít produkční homepage a admin panel.
 - [ ] Otestovat login a autorizace (Admin/Editor/Contributor).
-- [ ] Overit vytvoreni/ulozeni obsahu (Entry/Page).
-- [ ] Overit formular (odeslani + doruceni mailu).
-- [ ] Overit SEO sekci (robots/sitemap) v adminu.
-- [ ] Zkontrolovat logy na kriticke chyby.
-- [ ] Overit, ze queue zpracovava jobs bez failu.
+- [ ] Ověřit vytvoření/uložení obsahu (Entry/Page).
+- [ ] Ověřit formulář (odeslání + doručení mailu).
+- [ ] Ověřit SEO sekci (robots/sitemap) v adminu.
+- [ ] Zkontrolovat logy na kritické chyby.
+- [ ] Ověřit, že queue zpracovává jobs bez failů.
+- [ ] Ověřit, že scheduler běží (`php artisan schedule:list`).
+- [ ] Ověřit, že naplánovaný obsah se publikuje.
 
 ## 4. Rollback plan
 
-- [ ] Mit pripraveny predchozi stabilni release commit/tag.
-- [ ] Pri kritickem problemu:
-  - [ ] Prepnout kod na predchozi release.
+- [ ] Mít připravený předchozí stabilní release commit/tag.
+- [ ] Při kritickém problému:
+  - [ ] Přepnout kód na předchozí release.
   - [ ] Spustit `composer install --no-dev --optimize-autoloader --no-interaction`.
   - [ ] Spustit `php artisan optimize:clear`.
   - [ ] Spustit `php artisan queue:restart`.
-- [ ] Databazi nerollbackovat destruktivne bez explicitniho schvaleni.
+- [ ] Databázi nerollbackovat destruktivně bez explicitního schválení.
+
+## 5. Provozní dokumentace
+
+Pro detailní popis produkčních procesů (scheduler, queue, env baseline, instalace) viz `DEPLOYMENT.md`.

@@ -1,6 +1,7 @@
 (() => {
     const storageKey = 'mipress-theme';
     const root = document.documentElement;
+    const body = document.body;
     const media = window.matchMedia('(prefers-color-scheme: dark)');
 
     const resolveTheme = (preference) => {
@@ -26,6 +27,23 @@
         });
     };
 
+    const setMenuState = (isOpen) => {
+        const overlay = document.querySelector('[data-mobile-overlay]');
+
+        if (!overlay) {
+            return;
+        }
+
+        overlay.hidden = !isOpen;
+        overlay.classList.toggle('is-open', isOpen);
+        overlay.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        body.classList.toggle('mp-menu-lock', isOpen);
+
+        document.querySelectorAll('[data-menu-open]').forEach((toggle) => {
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+    };
+
     const storedPreference = localStorage.getItem(storageKey) || root.dataset.themePreference || 'system';
     applyTheme(storedPreference);
 
@@ -38,16 +56,23 @@
         });
     });
 
-    const menu = document.querySelector('[data-site-menu]');
-    const menuToggle = document.querySelector('[data-menu-toggle]');
-
-    if (menu && menuToggle) {
-        menuToggle.addEventListener('click', () => {
-            const isOpen = menu.classList.toggle('is-open');
-
-            menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    document.querySelectorAll('[data-menu-open]').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+            setMenuState(true);
         });
-    }
+    });
+
+    document.querySelectorAll('[data-menu-close]').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+            setMenuState(false);
+        });
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            setMenuState(false);
+        }
+    });
 
     const handleSystemChange = () => {
         if ((localStorage.getItem(storageKey) || 'system') === 'system') {

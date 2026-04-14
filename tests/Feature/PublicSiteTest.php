@@ -11,13 +11,13 @@ use MiPress\Core\Models\Setting;
 test('the homepage falls back to the default theme landing page when no homepage entry is configured', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSeeText('Prezentační web pro moderní obsahové projekty.');
+        ->assertSeeText('A SaaS presentation layer for your CMS, not just another blog skin.');
 });
 
 test('the homepage renders the configured published entry', function () {
     $page = Page::factory()->create([
-        'title' => 'Domovská stránka',
-        'slug' => 'domovska-stranka',
+        'title' => 'Home Page',
+        'slug' => 'home-page',
         'status' => EntryStatus::Published,
         'published_at' => now(),
     ]);
@@ -26,7 +26,7 @@ test('the homepage renders the configured published entry', function () {
 
     $this->get('/')
         ->assertOk()
-        ->assertSee('Domovská stránka');
+        ->assertSee('Home Page');
 });
 
 test('the homepage still resolves the legacy site homepage setting during the transition', function () {
@@ -91,14 +91,14 @@ test('simple page routes using a root slug are publicly reachable', function () 
         'status' => EntryStatus::Published,
         'published_at' => now(),
         'data' => [
-            'perex' => 'Stránka o projektu MiPress.',
+            'perex' => 'About page for the MiPress project.',
         ],
     ]);
 
     $this->get('/about-mipress')
         ->assertOk()
         ->assertSee('About MiPress')
-        ->assertSee('Stránka o projektu MiPress.');
+        ->assertSee('About page for the MiPress project.');
 });
 
 test('archive routes render published entries for public collections', function () {

@@ -3,6 +3,6 @@
     "slug": "default",
     "version": "1.0.0",
     "author": "miPress",
-    "description": "Editorial default theme with light, dark and system mode support.",
+    "description": "SaaS presentation theme for MiPress with dark mode, Mason storytelling and SEO-ready public pages.",
     "screenshot": "assets/images/theme-preview.svg"
 }

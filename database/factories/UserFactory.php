@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\User;
@@ -40,6 +42,26 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Set the user's avatar path (file-based avatar).
+     */
+    public function withAvatarPath(string $path = 'avatars/test-avatar.jpg'): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'avatar_path' => $path,
+        ]);
+    }
+
+    /**
+     * Set the user's avatar from a Curator media record.
+     */
+    public function withAvatarId(int $mediaId): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'avatar_id' => $mediaId,
         ]);
     }
 }

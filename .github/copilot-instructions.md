@@ -43,7 +43,10 @@ Důležité integrační balíčky:
 
 ## 4) Filament pravidla
 
+- Pro Laravel a Filament úlohy vždy nejdřív použij Laravel Boost `search-docs`, pokud je v aktuální relaci dostupný.
+- Pokud `search-docs` v aktuální relaci není vystavený, explicitně to uveď a pak použij ostatní dostupné Laravel Boost nástroje.
 - Drž se existující navigační a cluster struktury.
+- Pro admin UI preferuj nativní Filament components a patterns před custom Blade/Tailwind řešením.
 - `Entry` obsah drž jako Mason `data.content` + Blueprint custom fields.
 - `Page` obsah drž jako Mason `content`.
 - Blueprint pole řeš přes `FieldTypeRegistry` + `BlueprintFieldResolver`.

@@ -10,7 +10,9 @@ Primární pravidla jsou v:
 
 Tento wrapper přidává pouze Filament-specific akcenty:
 
+- Pro Laravel/Filament dokumentaci vždy preferuj Laravel Boost `search-docs`, pokud je v aktuální relaci dostupný.
 - Respektuj aktuální cluster/navigation strukturu (`ContentCluster`, `WebCluster`) a existující group/label naming v kódu.
+- Pro admin UI preferuj nativní Filament components (`x-filament::*`, Filament actions, widgets, forms) před custom Blade/Tailwind markupem, pokud nativní komponenty stačí.
 - `Entry` formuláře drž jako Mason (`data.content`) + Blueprint custom fields.
 - `Page` formuláře drž jako Mason (`content`).
 - Blueprint dynamiku stav na `FieldTypeRegistry` + `BlueprintFieldResolver`.

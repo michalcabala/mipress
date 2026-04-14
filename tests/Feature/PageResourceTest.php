@@ -317,6 +317,34 @@ it('uses the title column for resource lock indicators in the pages list', funct
         ->assertTableColumnExists('slug');
 });
 
+it('renders the publication status overview buttons for pages', function () {
+    Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Draft,
+    ]);
+
+    Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Published,
+        'published_at' => now()->subMinute(),
+    ]);
+
+    $trashedPage = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => EntryStatus::Published,
+        'published_at' => now()->subMinute(),
+    ]);
+
+    $trashedPage->delete();
+
+    Livewire::test(ListPages::class)
+        ->assertSee('Vše')
+        ->assertSee(EntryStatus::Draft->getLabel())
+        ->assertSee(EntryStatus::Published->getLabel())
+        ->assertSee('Koš')
+        ->assertDontSee(EntryStatus::Scheduled->getLabel());
+});
+
 it('does not render record state tabs or the legacy record state links row', function () {
     Page::factory()->count(2)->create([
         'blueprint_id' => $this->blueprint->id,

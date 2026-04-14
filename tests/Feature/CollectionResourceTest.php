@@ -122,6 +122,28 @@ describe('create page', function () {
             ->call('create')
             ->assertHasFormErrors(['handle' => 'unique']);
     });
+
+    it('rejects the reserved pages handle for new collections', function () {
+        Livewire::test(CreateCollection::class)
+            ->fillForm([
+                'name' => 'Stránky',
+                'handle' => 'pages',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['handle']);
+    });
+
+    it('rejects the reserved root slug route for new collections', function () {
+        Livewire::test(CreateCollection::class)
+            ->fillForm([
+                'name' => 'Landing pages',
+                'handle' => 'landing-pages',
+                'slugs' => true,
+                'route' => '/{slug}',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['route']);
+    });
 });
 
 describe('edit page', function () {
@@ -166,6 +188,25 @@ describe('edit page', function () {
             ->assertHasNoFormErrors();
 
         expect($collection->fresh()->name)->toBe('Upravená sekce');
+    });
+
+    it('allows saving a legacy pages collection during the transition', function () {
+        $collection = Collection::factory()->create([
+            'name' => 'Stránky',
+            'handle' => 'pages',
+            'route' => '/{slug}',
+            'slugs' => true,
+            'hierarchical' => true,
+        ]);
+
+        Livewire::test(EditCollection::class, ['record' => $collection->getRouteKey()])
+            ->fillForm([
+                'name' => 'Legacy stránky',
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        expect($collection->fresh()->name)->toBe('Legacy stránky');
     });
 
     it('can toggle dated flag', function () {

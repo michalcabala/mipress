@@ -1,6 +1,6 @@
 # ROADMAP_REFAKTORING
 
-Aktualizováno: 14. dubna 2026
+Aktualizováno: 15. dubna 2026
 Owner: průběžně (tým + agent)
 Primární cíl: dovést miPress k první produkční verzi bez zbytečného architektonického přepisu
 
@@ -80,6 +80,26 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    Zbylá průběžná údržba je ongoing proces, ne bloker.
 9. `DONE` Odstraněn `app/Models/CuratorMedia.php` alias — potvrzeno nulové využití (14. 4.).
 10. `DONE` Avatar factory states (`withAvatarPath`, `withAvatarId`) a `declare(strict_types)` v `UserFactory.php` (14. 4.).
+
+## P2/P3 - oddělení Pages od Collections
+
+1. `IN_PROGRESS` PR1: zakázat nový handle `pages` a nový collection route vzor `/{slug}` v admin validaci,
+   ale dočasně neblokovat edit legacy kolekce, pokud už takto existuje.
+2. `TODO` PR2: odstranit runtime a test kompatibilitu pro page-like entries přes collection `pages`.
+3. `TODO` PR3: rozdělit public runtime z `EntryController` na menší služby pro homepage, archive/detail a route resolution.
+4. `TODO` PR4: sjednotit preview pipeline pro Entry a Page přes sdílený renderer/service.
+5. `TODO` PR5: deduplikovat shared admin stavebnice kolem status overview widgetů a policies.
+6. `TODO` PR6: rozsekat `EntryForm` a `PageForm` na shared section/builders pro publikaci, SEO, featured image a stavové boxy.
+7. `TODO` PR7: rozsekat `EntriesTable` a `PagesTable` na shared table builders/helpery pro common columns, filters a workflow UI.
+8. `TODO` PR8: dokončit naming cleanup (`EntryStatus` → neutrální název apod.) až po stabilizaci behavior změn.
+
+### Invarianty tohoto směru
+
+- `Page` je jediný typ obsahu pro samostatné stránky, homepage a root slug space.
+- `Entry` je vždy collection-based obsah.
+- Collection nesmí používat handle `pages`.
+- Collection nesmí nově zabírat root page route vzor `/{slug}`.
+- V admin UI nedělat výrazné vizuální změny, pokud nejsou nutné pro funkčnost nebo údržbu.
 
 ## Poznámky k prioritám
 

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\Testing\TestAction;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Enums\ColumnManagerLayout;
@@ -411,6 +413,48 @@ it('renders the publication status overview buttons for pages', function () {
         ->assertSee(ContentStatus::Published->getLabel())
         ->assertSee('Koš')
         ->assertDontSee(ContentStatus::Scheduled->getLabel());
+});
+
+it('dispatches a publication overview refresh after changing page publication from the table', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+        'status' => ContentStatus::Draft,
+        'published_at' => null,
+    ]);
+
+    Livewire::test(ListPages::class)
+        ->callAction(TestAction::make('togglePublicationStatus')->table($page), [
+            'status' => ContentStatus::Published->value,
+            'published_at' => now()->format('Y-m-d H:i:s'),
+        ])
+        ->assertDispatched('entry-publication-status-updated');
+});
+
+it('dispatches a publication overview refresh after deleting a page from the table', function () {
+    $page = Page::factory()->create([
+        'blueprint_id' => $this->blueprint->id,
+    ]);
+
+    Livewire::test(ListPages::class)
+        ->callAction(TestAction::make(DeleteAction::class)->table($page))
+        ->assertDispatched('entry-publication-status-updated');
+
+    expect($page->fresh()?->trashed())->toBeTrue();
+});
+
+it('dispatches a publication overview refresh after bulk deleting pages from the table', function () {
+    $pages = Page::factory()->count(2)->create([
+        'blueprint_id' => $this->blueprint->id,
+    ]);
+
+    Livewire::test(ListPages::class)
+        ->selectTableRecords($pages)
+        ->callAction(TestAction::make(DeleteBulkAction::class)->table()->bulk())
+        ->assertDispatched('entry-publication-status-updated');
+
+    foreach ($pages as $page) {
+        expect($page->fresh()?->trashed())->toBeTrue();
+    }
 });
 
 it('does not render record state tabs or the legacy record state links row', function () {

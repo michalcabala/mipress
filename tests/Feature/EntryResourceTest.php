@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\Testing\TestAction;
 use Filament\Notifications\DatabaseNotification as FilamentDatabaseNotification;
 use Filament\Schemas\Components\Section;
 use Filament\Tables\Enums\ColumnManagerLayout;
@@ -185,6 +188,51 @@ describe('list page', function () {
             ->filterTable('trashed', false)
             ->assertCanSeeTableRecords([$trashedEntry])
             ->assertCanNotSeeTableRecords([$activeEntry]);
+    });
+
+    it('dispatches a publication overview refresh after changing entry publication from the table', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+            'status' => ContentStatus::Draft,
+            'published_at' => null,
+        ]);
+
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
+            ->callAction(TestAction::make('togglePublicationStatus')->table($entry), [
+                'status' => ContentStatus::Published->value,
+                'published_at' => now()->format('Y-m-d H:i:s'),
+            ])
+            ->assertDispatched('entry-publication-status-updated');
+    });
+
+    it('dispatches a publication overview refresh after deleting an entry from the table', function () {
+        $entry = Entry::factory()->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
+            ->callAction(TestAction::make(DeleteAction::class)->table($entry))
+            ->assertDispatched('entry-publication-status-updated');
+
+        expect($entry->fresh()?->trashed())->toBeTrue();
+    });
+
+    it('dispatches a publication overview refresh after bulk deleting entries from the table', function () {
+        $entries = Entry::factory()->count(2)->create([
+            'collection_id' => $this->collection->id,
+            'blueprint_id' => $this->blueprint->id,
+        ]);
+
+        Livewire::test(ListEntries::class, ['collectionHandle' => 'blog'])
+            ->selectTableRecords($entries)
+            ->callAction(TestAction::make(DeleteBulkAction::class)->table()->bulk())
+            ->assertDispatched('entry-publication-status-updated');
+
+        foreach ($entries as $entry) {
+            expect($entry->fresh()?->trashed())->toBeTrue();
+        }
     });
 
     it('can filter entries by created month', function () {

@@ -15,11 +15,11 @@ class EditProfile extends BaseEditProfile
     {
         return $schema
             ->components([
-                Section::make('Profil')
+                Section::make(__('admin.profile.sections.profile'))
                     ->schema([
                         FileUpload::make('avatar_path')
-                            ->label('Avatar')
-                            ->helperText('Profilová fotka zobrazená v administraci.')
+                            ->label(__('admin.profile.fields.avatar'))
+                            ->helperText(__('admin.profile.help.avatar'))
                             ->avatar()
                             ->imageEditor()
                             ->circleCropper()
@@ -33,7 +33,7 @@ class EditProfile extends BaseEditProfile
                         $this->getNameFormComponent(),
                         $this->getEmailFormComponent(),
                     ]),
-                Section::make('Změna hesla')
+                Section::make(__('admin.profile.sections.password'))
                     ->schema([
                         $this->getPasswordFormComponent(),
                         $this->getPasswordConfirmationFormComponent(),

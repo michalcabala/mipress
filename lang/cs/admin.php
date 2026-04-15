@@ -10,9 +10,11 @@ return [
         ],
         'fields' => [
             'avatar' => 'Avatar',
+            'preferred_locale' => 'Jazyk administrace',
         ],
         'help' => [
             'avatar' => 'Profilová fotka zobrazená v administraci.',
+            'preferred_locale' => 'Výchozí jazyk systému',
         ],
     ],
 ];

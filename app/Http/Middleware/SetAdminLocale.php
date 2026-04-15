@@ -13,8 +13,11 @@ class SetAdminLocale
 {
     public function handle(Request $request, Closure $next): Response
     {
-        app()->setLocale('cs');
-        Carbon::setLocale('cs');
+        $locale = auth()->user()?->preferred_locale
+            ?? config('app.locale');
+
+        app()->setLocale($locale);
+        Carbon::setLocale($locale);
 
         return $next($request);
     }

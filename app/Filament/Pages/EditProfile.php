@@ -6,6 +6,7 @@ namespace App\Filament\Pages;
 
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -32,6 +33,11 @@ class EditProfile extends BaseEditProfile
                             ->imageResizeTargetHeight('512'),
                         $this->getNameFormComponent(),
                         $this->getEmailFormComponent(),
+                        Select::make('preferred_locale')
+                            ->label(__('admin.profile.fields.preferred_locale'))
+                            ->options(config('mipress.locales'))
+                            ->placeholder(__('admin.profile.help.preferred_locale'))
+                            ->native(false),
                     ]),
                 Section::make(__('admin.profile.sections.password'))
                     ->schema([

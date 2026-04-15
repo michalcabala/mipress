@@ -10,9 +10,11 @@ return [
         ],
         'fields' => [
             'avatar' => 'Avatar',
+            'preferred_locale' => 'Admin language',
         ],
         'help' => [
             'avatar' => 'Profile photo shown in the admin panel.',
+            'preferred_locale' => 'System default language',
         ],
     ],
 ];

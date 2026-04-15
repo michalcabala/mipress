@@ -448,7 +448,7 @@ describe('list page', function () {
 
     it('shows in-review badge in navigation for users who can publish', function () {
         $blogCollection = Collection::factory()->create([
-            'name' => 'Blog',
+            'name' => 'Badge Blog',
             'handle' => 'blog-badge-test',
         ]);
 
@@ -458,7 +458,7 @@ describe('list page', function () {
         ]);
 
         $items = EntryResource::getNavigationItems();
-        $blogItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Blog');
+        $blogItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Badge Blog');
 
         expect($blogItem)->not->toBeNull()
             ->and($blogItem->getBadge())->toBe('1');
@@ -466,7 +466,7 @@ describe('list page', function () {
 
     it('does not show in-review badge in navigation for contributor', function () {
         $blogCollection = Collection::factory()->create([
-            'name' => 'Blog',
+            'name' => 'Badge Blog',
             'handle' => 'blog-badge-test',
         ]);
 
@@ -480,7 +480,7 @@ describe('list page', function () {
         $this->actingAs($contributor);
 
         $items = EntryResource::getNavigationItems();
-        $blogItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Blog');
+        $blogItem = collect($items)->first(fn ($item) => $item->getLabel() === 'Badge Blog');
 
         expect($blogItem)->not->toBeNull()
             ->and($blogItem->getBadge())->toBeNull();
@@ -1159,7 +1159,7 @@ describe('preview', function () {
         $url = URL::temporarySignedRoute('preview.entry', now()->addHour(), ['entry' => $entry->id]);
 
         $this->get($url)
-            ->assertRedirect('/live-article');
+            ->assertRedirect('/blog/live-article');
     });
 });
 

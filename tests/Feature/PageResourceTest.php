@@ -16,6 +16,7 @@ use MiPress\Core\Filament\Resources\PageResource;
 use MiPress\Core\Filament\Resources\PageResource\Pages\CreatePage;
 use MiPress\Core\Filament\Resources\PageResource\Pages\EditPage;
 use MiPress\Core\Filament\Resources\PageResource\Pages\ListPages;
+use MiPress\Core\Filament\Resources\PageResource\Widgets\PagePublicationStatusOverview;
 use MiPress\Core\Models\Blueprint;
 use MiPress\Core\Models\Page;
 use MiPress\Core\Models\Setting;
@@ -403,7 +404,7 @@ it('renders the publication status overview buttons for pages', function () {
 
     $trashedPage->delete();
 
-    Livewire::test(ListPages::class)
+    Livewire::test(PagePublicationStatusOverview::class)
         ->assertSee('Vše')
         ->assertSee(ContentStatus::Draft->getLabel())
         ->assertSee(ContentStatus::Published->getLabel())

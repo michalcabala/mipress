@@ -49,4 +49,21 @@ class EditProfile extends BaseEditProfile
                     ->collapsed(),
             ]);
     }
+
+    protected function afterSave(): void
+    {
+        $locale = $this->getUser()->preferred_locale;
+
+        if (blank($locale)) {
+            session()->forget('locale');
+            cookie()->queue(cookie()->forget('filament_language_switch_locale'));
+            app()->setLocale(config('app.locale'));
+
+            return;
+        }
+
+        session()->put('locale', $locale);
+        cookie()->queue(cookie()->forever('filament_language_switch_locale', $locale));
+        app()->setLocale($locale);
+    }
 }

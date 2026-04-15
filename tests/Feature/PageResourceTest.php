@@ -384,7 +384,7 @@ it('uses the title column for resource lock indicators in the pages list', funct
         ->assertTableColumnExists('slug');
 });
 
-it('renders the publication status overview buttons for pages', function () {
+it('renders the publication status overview links for pages', function () {
     Page::factory()->create([
         'blueprint_id' => $this->blueprint->id,
         'status' => ContentStatus::Draft,
@@ -405,6 +405,7 @@ it('renders the publication status overview buttons for pages', function () {
     $trashedPage->delete();
 
     Livewire::test(PagePublicationStatusOverview::class)
+        ->assertSeeHtml('fi-link')
         ->assertSee('Vše')
         ->assertSee(ContentStatus::Draft->getLabel())
         ->assertSee(ContentStatus::Published->getLabel())

@@ -39,7 +39,7 @@ $run = static function (string $command): void {
 
 echo "Starting miPress installer...\n";
 
-$freshEnv = false;
+$shouldGenerateApplicationKey = false;
 
 if (! file_exists('.env')) {
     if (! copy('.env.example', '.env')) {
@@ -47,11 +47,15 @@ if (! file_exists('.env')) {
         exit(1);
     }
 
-    $freshEnv = true;
     echo "Created .env from .env.example\n";
 } else {
     echo ".env already exists, keeping current values\n";
 }
+
+$environmentFile = file_exists('.env') ? file_get_contents('.env') : false;
+
+$shouldGenerateApplicationKey = ! is_string($environmentFile)
+    || preg_match('/^APP_KEY=.+$/m', $environmentFile) !== 1;
 
 if (! $skipComposerInstall) {
     $run('composer install --no-interaction --prefer-dist --no-progress');
@@ -59,7 +63,7 @@ if (! $skipComposerInstall) {
     echo "Skipping composer install (--skip-composer-install)\n";
 }
 
-if ($freshEnv) {
+if ($shouldGenerateApplicationKey) {
     $run(PHP_BINARY.' artisan key:generate --no-interaction');
 } else {
     echo "APP_KEY already configured, skipping key:generate\n";

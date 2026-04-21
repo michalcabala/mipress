@@ -88,7 +88,7 @@ Release model je nyni ukotveny takto:
 Aktualni stav release modelu:
 
 - root skeleton pouziva verejna Composer jmena `michalcabala/*`,
-- release skeleton uz neni zavisly na lokalnich `path` repositories, protoze balicky resi pres verejne GitHub VCS zdroje,
+- release skeleton uz neni zavisly na lokalnich `path` repositories, protoze balicky resi pres verejne GitHub `git` zdroje bez zavislosti na GitHub API driveru,
 - create-project bootstrap uz neprovadi automaticke migrace a seedy bez vedomeho kroku installera.
 
 Zbyvajici externi krok mimo tento repozitar je registrace root skeletonu na Packagist, aby sel volat primo pres `composer create-project michalcabala/mipress` bez dalsich repository argumentu.

@@ -84,7 +84,6 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
-            "@php artisan key:generate --ansi --no-interaction",
             "@php -r \"fwrite(STDOUT, 'Configure .env and run composer run setup:create-project to finish miPress installation.'.PHP_EOL);\""
         ],
         "pre-package-uninstall": [
@@ -110,15 +109,15 @@
     },
     "repositories": [
         {
-            "type": "vcs",
+            "type": "git",
             "url": "https://github.com/michalcabala/mipress-core.git"
         },
         {
-            "type": "vcs",
+            "type": "git",
             "url": "https://github.com/michalcabala/mipress-forms.git"
         },
         {
-            "type": "vcs",
+            "type": "git",
             "url": "https://github.com/michalcabala/mipress-social-feeds.git"
         }
     ],

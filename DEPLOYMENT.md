@@ -176,11 +176,12 @@ git checkout main
 
 ## Release model balíčků
 
-Aktuální release model používá veřejná Composer jména a veřejné GitHub VCS zdroje.
+Aktuální release model používá veřejná Composer jména a veřejné GitHub `git` zdroje.
 
 To řeší dvě praktické věci:
 
 - root `composer.json` už není navázaný na interní názvy ani lokální `path` repositories,
+- clean install flow už není závislý na GitHub API rate limitu pro Composer `vcs` driver,
 - release rehearsal v tomto repu lépe odpovídá budoucímu public install flow.
 
 Pro první ostrý release ještě zbývá hlavně externí registrace root skeletonu na Packagist a následný čistý `create-project` rehearsal mimo tento workspace.

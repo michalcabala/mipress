@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "15202202d0300652386f67969d094ee7",
+    "content-hash": "80efdb19c7e170decd66d781b4eed86b",
     "packages": [
         {
             "name": "awcodes/botly",

@@ -45,8 +45,9 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    manifesty a Blade view už nejdou číst přes veřejnou `theme-files` route (21. 4.).
 8. `DONE` Bootstrap super admin už nepoužívá známé fallback credentials; vznikne jen při
    explicitně nastavených `MIPRESS_ADMIN_EMAIL` + `MIPRESS_ADMIN_PASSWORD` (21. 4.).
-9. `DONE` Root skeleton už používá veřejná Composer jména `michalcabala/*` a release už není závislý na lokálních `path` repositories; balíčky se řeší přes veřejné GitHub VCS zdroje (21. 4.).
-10. `DONE` `post-create-project-cmd` už nespouští automatické migrace; explicitní dokončení instalace pro budoucí vydaný skeleton je `composer run setup:create-project` (21. 4.).
+9. `DONE` Root skeleton už používá veřejná Composer jména `michalcabala/*` a release už není závislý na lokálních `path` repositories; balíčky se řeší přes veřejné GitHub `git` zdroje bez závislosti na GitHub API driveru (21. 4.).
+10. `DONE` `post-create-project-cmd` už nespoléhá na `artisan` při `composer create-project --no-install`; explicitní dokončení instalace pro vydaný skeleton je `composer run setup:create-project` (21. 4.).
+11. `DONE` Installer `scripts/install-web.php` generuje `APP_KEY` i tehdy, když `.env` už existuje, ale klíč je prázdný; to opravuje recovery flow po `create-project --no-install` (21. 4.).
 
 ## P1 - stabilizace release kandidáta
 

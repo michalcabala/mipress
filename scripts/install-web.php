@@ -7,6 +7,7 @@ declare(strict_types=1);
  *
  * Usage:
  *   php scripts/install-web.php
+ *   php scripts/install-web.php --skip-composer-install
  *   php scripts/install-web.php --skip-build
  *   php scripts/install-web.php --skip-migrate
  *   php scripts/install-web.php --skip-seed
@@ -16,10 +17,11 @@ $arguments = array_slice($argv, 1);
 
 if (in_array('--help', $arguments, true) || in_array('-h', $arguments, true)) {
     echo "miPress installer\n";
-    echo "Usage: php scripts/install-web.php [--skip-build] [--skip-migrate] [--skip-seed] [--skip-smoke]\n";
+    echo "Usage: php scripts/install-web.php [--skip-composer-install] [--skip-build] [--skip-migrate] [--skip-seed] [--skip-smoke]\n";
     exit(0);
 }
 
+$skipComposerInstall = in_array('--skip-composer-install', $arguments, true);
 $skipBuild = in_array('--skip-build', $arguments, true);
 $skipMigrate = in_array('--skip-migrate', $arguments, true);
 $skipSeed = in_array('--skip-seed', $arguments, true);
@@ -37,8 +39,6 @@ $run = static function (string $command): void {
 
 echo "Starting miPress installer...\n";
 
-$run('composer install --no-interaction --prefer-dist --no-progress');
-
 $freshEnv = false;
 
 if (! file_exists('.env')) {
@@ -51,6 +51,12 @@ if (! file_exists('.env')) {
     echo "Created .env from .env.example\n";
 } else {
     echo ".env already exists, keeping current values\n";
+}
+
+if (! $skipComposerInstall) {
+    $run('composer install --no-interaction --prefer-dist --no-progress');
+} else {
+    echo "Skipping composer install (--skip-composer-install)\n";
 }
 
 if ($freshEnv) {

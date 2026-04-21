@@ -45,6 +45,8 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    manifesty a Blade view už nejdou číst přes veřejnou `theme-files` route (21. 4.).
 8. `DONE` Bootstrap super admin už nepoužívá známé fallback credentials; vznikne jen při
    explicitně nastavených `MIPRESS_ADMIN_EMAIL` + `MIPRESS_ADMIN_PASSWORD` (21. 4.).
+9. `DONE` Root skeleton už používá verzované constraints pro `mipress/*`; lokální monorepo je mapuje přes Composer `path` repository `options.versions`, takže release preflight už není blokovaný interními `@dev` odkazy (21. 4.).
+10. `DONE` `post-create-project-cmd` už nespouští automatické migrace; explicitní dokončení instalace pro budoucí vydaný skeleton je `composer run setup:create-project` (21. 4.).
 
 ## P1 - stabilizace release kandidáta
 
@@ -111,6 +113,7 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 1. `TODO` Srovnat Composer boundary mezi root skeletonem a `mipress/core`.
    Root má držet jen host app / Laravel / Filament bootstrap závislosti, zatímco core má explicitně deklarovat CMS runtime dependency, které opravdu používá.
    První audit ukázal, že core používal Curator integraci bez explicitní dependency; quick fix je hotový a core nyní deklaruje `awcodes/filament-curator`.
+   Další quick fix je také hotový: root skeleton přešel z `@dev` constraintů na explicitní verze `mipress/*` a lokální monorepo je mapuje přes `options.versions`, takže release model je blíž reálnému publish flow.
    Zůstává dořešit ownership ostatních CMS balíčků v root `composer.json` (`awcodes/mason`, `codewithdennis/filament-select-tree`, `spatie/laravel-permission`, `spatie/laravel-sluggable`).
 
 2. `TODO` Rozhodnout ownership CMS-owned root configů a migrací.
@@ -124,6 +127,7 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 4. `TODO` Sepsat a zafixovat contract thin host app.
    Root má vlastnit `User`, `AdminPanelProvider`, deploy/install/ops commands, branding a prostředí;
    core má vlastnit content modely, Filament resources/pages, public rendering, theme runtime, SEO, settings, media a workflow;
+   Quick fix hotov: create-project bootstrap už nedělá automatické DB mutace v Composer hooku; explicitní install flow jde přes `composer run setup:create-project`.
    forms a social-feeds zůstávají jako volitelné moduly mimo core.
 
 5. `TODO` Rozhodnout, zda `Botly` patří do core baseline nebo do samostatného addon modulu.

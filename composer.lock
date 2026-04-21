@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7bae601f00b02d990347f9c19117ab83",
+    "content-hash": "cacd553e6c1689a2663b0e0f399de611",
     "packages": [
         {
             "name": "awcodes/botly",
@@ -4134,11 +4134,11 @@
         },
         {
             "name": "mipress/core",
-            "version": "dev-main",
+            "version": "0.10.6",
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/core",
-                "reference": "a94333a562de902be908d256f1826527fcada4b1"
+                "reference": "e0ccb354108da8e8eb4d880421968324ff58f476"
             },
             "require": {
                 "awcodes/botly": "^1.0",
@@ -4183,14 +4183,14 @@
         },
         {
             "name": "mipress/forms",
-            "version": "dev-main",
+            "version": "0.1.2",
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/forms",
-                "reference": "19142505d87b0905300065ad31bc00a130c90c31"
+                "reference": "59e451d6512e818039a75473ba0ca06b1290864c"
             },
             "require": {
-                "mipress/core": "@dev",
+                "mipress/core": "^0.10.6",
                 "php": "^8.3"
             },
             "type": "library",
@@ -4217,11 +4217,11 @@
         },
         {
             "name": "mipress/social-feeds",
-            "version": "dev-main",
+            "version": "0.1.1",
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/social-feeds",
-                "reference": "fe21b05226d9f1701ec5fc5e9f7c890b17b5c468"
+                "reference": "7a29fc15c29e710ceedd3032fe97d984b46c2ed9"
             },
             "require": {
                 "filament/filament": "^5.0",
@@ -12999,11 +12999,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "mipress/core": 20,
-        "mipress/forms": 20,
-        "mipress/social-feeds": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

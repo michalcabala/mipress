@@ -15,9 +15,9 @@
         "filament/filament": "^5.0",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
-        "mipress/core": "@dev",
-        "mipress/forms": "@dev",
-        "mipress/social-feeds": "@dev",
+        "mipress/core": "^0.10.6",
+        "mipress/forms": "^0.1.2",
+        "mipress/social-feeds": "^0.1.1",
         "spatie/laravel-permission": "^7.2",
         "spatie/laravel-sluggable": "^3.8"
     },
@@ -48,8 +48,14 @@
         "setup": [
             "@install:web"
         ],
+        "setup:create-project": [
+            "@php scripts/install-web.php --skip-composer-install"
+        ],
         "install:web": [
             "@php scripts/install-web.php"
+        ],
+        "dev:boost-update": [
+            "@php artisan boost:update --ansi"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
@@ -72,15 +78,14 @@
             "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@php artisan boost:update --ansi"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
-            "@php artisan key:generate --ansi",
-            "@php artisan migrate --graceful --ansi"
+            "@php artisan key:generate --ansi --no-interaction",
+            "@php -r \"fwrite(STDOUT, 'Configure .env and run composer run setup:create-project to finish miPress installation.'.PHP_EOL);\""
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
@@ -108,21 +113,30 @@
             "type": "path",
             "url": "packages/mipress/core",
             "options": {
-                "symlink": true
+                "symlink": true,
+                "versions": {
+                    "mipress/core": "0.10.6"
+                }
             }
         },
         {
             "type": "path",
             "url": "packages/mipress/forms",
             "options": {
-                "symlink": true
+                "symlink": true,
+                "versions": {
+                    "mipress/forms": "0.1.2"
+                }
             }
         },
         {
             "type": "path",
             "url": "packages/mipress/social-feeds",
             "options": {
-                "symlink": true
+                "symlink": true,
+                "versions": {
+                    "mipress/social-feeds": "0.1.1"
+                }
             }
         }
     ],

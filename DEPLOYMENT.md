@@ -113,6 +113,22 @@ MIPRESS_ADMIN_PASSWORD=<secure-random>
 
 ## Instalace nové instance
 
+Pro checkout tohoto repozitáře je preferovaný bootstrap:
+
+```bash
+composer run setup
+```
+
+To provede Composer install, build, migrace, seed, storage link, cache clear a smoke test.
+
+Pokud bude skeleton distribuovaný přes `composer create-project`, create-project hook záměrně negeneruje databázové schéma automaticky. Po konfiguraci `.env` a DB použít explicitní dokončení instalace:
+
+```bash
+composer run setup:create-project
+```
+
+Tento wrapper používá `scripts/install-web.php --skip-composer-install`, protože závislosti už v create-project scénáři existují.
+
 ```bash
 # 1. Závislosti
 composer install --no-dev --optimize-autoloader
@@ -155,3 +171,14 @@ git add composer.lock && git commit -m "chore: update mipress/core" && git push
 git checkout staging && git merge main --no-edit && git push origin staging
 git checkout main
 ```
+
+## Release model balíčků
+
+Aktuální monorepo používá lokální `path` repositories s explicitními `options.versions`, aby root skeleton validoval jako verzovaný release i během vývoje.
+
+To řeší dvě praktické věci:
+
+- root `composer.json` už není navázaný na interní `@dev` constraints,
+- release rehearsal v tomto repu lépe odpovídá budoucímu publish/install flow.
+
+Pro první ostrý release ještě zbývá rozhodnout finální veřejný skeleton package name a cílový Composer registry model pro `mipress/core`, `mipress/forms` a `mipress/social-feeds`.

@@ -43,6 +43,12 @@ composer run setup
 
 Installer provede Composer install, pripravi `.env`, vygeneruje `APP_KEY`, postavi frontend, spusti migrace a seedy, vytvori storage link, procisti cache a pusti smoke test.
 
+Pro budoucí `composer create-project` flow je záměr jiný: create-project hook pouze připraví `.env` + `APP_KEY`, ale nespouští databázové změny automaticky. Po doplnění `.env` má následovat explicitní bootstrap:
+
+```bash
+composer run setup:create-project
+```
+
 Pokud se ma pri prvni instalaci vytvorit bootstrap admin, nastav v `.env`:
 
 ```env
@@ -62,7 +68,13 @@ MIPRESS_ADMIN_PASSWORD=<secure-random>
 Repo je momentalne monorepo se `path` repositories. To je pohodlne pro vyvoj, ale pro prvni Composer-ready release jeste zbyva doresit:
 
 - finalni verejne Composer package naming skeletonu,
-- versioned constraints misto internich `@dev` odkazu,
+- distribuci balicku mimo lokalni monorepo (`Packagist`, private Composer repo nebo jiny registry model),
 - explicitni contract toho, co zustava v root skeletonu a co vlastni `mipress/core`.
+
+Aktualni stav release modelu:
+
+- root skeleton uz pouziva explicitni versioned constraints pro `mipress/*`,
+- lokalni monorepo je mapuje pres Composer `path` repository `options.versions`,
+- create-project bootstrap uz neprovadi automaticke migrace a seedy bez vedomeho kroku installera.
 
 Aktualni backlog a refaktoring priority jsou v `ROADMAP_REFAKTORING.md`.

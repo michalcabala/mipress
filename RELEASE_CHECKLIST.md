@@ -21,6 +21,9 @@
 
 - [ ] Všechny změny jsou v commitech a pushnuté na remote.
 - [ ] CI je zelená pro cílovou branch (lint, tests, smoke).
+- [ ] `composer validate --strict --no-check-publish` je čistý v root skeletonu i balíčcích.
+- [ ] Root skeleton používá verzované constraints pro `mipress/*`, ne interní `@dev` odkazy.
+- [ ] `post-create-project-cmd` nespouští automatické migrace; explicitní bootstrap pro vydaný skeleton je zdokumentovaný (`composer run setup:create-project`).
 - [ ] Lokální smoke test adminu:
   - [ ] Přihlášení do admin panelu `/mpcp`.
   - [ ] Otevření klíčových sekcí (Položky, Stránky, Formuláře, SEO).
@@ -30,6 +33,13 @@
   - [ ] `composer test:ci`
 - [ ] Frontend build:
   - [ ] `npm run build`
+- [ ] Lokální produkční cache rehearsal:
+  - [ ] `php artisan config:cache`
+  - [ ] `php artisan route:cache`
+  - [ ] `php artisan view:cache`
+  - [ ] `php artisan filament:cache-components`
+  - [ ] Homepage a `/mpcp/login` odpovídají korektně.
+  - [ ] Po rehearsal vráceno na čistý stav přes `php artisan optimize:clear`.
 - [ ] Migrace bez destruktivních kroků:
   - [ ] `php artisan migrate --pretend`
   - [ ] Kontrola SQL výstupu (bez drop/truncate/reset).

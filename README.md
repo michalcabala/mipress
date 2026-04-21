@@ -1,7 +1,7 @@
 # miPress
 
-miPress je modularni CMS postavene na Laravelu 13, Filamentu 5 a lokalnich Composer baliccich.
-Root repozitar funguje jako skeleton aplikace; CMS kernel a volitelne moduly jsou rozdelene do balicku v `packages/mipress/*`.
+miPress je modularni CMS postavene na Laravelu 13, Filamentu 5 a verejnych Composer baliccich.
+Root repozitar funguje jako skeleton aplikace; CMS kernel a moduly jsou publikovane jako samostatne Composer balicky a skeleton je sklada dohromady.
 
 Aktualni priorita projektu je priprava prvniho ostreho release tak, aby slo zalozit novy web/projekt pres Composer s co nejtensim skeletonem a jasnou hranici mezi host app a CMS balicky.
 
@@ -16,9 +16,22 @@ Aktualni priorita projektu je priprava prvniho ostreho release tak, aby slo zalo
 
 ## Balicky
 
-- `mipress/core`: CMS kernel, content modely, admin resources/pages, public rendering, themes, SEO, settings, workflow, media
-- `mipress/forms`: formularovy modul, submit flow a administrace odpovedi
-- `mipress/social-feeds`: social account/feed integrace a scheduled refresh
+- `michalcabala/mipress-core`: CMS kernel, content modely, admin resources/pages, public rendering, themes, SEO, settings, workflow, media
+- `michalcabala/mipress-forms`: formularovy modul, submit flow a administrace odpovedi
+- `michalcabala/mipress-social-feeds`: social account/feed integrace a scheduled refresh
+
+## Instalace noveho projektu
+
+Cilovy public install flow je:
+
+```bash
+composer create-project michalcabala/mipress muj-web
+cd muj-web
+composer run setup:create-project
+```
+
+Skeleton si zavislosti taha z verejnych GitHub repozitaru `michalcabala/mipress-core`,
+`michalcabala/mipress-forms` a `michalcabala/mipress-social-feeds`.
 
 ## Lokalni instalace
 
@@ -43,7 +56,7 @@ composer run setup
 
 Installer provede Composer install, pripravi `.env`, vygeneruje `APP_KEY`, postavi frontend, spusti migrace a seedy, vytvori storage link, procisti cache a pusti smoke test.
 
-Pro budoucí `composer create-project` flow je záměr jiný: create-project hook pouze připraví `.env` + `APP_KEY`, ale nespouští databázové změny automaticky. Po doplnění `.env` má následovat explicitní bootstrap:
+Pro `composer create-project` flow je zamer jiny: create-project hook pouze pripravi `.env` + `APP_KEY`, ale nespousti databazove zmeny automaticky. Po doplneni `.env` ma nasledovat explicitni bootstrap:
 
 ```bash
 composer run setup:create-project
@@ -65,16 +78,19 @@ MIPRESS_ADMIN_PASSWORD=<secure-random>
 
 ## Release smer
 
-Repo je momentalne monorepo se `path` repositories. To je pohodlne pro vyvoj, ale pro prvni Composer-ready release jeste zbyva doresit:
+Release model je nyni ukotveny takto:
 
-- finalni verejne Composer package naming skeletonu,
-- distribuci balicku mimo lokalni monorepo (`Packagist`, private Composer repo nebo jiny registry model),
-- explicitni contract toho, co zustava v root skeletonu a co vlastni `mipress/core`.
+- skeleton balicek je `michalcabala/mipress`,
+- CMS kernel je `michalcabala/mipress-core`,
+- forms modul je `michalcabala/mipress-forms`,
+- social feeds modul je `michalcabala/mipress-social-feeds`.
 
 Aktualni stav release modelu:
 
-- root skeleton uz pouziva explicitni versioned constraints pro `mipress/*`,
-- lokalni monorepo je mapuje pres Composer `path` repository `options.versions`,
+- root skeleton pouziva verejna Composer jmena `michalcabala/*`,
+- release skeleton uz neni zavisly na lokalnich `path` repositories, protoze balicky resi pres verejne GitHub VCS zdroje,
 - create-project bootstrap uz neprovadi automaticke migrace a seedy bez vedomeho kroku installera.
+
+Zbyvajici externi krok mimo tento repozitar je registrace root skeletonu na Packagist, aby sel volat primo pres `composer create-project michalcabala/mipress` bez dalsich repository argumentu.
 
 Aktualni backlog a refaktoring priority jsou v `ROADMAP_REFAKTORING.md`.

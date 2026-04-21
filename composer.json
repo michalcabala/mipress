@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "michalcabala/mipress",
     "type": "project",
     "description": "miPress CMS skeleton application built on Laravel and Filament.",
     "keywords": ["mipress", "cms", "laravel", "filament"],
@@ -15,9 +15,9 @@
         "filament/filament": "^5.0",
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
-        "mipress/core": "^0.10.6",
-        "mipress/forms": "^0.1.2",
-        "mipress/social-feeds": "^0.1.1",
+        "michalcabala/mipress-core": "^1.0",
+        "michalcabala/mipress-forms": "^1.0",
+        "michalcabala/mipress-social-feeds": "^1.0",
         "spatie/laravel-permission": "^7.2",
         "spatie/laravel-sluggable": "^3.8"
     },
@@ -110,34 +110,16 @@
     },
     "repositories": [
         {
-            "type": "path",
-            "url": "packages/mipress/core",
-            "options": {
-                "symlink": true,
-                "versions": {
-                    "mipress/core": "0.10.6"
-                }
-            }
+            "type": "vcs",
+            "url": "https://github.com/michalcabala/mipress-core.git"
         },
         {
-            "type": "path",
-            "url": "packages/mipress/forms",
-            "options": {
-                "symlink": true,
-                "versions": {
-                    "mipress/forms": "0.1.2"
-                }
-            }
+            "type": "vcs",
+            "url": "https://github.com/michalcabala/mipress-forms.git"
         },
         {
-            "type": "path",
-            "url": "packages/mipress/social-feeds",
-            "options": {
-                "symlink": true,
-                "versions": {
-                    "mipress/social-feeds": "0.1.1"
-                }
-            }
+            "type": "vcs",
+            "url": "https://github.com/michalcabala/mipress-social-feeds.git"
         }
     ],
     "minimum-stability": "stable",

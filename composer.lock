@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cacd553e6c1689a2663b0e0f399de611",
+    "content-hash": "15202202d0300652386f67969d094ee7",
     "packages": [
         {
             "name": "awcodes/botly",
@@ -1326,16 +1326,16 @@
         },
         {
             "name": "filament/actions",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/actions.git",
-                "reference": "7a11c8e31119868dc1e6e48e4a0af43782645fb8"
+                "reference": "0ab8251a829cfd800b4b463d57bbb126a212fa28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/actions/zipball/7a11c8e31119868dc1e6e48e4a0af43782645fb8",
-                "reference": "7a11c8e31119868dc1e6e48e4a0af43782645fb8",
+                "url": "https://api.github.com/repos/filamentphp/actions/zipball/0ab8251a829cfd800b4b463d57bbb126a212fa28",
+                "reference": "0ab8251a829cfd800b4b463d57bbb126a212fa28",
                 "shasum": ""
             },
             "require": {
@@ -1370,20 +1370,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:14:26+00:00"
+            "time": "2026-04-21T15:40:50+00:00"
         },
         {
             "name": "filament/filament",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/panels.git",
-                "reference": "c36de5420bdc29a3fe5126d8219ab7be1ba33a53"
+                "reference": "fcda4f158395b691fd189c4b2a2e68455bb8a96f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/panels/zipball/c36de5420bdc29a3fe5126d8219ab7be1ba33a53",
-                "reference": "c36de5420bdc29a3fe5126d8219ab7be1ba33a53",
+                "url": "https://api.github.com/repos/filamentphp/panels/zipball/fcda4f158395b691fd189c4b2a2e68455bb8a96f",
+                "reference": "fcda4f158395b691fd189c4b2a2e68455bb8a96f",
                 "shasum": ""
             },
             "require": {
@@ -1427,20 +1427,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:10:13+00:00"
+            "time": "2026-04-21T15:37:04+00:00"
         },
         {
             "name": "filament/forms",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/forms.git",
-                "reference": "6381e44fa9010eabeb64cca2cbb329cf1f296933"
+                "reference": "8ebc5bf00397e683243694bc6bd25163c511b9f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/forms/zipball/6381e44fa9010eabeb64cca2cbb329cf1f296933",
-                "reference": "6381e44fa9010eabeb64cca2cbb329cf1f296933",
+                "url": "https://api.github.com/repos/filamentphp/forms/zipball/8ebc5bf00397e683243694bc6bd25163c511b9f0",
+                "reference": "8ebc5bf00397e683243694bc6bd25163c511b9f0",
                 "shasum": ""
             },
             "require": {
@@ -1477,20 +1477,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:15:09+00:00"
+            "time": "2026-04-21T15:36:43+00:00"
         },
         {
             "name": "filament/infolists",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/infolists.git",
-                "reference": "151188b87a621b07a167db676d7a1d30b3f2e808"
+                "reference": "39b01e3a86ca0fe0a0c7e45038de9312eefcee51"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/infolists/zipball/151188b87a621b07a167db676d7a1d30b3f2e808",
-                "reference": "151188b87a621b07a167db676d7a1d30b3f2e808",
+                "url": "https://api.github.com/repos/filamentphp/infolists/zipball/39b01e3a86ca0fe0a0c7e45038de9312eefcee51",
+                "reference": "39b01e3a86ca0fe0a0c7e45038de9312eefcee51",
                 "shasum": ""
             },
             "require": {
@@ -1522,20 +1522,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:07:46+00:00"
+            "time": "2026-04-21T15:38:03+00:00"
         },
         {
             "name": "filament/notifications",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/notifications.git",
-                "reference": "37e133539de255ffa34caf13d01ba3c2aed04478"
+                "reference": "b6d6a349dab2177600dd981a5c94e7c1a52ea6dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/notifications/zipball/37e133539de255ffa34caf13d01ba3c2aed04478",
-                "reference": "37e133539de255ffa34caf13d01ba3c2aed04478",
+                "url": "https://api.github.com/repos/filamentphp/notifications/zipball/b6d6a349dab2177600dd981a5c94e7c1a52ea6dd",
+                "reference": "b6d6a349dab2177600dd981a5c94e7c1a52ea6dd",
                 "shasum": ""
             },
             "require": {
@@ -1569,20 +1569,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:08:42+00:00"
+            "time": "2026-04-21T15:41:06+00:00"
         },
         {
             "name": "filament/query-builder",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/query-builder.git",
-                "reference": "6da87cd76791bb31232e68d01680794204c27c6d"
+                "reference": "3f1fc2c03649552922954389f81a702180a5166c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/query-builder/zipball/6da87cd76791bb31232e68d01680794204c27c6d",
-                "reference": "6da87cd76791bb31232e68d01680794204c27c6d",
+                "url": "https://api.github.com/repos/filamentphp/query-builder/zipball/3f1fc2c03649552922954389f81a702180a5166c",
+                "reference": "3f1fc2c03649552922954389f81a702180a5166c",
                 "shasum": ""
             },
             "require": {
@@ -1615,20 +1615,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:13:17+00:00"
+            "time": "2026-04-21T15:37:23+00:00"
         },
         {
             "name": "filament/schemas",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/schemas.git",
-                "reference": "7fd7037dae90c4c45725858e5ffee5cd93761d9f"
+                "reference": "447b5f0034aab7bbda025ff6b5b177f424468e39"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/schemas/zipball/7fd7037dae90c4c45725858e5ffee5cd93761d9f",
-                "reference": "7fd7037dae90c4c45725858e5ffee5cd93761d9f",
+                "url": "https://api.github.com/repos/filamentphp/schemas/zipball/447b5f0034aab7bbda025ff6b5b177f424468e39",
+                "reference": "447b5f0034aab7bbda025ff6b5b177f424468e39",
                 "shasum": ""
             },
             "require": {
@@ -1660,20 +1660,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:10:06+00:00"
+            "time": "2026-04-21T15:39:34+00:00"
         },
         {
             "name": "filament/support",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/support.git",
-                "reference": "2ab96f5975cc2f7a8829ac650caf9d7aeeb5e5aa"
+                "reference": "a16403582ed0a3c74fb1bd11615df9a4f95a155c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/support/zipball/2ab96f5975cc2f7a8829ac650caf9d7aeeb5e5aa",
-                "reference": "2ab96f5975cc2f7a8829ac650caf9d7aeeb5e5aa",
+                "url": "https://api.github.com/repos/filamentphp/support/zipball/a16403582ed0a3c74fb1bd11615df9a4f95a155c",
+                "reference": "a16403582ed0a3c74fb1bd11615df9a4f95a155c",
                 "shasum": ""
             },
             "require": {
@@ -1718,20 +1718,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:11:00+00:00"
+            "time": "2026-04-21T15:41:41+00:00"
         },
         {
             "name": "filament/tables",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/tables.git",
-                "reference": "44d87a87122e7aa40c9447aa73c133b52025a96c"
+                "reference": "e8aab9455d07dfb9073127297ba726a72dfb33a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/tables/zipball/44d87a87122e7aa40c9447aa73c133b52025a96c",
-                "reference": "44d87a87122e7aa40c9447aa73c133b52025a96c",
+                "url": "https://api.github.com/repos/filamentphp/tables/zipball/e8aab9455d07dfb9073127297ba726a72dfb33a4",
+                "reference": "e8aab9455d07dfb9073127297ba726a72dfb33a4",
                 "shasum": ""
             },
             "require": {
@@ -1764,20 +1764,20 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-14T11:09:54+00:00"
+            "time": "2026-04-21T15:38:41+00:00"
         },
         {
             "name": "filament/widgets",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filamentphp/widgets.git",
-                "reference": "9d015855538378f536156feb9d2af494fb236579"
+                "reference": "9327b63e0c3f6a646376a18ed4c8d485c18a8dc6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filamentphp/widgets/zipball/9d015855538378f536156feb9d2af494fb236579",
-                "reference": "9d015855538378f536156feb9d2af494fb236579",
+                "url": "https://api.github.com/repos/filamentphp/widgets/zipball/9327b63e0c3f6a646376a18ed4c8d485c18a8dc6",
+                "reference": "9327b63e0c3f6a646376a18ed4c8d485c18a8dc6",
                 "shasum": ""
             },
             "require": {
@@ -1808,7 +1808,7 @@
                 "issues": "https://github.com/filamentphp/filament/issues",
                 "source": "https://github.com/filamentphp/filament"
             },
-            "time": "2026-04-03T15:40:06+00:00"
+            "time": "2026-04-21T15:39:57+00:00"
         },
         {
             "name": "firebase/php-jwt",
@@ -2628,16 +2628,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v13.5.0",
+            "version": "v13.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "ffa1850049a691b93129808f27ecd10e65c9d1a5"
+                "reference": "416a93ea9c53161e0d4b8a44045f447b65a7d2f1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/ffa1850049a691b93129808f27ecd10e65c9d1a5",
-                "reference": "ffa1850049a691b93129808f27ecd10e65c9d1a5",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/416a93ea9c53161e0d4b8a44045f447b65a7d2f1",
+                "reference": "416a93ea9c53161e0d4b8a44045f447b65a7d2f1",
                 "shasum": ""
             },
             "require": {
@@ -2847,20 +2847,20 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2026-04-14T13:55:03+00:00"
+            "time": "2026-04-21T13:32:11+00:00"
         },
         {
             "name": "laravel/prompts",
-            "version": "v0.3.16",
+            "version": "v0.3.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/prompts.git",
-                "reference": "11e7d5f93803a2190b00e145142cb00a33d17ad2"
+                "reference": "6a82ac19a28b916ae0885828795dbd4c59d9a818"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/prompts/zipball/11e7d5f93803a2190b00e145142cb00a33d17ad2",
-                "reference": "11e7d5f93803a2190b00e145142cb00a33d17ad2",
+                "url": "https://api.github.com/repos/laravel/prompts/zipball/6a82ac19a28b916ae0885828795dbd4c59d9a818",
+                "reference": "6a82ac19a28b916ae0885828795dbd4c59d9a818",
                 "shasum": ""
             },
             "require": {
@@ -2904,9 +2904,9 @@
             "description": "Add beautiful and user-friendly forms to your command-line applications.",
             "support": {
                 "issues": "https://github.com/laravel/prompts/issues",
-                "source": "https://github.com/laravel/prompts/tree/v0.3.16"
+                "source": "https://github.com/laravel/prompts/tree/v0.3.17"
             },
-            "time": "2026-03-23T14:35:33+00:00"
+            "time": "2026-04-20T16:07:33+00:00"
         },
         {
             "name": "laravel/serializable-closure",
@@ -4133,12 +4133,18 @@
             "time": "2026-04-02T09:28:37+00:00"
         },
         {
-            "name": "mipress/core",
-            "version": "0.10.6",
+            "name": "michalcabala/mipress-core",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michalcabala/mipress-core.git",
+                "reference": "7cb28b7f7200161ce30574349134b26f8410669c"
+            },
             "dist": {
-                "type": "path",
-                "url": "packages/mipress/core",
-                "reference": "e0ccb354108da8e8eb4d880421968324ff58f476"
+                "type": "zip",
+                "url": "https://api.github.com/repos/michalcabala/mipress-core/zipball/7cb28b7f7200161ce30574349134b26f8410669c",
+                "reference": "7cb28b7f7200161ce30574349134b26f8410669c",
+                "shasum": ""
             },
             "require": {
                 "awcodes/botly": "^1.0",
@@ -4176,21 +4182,28 @@
                 "MIT"
             ],
             "description": "MiPress CMS core package.",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "support": {
+                "source": "https://github.com/michalcabala/mipress-core/tree/1.0.0",
+                "issues": "https://github.com/michalcabala/mipress-core/issues"
+            },
+            "time": "2026-04-21T16:57:27+00:00"
         },
         {
-            "name": "mipress/forms",
-            "version": "0.1.2",
+            "name": "michalcabala/mipress-forms",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michalcabala/mipress-forms.git",
+                "reference": "4519983701db37554c75258b7b1f8ab426804d50"
+            },
             "dist": {
-                "type": "path",
-                "url": "packages/mipress/forms",
-                "reference": "59e451d6512e818039a75473ba0ca06b1290864c"
+                "type": "zip",
+                "url": "https://api.github.com/repos/michalcabala/mipress-forms/zipball/4519983701db37554c75258b7b1f8ab426804d50",
+                "reference": "4519983701db37554c75258b7b1f8ab426804d50",
+                "shasum": ""
             },
             "require": {
-                "mipress/core": "^0.10.6",
+                "michalcabala/mipress-core": "^1.0",
                 "php": "^8.3"
             },
             "type": "library",
@@ -4210,18 +4223,25 @@
                 "MIT"
             ],
             "description": "Form builder module for miPress CMS",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "support": {
+                "source": "https://github.com/michalcabala/mipress-forms/tree/1.0.0",
+                "issues": "https://github.com/michalcabala/mipress-forms/issues"
+            },
+            "time": "2026-04-21T16:57:30+00:00"
         },
         {
-            "name": "mipress/social-feeds",
-            "version": "0.1.1",
+            "name": "michalcabala/mipress-social-feeds",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michalcabala/mipress-social-feeds.git",
+                "reference": "853f0454c3cb33cdd6b130bd743c75fab182b780"
+            },
             "dist": {
-                "type": "path",
-                "url": "packages/mipress/social-feeds",
-                "reference": "7a29fc15c29e710ceedd3032fe97d984b46c2ed9"
+                "type": "zip",
+                "url": "https://api.github.com/repos/michalcabala/mipress-social-feeds/zipball/853f0454c3cb33cdd6b130bd743c75fab182b780",
+                "reference": "853f0454c3cb33cdd6b130bd743c75fab182b780",
+                "shasum": ""
             },
             "require": {
                 "filament/filament": "^5.0",
@@ -4246,10 +4266,11 @@
                 "proprietary"
             ],
             "description": "Social feeds integration for miPress CMS",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "support": {
+                "source": "https://github.com/michalcabala/mipress-social-feeds/tree/1.0.0",
+                "issues": "https://github.com/michalcabala/mipress-social-feeds/issues"
+            },
+            "time": "2026-04-21T16:57:33+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -7565,7 +7586,7 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
@@ -7624,7 +7645,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -7648,7 +7669,7 @@
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-grapheme.git",
@@ -7706,7 +7727,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -7730,7 +7751,7 @@
         },
         {
             "name": "symfony/polyfill-intl-idn",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-idn.git",
@@ -7793,7 +7814,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -7817,7 +7838,7 @@
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-normalizer.git",
@@ -7878,7 +7899,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -7902,7 +7923,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -7963,7 +7984,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -7987,7 +8008,7 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
@@ -8047,7 +8068,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -8071,7 +8092,7 @@
         },
         {
             "name": "symfony/polyfill-php84",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php84.git",
@@ -8127,7 +8148,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php84/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-php84/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -8151,7 +8172,7 @@
         },
         {
             "name": "symfony/polyfill-php85",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php85.git",
@@ -8207,7 +8228,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php85/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-php85/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -8231,7 +8252,7 @@
         },
         {
             "name": "symfony/polyfill-uuid",
-            "version": "v1.35.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-uuid.git",
@@ -8290,7 +8311,7 @@
                 "uuid"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-uuid/tree/v1.35.0"
+                "source": "https://github.com/symfony/polyfill-uuid/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -9184,23 +9205,23 @@
         },
         {
             "name": "voku/portable-ascii",
-            "version": "2.0.3",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/voku/portable-ascii.git",
-                "reference": "b1d923f88091c6bf09699efcd7c8a1b1bfd7351d"
+                "reference": "d870a33f0f79d2b4579740b0620200221ee44aeb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/voku/portable-ascii/zipball/b1d923f88091c6bf09699efcd7c8a1b1bfd7351d",
-                "reference": "b1d923f88091c6bf09699efcd7c8a1b1bfd7351d",
+                "url": "https://api.github.com/repos/voku/portable-ascii/zipball/d870a33f0f79d2b4579740b0620200221ee44aeb",
+                "reference": "d870a33f0f79d2b4579740b0620200221ee44aeb",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0.0"
+                "php": ">=7.1.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~6.0 || ~7.0 || ~9.0"
+                "phpunit/phpunit": "~8.5 || ~9.6 || ~10.5 || ~11.5"
             },
             "suggest": {
                 "ext-intl": "Use Intl for transliterator_transliterate() support"
@@ -9230,7 +9251,7 @@
             ],
             "support": {
                 "issues": "https://github.com/voku/portable-ascii/issues",
-                "source": "https://github.com/voku/portable-ascii/tree/2.0.3"
+                "source": "https://github.com/voku/portable-ascii/tree/2.1.0"
             },
             "funding": [
                 {
@@ -9254,7 +9275,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-11-21T01:49:47+00:00"
+            "time": "2026-04-16T23:10:39+00:00"
         }
     ],
     "packages-dev": [

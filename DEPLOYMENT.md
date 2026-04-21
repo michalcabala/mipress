@@ -129,6 +129,8 @@ composer run setup:create-project
 
 Tento wrapper používá `scripts/install-web.php --skip-composer-install`, protože závislosti už v create-project scénáři existují.
 
+Release skeleton už nespoléhá na lokální `path` repositories. Závislosti `michalcabala/mipress-core`, `michalcabala/mipress-forms` a `michalcabala/mipress-social-feeds` se řeší přes veřejné GitHub repozitáře.
+
 ```bash
 # 1. Závislosti
 composer install --no-dev --optimize-autoloader
@@ -164,7 +166,7 @@ Viz `cpanel.yml` v projektu pro přesnou sekvenci kroků.
 Manuální staging deploy:
 ```bash
 # V package repo: push tagu, pak v skeleton:
-composer update mipress/core
+composer update michalcabala/mipress-core
 git add composer.lock && git commit -m "chore: update mipress/core" && git push
 
 # Merge do staging:
@@ -174,11 +176,11 @@ git checkout main
 
 ## Release model balíčků
 
-Aktuální monorepo používá lokální `path` repositories s explicitními `options.versions`, aby root skeleton validoval jako verzovaný release i během vývoje.
+Aktuální release model používá veřejná Composer jména a veřejné GitHub VCS zdroje.
 
 To řeší dvě praktické věci:
 
-- root `composer.json` už není navázaný na interní `@dev` constraints,
-- release rehearsal v tomto repu lépe odpovídá budoucímu publish/install flow.
+- root `composer.json` už není navázaný na interní názvy ani lokální `path` repositories,
+- release rehearsal v tomto repu lépe odpovídá budoucímu public install flow.
 
-Pro první ostrý release ještě zbývá rozhodnout finální veřejný skeleton package name a cílový Composer registry model pro `mipress/core`, `mipress/forms` a `mipress/social-feeds`.
+Pro první ostrý release ještě zbývá hlavně externí registrace root skeletonu na Packagist a následný čistý `create-project` rehearsal mimo tento workspace.

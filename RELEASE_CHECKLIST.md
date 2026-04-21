@@ -22,8 +22,10 @@
 - [ ] Všechny změny jsou v commitech a pushnuté na remote.
 - [ ] CI je zelená pro cílovou branch (lint, tests, smoke).
 - [ ] `composer validate --strict --no-check-publish` je čistý v root skeletonu i balíčcích.
-- [ ] Root skeleton používá verzované constraints pro `mipress/*`, ne interní `@dev` odkazy.
+- [ ] Root skeleton používá veřejná Composer jména `michalcabala/*`.
+- [ ] Release skeleton není závislý na lokálních `path` repositories.
 - [ ] `post-create-project-cmd` nespouští automatické migrace; explicitní bootstrap pro vydaný skeleton je zdokumentovaný (`composer run setup:create-project`).
+- [ ] Tagy `1.0.0` existují v `michalcabala/mipress-core`, `michalcabala/mipress-forms`, `michalcabala/mipress-social-feeds` a skeletonu.
 - [ ] Lokální smoke test adminu:
   - [ ] Přihlášení do admin panelu `/mpcp`.
   - [ ] Otevření klíčových sekcí (Položky, Stránky, Formuláře, SEO).

@@ -4138,10 +4138,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/core",
-                "reference": "baa8029fcdb3f869a67a76c1f76142420d8e9062"
+                "reference": "a94333a562de902be908d256f1826527fcada4b1"
             },
             "require": {
                 "awcodes/botly": "^1.0",
+                "awcodes/filament-curator": "^5.0",
                 "awcodes/mason": "^3.0",
                 "codewithdennis/filament-select-tree": "4.x",
                 "filament/filament": "^5.0",
@@ -4186,7 +4187,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/forms",
-                "reference": "e8870f8be95b955fc723c71d0c60462df36d8f78"
+                "reference": "19142505d87b0905300065ad31bc00a130c90c31"
             },
             "require": {
                 "mipress/core": "@dev",
@@ -4220,7 +4221,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mipress/social-feeds",
-                "reference": "4bbbab4d745b7d0a6684631021ecd59bac45e12d"
+                "reference": "fe21b05226d9f1701ec5fc5e9f7c890b17b5c468"
             },
             "require": {
                 "filament/filament": "^5.0",

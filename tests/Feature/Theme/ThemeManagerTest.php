@@ -260,3 +260,18 @@ describe('theme_asset helper', function () {
             ->toBe('/theme-files/my-theme/assets/css/theme.css');
     });
 });
+
+describe('theme asset endpoint', function () {
+    it('serves public theme assets from the assets directory', function () {
+        $this->get('/theme-files/default/assets/css/theme.css')
+            ->assertSuccessful();
+    });
+
+    it('does not expose theme manifest or blade files', function () {
+        $this->get('/theme-files/default/theme.json')
+            ->assertNotFound();
+
+        $this->get('/theme-files/default/views/home.blade.php')
+            ->assertNotFound();
+    });
+});

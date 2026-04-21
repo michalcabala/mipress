@@ -5,8 +5,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Cache;
-use MiPress\Core\Console\Commands\PublishScheduledEntries;
-use MiPress\Core\Console\Commands\PublishScheduledPages;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,9 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withSchedule(function (Schedule $schedule): void {
-        $schedule->command(PublishScheduledEntries::class)->everyMinute();
-        $schedule->command(PublishScheduledPages::class)->everyMinute();
-
         // Housekeeping
         $schedule->command('queue:prune-failed --hours=168')->daily();
         $schedule->command('queue:prune-batches --hours=48 --cancelled=72 --unfinished=72')->daily();

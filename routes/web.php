@@ -1,7 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use MiPress\Core\Http\Controllers\EntryController;
+declare(strict_types=1);
 
-Route::get('/', [EntryController::class, 'home'])
-    ->name('home');
+// Host app intentionally keeps root web routes minimal.
+// Public CMS routes are registered by packages.

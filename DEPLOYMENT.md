@@ -93,7 +93,7 @@ MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=noreply@your-domain.cz
 MAIL_FROM_NAME="${APP_NAME}"
 
-# Volitelné: admin pro bootstrap seeder
+# Vyžadováno pro automatické vytvoření bootstrap admina
 MIPRESS_ADMIN_EMAIL=admin@your-domain.cz
 MIPRESS_ADMIN_PASSWORD=<secure-random>
 ```
@@ -108,6 +108,7 @@ MIPRESS_ADMIN_PASSWORD=<secure-random>
 - [ ] Queue worker běží (supervisor/systemd)
 - [ ] `php artisan storage:link` provedeno
 - [ ] `php artisan mipress:publish-assets` provedeno
+- [ ] `MIPRESS_ADMIN_EMAIL` a `MIPRESS_ADMIN_PASSWORD` jsou vyplněné, pokud se má vytvořit bootstrap admin
 - [ ] `php artisan db:seed` provedeno (permissions + roles + admin)
 
 ## Instalace nové instance

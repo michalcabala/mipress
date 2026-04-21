@@ -41,6 +41,10 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
 6. `DONE` Social-feeds scope rozhodnut: modul je volitelný per-projekt (instalace záleží
    na konkrétním webu). Aktuálně Facebook-only, další platformy se doplní postupně.
    Není bloker pro v1 release (14. 4.).
+7. `DONE` Theme asset endpoint je omezený pouze na soubory pod `assets/` v aktivním theme;
+   manifesty a Blade view už nejdou číst přes veřejnou `theme-files` route (21. 4.).
+8. `DONE` Bootstrap super admin už nepoužívá známé fallback credentials; vznikne jen při
+   explicitně nastavených `MIPRESS_ADMIN_EMAIL` + `MIPRESS_ADMIN_PASSWORD` (21. 4.).
 
 ## P1 - stabilizace release kandidáta
 
@@ -101,6 +105,29 @@ Primární cíl: dovést miPress k první produkční verzi bez zbytečného arc
    Doplněny přímé regrese pro `created_month` filtr v Entry/Page resource testech (15. 4.).
 8. `DONE` PR8: interní kód a testy převedeny na neutrální enum `ContentStatus`,
    původní `EntryStatus` zůstává jako backward-compatible alias; doplněna přímá kompatibilitní regrese (15. 4.).
+
+## P1/P2 - thin skeleton / core boundary cleanup
+
+1. `TODO` Srovnat Composer boundary mezi root skeletonem a `mipress/core`.
+   Root má držet jen host app / Laravel / Filament bootstrap závislosti, zatímco core má explicitně deklarovat CMS runtime dependency, které opravdu používá.
+   První audit ukázal, že core používal Curator integraci bez explicitní dependency; quick fix je hotový a core nyní deklaruje `awcodes/filament-curator`.
+   Zůstává dořešit ownership ostatních CMS balíčků v root `composer.json` (`awcodes/mason`, `codewithdennis/filament-select-tree`, `spatie/laravel-permission`, `spatie/laravel-sluggable`).
+
+2. `TODO` Rozhodnout ownership CMS-owned root configů a migrací.
+   Root dnes obsahuje CMS/integration soubory jako `config/curator.php`, `config/mason.php` a migrace pro `botly`, `sitemap_*`, `permissions` a `curator`.
+   Cíl: root ponechat pro host-level user/app infra; CMS runtime schema a config přesunout do core, nebo explicitně zdokumentovat jako vědomou host integraci.
+
+3. `TODO` Dovést public runtime boundary do core.
+   Quick fix hotov: homepage route i publish scheduler byly přesunuty z host rootu do core.
+   Zůstává dořešit další orchestration boundary a explicitně rozhodnout, co je správně host-level bootstrap a co si má balíček registrovat sám (např. config/migrations ownership).
+
+4. `TODO` Sepsat a zafixovat contract thin host app.
+   Root má vlastnit `User`, `AdminPanelProvider`, deploy/install/ops commands, branding a prostředí;
+   core má vlastnit content modely, Filament resources/pages, public rendering, theme runtime, SEO, settings, media a workflow;
+   forms a social-feeds zůstávají jako volitelné moduly mimo core.
+
+5. `TODO` Rozhodnout, zda `Botly` patří do core baseline nebo do samostatného addon modulu.
+   Dnes je plugin registrovaný v core, ale host root stále drží vlastní `botly` migraci, což rozmazává hranici mezi CMS kernelem a volitelnou AI/SEO integrací.
 
 ### Invarianty tohoto směru
 

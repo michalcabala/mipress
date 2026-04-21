@@ -6,7 +6,8 @@
     "nightwatch_mcp": false,
     "packages": [
         "spatie/laravel-permission",
-        "filament/filament"
+        "filament/filament",
+        "fruitcake/laravel-debugbar"
     ],
     "sail": false
 }

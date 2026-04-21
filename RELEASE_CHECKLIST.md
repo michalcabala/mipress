@@ -1,6 +1,13 @@
 # miPress Release Checklist (v1)
 
-## 0. Release gates (GitHub)
+## 0. Hardening blockers
+
+- [ ] `theme-files` endpoint vrací pouze veřejné assety z theme (`assets/*`), ne Blade/view/manifest soubory.
+- [ ] Bootstrap super-admin nepoužívá známý fallback login/heslo; produkční hodnoty jsou explicitně nastavené a bezpečné.
+- [ ] Proběhl staging rehearsal na MySQL s aktivním cron schedulerem, `QUEUE_CONNECTION=database` a reálným SMTP.
+- [ ] Je potvrzený rollback owner, komunikační kanál a odpovědnost za post-release monitoring.
+
+## 1. Release gates (GitHub)
 
 - [ ] Branch protection je aktivní pro `main`.
 - [ ] Mergování vyžaduje pull request (zakázat direct push).
@@ -10,7 +17,7 @@
   - [ ] `smoke` (ProductionSmokeTest)
 - [ ] Mergování je povoleno pouze při zelené CI.
 
-## 1. Pre-release (lokál/staging)
+## 2. Pre-release (lokál/staging)
 
 - [ ] Všechny změny jsou v commitech a pushnuté na remote.
 - [ ] CI je zelená pro cílovou branch (lint, tests, smoke).
@@ -28,8 +35,13 @@
   - [ ] Kontrola SQL výstupu (bez drop/truncate/reset).
 - [ ] Seed databáze (pokud nová instance):
   - [ ] `php artisan db:seed` (permissions, role, admin, global sets)
+- [ ] Staging smoke v produkčnějším režimu:
+   - [ ] Homepage a admin `/mpcp` fungují po `config:cache`, `route:cache`, `view:cache`.
+   - [ ] Queue worker zpracuje notifikaci nebo refresh job.
+   - [ ] Scheduler publikuje naplánovaný obsah.
+   - [ ] Formulář doručí e-mail přes skutečný mailer.
 
-## 2. Production deploy
+## 3. Production deploy
 
 - [ ] Aktivovat maintenance mode (pokud je potřeba):
   - [ ] `php artisan down --render="errors::503"`
@@ -52,7 +64,7 @@
 - [ ] Deaktivovat maintenance mode:
   - [ ] `php artisan up`
 
-## 3. Post-release verifikace
+## 4. Post-release verifikace
 
 - [ ] Otevřít produkční homepage a admin panel.
 - [ ] Otestovat login a autorizace (Admin/Editor/Contributor).
@@ -64,7 +76,7 @@
 - [ ] Ověřit, že scheduler běží (`php artisan schedule:list`).
 - [ ] Ověřit, že naplánovaný obsah se publikuje.
 
-## 4. Rollback plan
+## 5. Rollback plan
 
 - [ ] Mít připravený předchozí stabilní release commit/tag.
 - [ ] Při kritickém problému:
@@ -74,6 +86,6 @@
   - [ ] Spustit `php artisan queue:restart`.
 - [ ] Databázi nerollbackovat destruktivně bez explicitního schválení.
 
-## 5. Provozní dokumentace
+## 6. Provozní dokumentace
 
 Pro detailní popis produkčních procesů (scheduler, queue, env baseline, instalace) viz `DEPLOYMENT.md`.

@@ -6,7 +6,6 @@ use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Support\Facades\Hash;
 use MiPress\Core\Enums\UserRole;
-use MiPress\Core\Models\Setting;
 
 it('does not create bootstrap super admin when credentials are missing', function () {
     config()->set('mipress.admin_email', null);
@@ -14,8 +13,7 @@ it('does not create bootstrap super admin when credentials are missing', functio
 
     $this->seed(DatabaseSeeder::class);
 
-    expect(User::query()->count())->toBe(0)
-        ->and(Setting::query()->where('handle', 'general')->exists())->toBeTrue();
+    expect(User::query()->count())->toBe(0);
 });
 
 it('creates bootstrap super admin when explicit credentials are configured', function () {

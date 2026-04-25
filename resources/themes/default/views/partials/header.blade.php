@@ -1,14 +1,15 @@
 @php
     $collections = mipress_public_collections();
     $currentUrl = url()->current();
+    $adminUrl = url('/'.trim((string) config('mipress.admin_path', 'mpcp'), '/'));
 @endphp
 
 <header class="mp-site-header">
     <div class="mp-container mp-header-inner">
-        <a href="{{ url('/') }}" class="mp-brand" aria-label="{{ config('app.name') }}">
+        <a href="{{ url('/') }}" class="mp-brand" aria-label="{{ $siteName }}">
             <span class="mp-brand-mark">MP</span>
             <span class="mp-brand-copy">
-                <strong>{{ config('app.name') }}</strong>
+                <strong>{{ $siteName }}</strong>
                 <small>SaaS publishing experience</small>
             </span>
         </a>
@@ -32,7 +33,7 @@
                 <button type="button" class="mp-theme-button" data-theme-option="system">Auto</button>
             </div>
 
-            <a href="{{ url('/admin') }}" class="mp-button mp-button--ghost mp-header-link">Open admin</a>
+            <a href="{{ $adminUrl }}" class="mp-button mp-button--ghost mp-header-link">Open admin</a>
 
             <button
                 type="button"
@@ -74,7 +75,7 @@
                 <button type="button" class="mp-theme-button" data-theme-option="system">Auto</button>
             </div>
 
-            <a href="{{ url('/admin') }}" class="mp-button mp-button--primary">Go to admin</a>
+            <a href="{{ $adminUrl }}" class="mp-button mp-button--primary">Go to admin</a>
         </div>
     </div>
 </div>

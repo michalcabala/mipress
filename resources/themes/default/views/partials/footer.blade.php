@@ -1,5 +1,6 @@
 @php
     $collections = mipress_public_collections();
+    $adminUrl = url('/'.trim((string) config('mipress.admin_path', 'mpcp'), '/'));
 @endphp
 
 <footer class="mp-site-footer">
@@ -29,10 +30,10 @@
         <div class="mp-footer-card">
             <span class="mp-footer-heading">Operations</span>
             <ul class="mp-footer-links">
-                <li><a href="{{ url('/admin') }}">Open admin</a></li>
+                <li><a href="{{ $adminUrl }}">Open admin</a></li>
                 <li><span>Active theme: Default</span></li>
                 <li><span>SEO-ready metadata and structured data included.</span></li>
-                <li><span>&copy; {{ date('Y') }} {{ config('app.name') }}</span></li>
+                <li><span>&copy; {{ date('Y') }} {{ $siteName }}</span></li>
             </ul>
         </div>
     </div>

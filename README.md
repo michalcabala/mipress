@@ -56,7 +56,7 @@ composer run setup
 
 Installer provede Composer install, pripravi `.env`, vygeneruje `APP_KEY`, postavi frontend, spusti migrace a seedy, vytvori storage link, procisti cache a pusti smoke test.
 
-Pro `composer create-project` flow je zamer jiny: create-project hook pouze pripravi `.env` + `APP_KEY`, ale nespousti databazove zmeny automaticky. Po doplneni `.env` ma nasledovat explicitni bootstrap:
+Pro `composer create-project` flow je zamer jiny: create-project hook pouze pripravi `.env` a vypise dalsi instrukci, ale nespousti databazove zmeny automaticky. `APP_KEY` se vygeneruje az v explicitnim installeru po doplneni `.env`. Nasledovat ma:
 
 ```bash
 composer run setup:create-project

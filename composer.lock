@@ -4134,17 +4134,11 @@
         },
         {
             "name": "michalcabala/mipress-core",
-            "version": "1.0.0",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/michalcabala/mipress-core.git",
-                "reference": "7cb28b7f7200161ce30574349134b26f8410669c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/michalcabala/mipress-core/zipball/7cb28b7f7200161ce30574349134b26f8410669c",
-                "reference": "7cb28b7f7200161ce30574349134b26f8410669c",
-                "shasum": ""
+                "reference": "b292741d721864c0c06c6e24ad40cbffc264e830"
             },
             "require": {
                 "awcodes/botly": "^1.0",
@@ -4182,11 +4176,7 @@
                 "MIT"
             ],
             "description": "MiPress CMS core package.",
-            "support": {
-                "source": "https://github.com/michalcabala/mipress-core/tree/1.0.0",
-                "issues": "https://github.com/michalcabala/mipress-core/issues"
-            },
-            "time": "2026-04-21T16:57:27+00:00"
+            "time": "2026-04-25T12:13:24+00:00"
         },
         {
             "name": "michalcabala/mipress-forms",

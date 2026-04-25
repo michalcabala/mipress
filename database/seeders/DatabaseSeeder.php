@@ -8,8 +8,8 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use MiPress\Core\Database\Seeders\GlobalSetSeeder;
 use MiPress\Core\Database\Seeders\PermissionSeeder;
+use MiPress\Core\Database\Seeders\SettingSeeder;
 use MiPress\Core\Enums\UserRole;
 
 class DatabaseSeeder extends Seeder
@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PermissionSeeder::class,
-            GlobalSetSeeder::class,
+            SettingSeeder::class,
         ]);
 
         if (User::count() !== 0) {

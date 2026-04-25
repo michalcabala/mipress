@@ -12,6 +12,10 @@
         'description' => trim((string) $__env->yieldContent('meta_description')),
         'isPreview' => (bool) ($isPreview ?? false),
     ]);
+
+    $siteName = filled($mipressSeo['site_name'] ?? null)
+        ? (string) $mipressSeo['site_name']
+        : config('app.name');
 @endphp
 
 <!DOCTYPE html>

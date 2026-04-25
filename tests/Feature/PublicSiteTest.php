@@ -14,6 +14,17 @@ test('the homepage falls back to the default theme landing page when no homepage
         ->assertSeeText('A SaaS presentation layer for your CMS, not just another blog skin.');
 });
 
+test('the default theme uses general site settings for public branding', function () {
+    Setting::putValue('general.site_name', 'Studio Atlas');
+    Setting::putValue('general.site_description', 'Moderní publishing platforma pro firemní weby.');
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSeeText('Studio Atlas')
+        ->assertSee('<title>Studio Atlas | SaaS CMS frontend</title>', false)
+        ->assertSee('<meta name="description" content="Moderní publishing platforma pro firemní weby.">', false);
+});
+
 test('the homepage renders the configured published entry', function () {
     $page = Page::factory()->create([
         'title' => 'Home Page',
@@ -77,6 +88,15 @@ test('theme asset links are rendered as relative urls', function () {
         ->assertOk()
         ->assertSee('href="/theme-files/default/assets/css/theme.css"', false)
         ->assertSee('src="/theme-files/default/assets/js/theme.js"', false);
+});
+
+test('default theme admin links follow the configured admin path', function () {
+    config()->set('mipress.admin_path', 'backoffice');
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('href="'.url('/backoffice').'"', false)
+        ->assertDontSee('href="'.url('/admin').'"', false);
 });
 
 test('public collection routes support multiple placeholders and resolve the slug parameter', function () {

@@ -1,7 +1,17 @@
 @extends('layouts.app')
 
-@section('title', config('app.name').' | SaaS CMS frontend')
-@section('meta_description', 'MiPress default theme redesigned as a SaaS presentation website with dark mode, Mason storytelling and SEO-ready public pages.')
+@php
+    $siteName = filled(settings('general', 'site_name'))
+        ? (string) settings('general', 'site_name')
+        : config('app.name');
+    $homepageMetaDescription = filled(settings('general', 'site_description'))
+        ? (string) settings('general', 'site_description')
+        : 'MiPress default theme redesigned as a SaaS presentation website with dark mode, Mason storytelling and SEO-ready public pages.';
+    $adminUrl = url('/'.trim((string) config('mipress.admin_path', 'mpcp'), '/'));
+@endphp
+
+@section('title', $siteName.' | SaaS CMS frontend')
+@section('meta_description', $homepageMetaDescription)
 
 @section('content')
     @php
@@ -25,7 +35,7 @@
                         <a href="{{ url($firstEntryUrl) }}" class="mp-button mp-button--primary">View sample content</a>
                     @endif
 
-                    <a href="{{ url('/admin') }}" class="mp-button mp-button--ghost">Open admin</a>
+                    <a href="{{ $adminUrl }}" class="mp-button mp-button--ghost">Open admin</a>
                 </div>
 
                 <div class="mp-proof-strip">
@@ -177,7 +187,7 @@
                 </div>
 
                 <div class="mp-cta__actions">
-                    <a href="{{ url('/admin') }}" class="mp-button mp-button--primary">Configure the site</a>
+                    <a href="{{ $adminUrl }}" class="mp-button mp-button--primary">Configure the site</a>
                     @if ($firstEntryUrl)
                         <a href="{{ url($firstEntryUrl) }}" class="mp-button mp-button--ghost">Open public example</a>
                     @endif

@@ -60,7 +60,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('mpcp')
+            ->path((string) config('mipress.admin_path', 'mpcp'))
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->passwordReset()

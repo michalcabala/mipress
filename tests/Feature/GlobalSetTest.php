@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Filament\FilamentManager;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
@@ -15,10 +16,10 @@ use MiPress\Core\Filament\Pages\EditSettings;
 use MiPress\Core\Filament\Pages\GlobalSeoSettings;
 use MiPress\Core\Filament\Pages\SitemapSettings;
 use MiPress\Core\Filament\Pages\ThemeSettings;
-use MiPress\Core\Filament\Resources\GlobalSetResource;
 use MiPress\Core\Models\Blueprint;
 use MiPress\Core\Models\Setting;
 use MiPress\Core\Services\SettingsManager;
+use Spatie\Permission\Models\Permission;
 
 it('reads and writes values on setting data via get and set', function () {
     $setting = Setting::factory()->create([
@@ -90,6 +91,35 @@ it('returns values using settings helper', function () {
     expect(settings('contact', 'email'))->toBe('info@mipress.test')
         ->and(settings('contact', 'missing', 'fallback'))->toBe('fallback')
         ->and(settings('contact'))->toBeArray();
+});
+
+it('bootstraps general settings into admin navigation for new installs', function () {
+    $this->seed(DatabaseSeeder::class);
+
+    $user = User::factory()->create();
+    $user->assignRole(UserRole::SuperAdmin->value);
+    $this->actingAs($user);
+
+    app(SettingsManager::class)->flush();
+
+    $general = Setting::query()
+        ->with('blueprint')
+        ->where('handle', 'general')
+        ->first();
+
+    $fieldHandles = collect($general?->blueprint?->fields ?? [])
+        ->flatMap(fn (array $section): array => $section['fields'] ?? [$section])
+        ->pluck('handle')
+        ->all();
+
+    $labels = collect(EditSettings::getNavigationItems())
+        ->map(fn ($item) => $item->getLabel())
+        ->all();
+
+    expect($general)->not->toBeNull()
+        ->and($general?->blueprint)->not->toBeNull()
+        ->and($fieldHandles)->toContain('site_name', 'site_description')
+        ->and($labels)->toContain('Obecné');
 });
 
 it('renders edit settings page for existing handle', function () {
@@ -298,6 +328,12 @@ it('uses the dedicated global seo page instead of the legacy dynamic seo setting
         ->assertSee('Google site verification');
 });
 
+it('does not seed legacy global set permissions', function () {
+    $this->seed(PermissionSeeder::class);
+
+    expect(Permission::query()->where('name', 'like', 'global_set.%')->exists())->toBeFalse();
+});
+
 it('does not register legacy global set resource in the admin panel', function () {
     $this->seed(PermissionSeeder::class);
 
@@ -307,7 +343,7 @@ it('does not register legacy global set resource in the admin panel', function (
 
     $resources = collect(app(FilamentManager::class)->getDefaultPanel()->getResources());
 
-    expect($resources)->not->toContain(GlobalSetResource::class);
+    expect($resources)->not->toContain('MiPress\\Core\\Filament\\Resources\\GlobalSetResource');
 
     $this->get('/'.trim((string) config('mipress.admin_path', 'mpcp'), '/').'/global-sets')
         ->assertNotFound();

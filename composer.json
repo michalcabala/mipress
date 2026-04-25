@@ -46,13 +46,16 @@
     },
     "scripts": {
         "setup": [
-            "@install:web"
+            "@php scripts/install-web.php"
         ],
         "setup:create-project": [
-            "@php scripts/install-web.php --skip-composer-install"
+            "@setup"
         ],
         "install:web": [
-            "@php scripts/install-web.php"
+            "@setup"
+        ],
+        "deploy": [
+            "@php scripts/deploy-web.php"
         ],
         "dev:boost-update": [
             "@php artisan boost:update --ansi"
@@ -84,7 +87,7 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
-            "@php -r \"fwrite(STDOUT, 'Configure .env and run composer run setup:create-project to finish miPress installation.'.PHP_EOL);\""
+            "@php -r \"fwrite(STDOUT, 'Configure .env and run composer run setup to finish miPress installation.'.PHP_EOL);\""
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"

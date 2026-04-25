@@ -113,55 +113,48 @@ MIPRESS_ADMIN_PASSWORD=<secure-random>
 
 ## Instalace nové instance
 
-Pro checkout tohoto repozitáře je preferovaný bootstrap:
+Kanonický bootstrap pro nový web je:
 
 ```bash
 composer run setup
 ```
 
-To provede Composer install, build, migrace, seed, storage link, cache clear a smoke test.
+To provede Composer install jen pokud je potřeba, build, migrace, seed, `storage:link`, publikaci theme assetů a cache clear.
 
-Pokud bude skeleton distribuovaný přes `composer create-project`, create-project hook záměrně negeneruje databázové schéma automaticky. Po konfiguraci `.env` a DB použít explicitní dokončení instalace:
+Pokud bude skeleton distribuovaný přes `composer create-project`, create-project hook záměrně negeneruje databázové schéma automaticky. Po konfiguraci `.env` a DB použij stejný dokončovací příkaz:
 
 ```bash
-composer run setup:create-project
+composer run setup
 ```
 
-Tento wrapper používá `scripts/install-web.php --skip-composer-install`, protože závislosti už v create-project scénáři existují.
+Historické `composer run setup:create-project` zůstává jen jako kompatibilní alias.
 
 Release skeleton už nespoléhá na lokální `path` repositories. Závislosti `michalcabala/mipress-core`, `michalcabala/mipress-forms` a `michalcabala/mipress-social-feeds` se řeší přes veřejné GitHub repozitáře.
 
+Pro ruční deploy je preferovaný jeden příkaz:
+
 ```bash
-# 1. Závislosti
-composer install --no-dev --optimize-autoloader
-npm ci && npm run build
-
-# 2. Prostředí
-cp .env.example .env
-# Upravit .env dle produkčního baseline výše
-php artisan key:generate
-
-# 3. Databáze + seed
-php artisan migrate --force
-php artisan db:seed
-
-# 4. Assety a symlinky
-php artisan storage:link
-php artisan mipress:publish-assets
-
-# 5. Cache
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan filament:cache-components
-
-# 6. Spustit scheduler + queue worker
+composer run deploy
 ```
+
+`composer run deploy` provede:
+
+- `composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist`,
+- frontend build, pokud je dostupné `npm`,
+- bezpečnostní kontrolu `php artisan migrate --pretend`,
+- maintenance mode,
+- migrace,
+- `storage:link`,
+- `php artisan mipress:publish-assets`,
+- `php artisan optimize:clear`,
+- `php artisan config:cache`, `route:cache`, `view:cache`, `filament:cache-components`,
+- `php artisan queue:restart`,
+- návrat aplikace z maintenance mode.
 
 ## Deploy flow (cPanel)
 
 Deploy je automatizovaný přes `cpanel.yml` a spouští se push do `staging` branch.
-Viz `cpanel.yml` v projektu pro přesnou sekvenci kroků.
+`cpanel.yml` teď volá stejný `scripts/deploy-web.php` jako `composer run deploy`, takže ruční i automatický deploy sdílí jednu sekvenci kroků.
 
 Manuální staging deploy:
 ```bash

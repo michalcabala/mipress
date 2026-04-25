@@ -24,7 +24,7 @@
 - [ ] `composer validate --strict --no-check-publish` je čistý v root skeletonu i balíčcích.
 - [ ] Root skeleton používá veřejná Composer jména `michalcabala/*`.
 - [ ] Release skeleton není závislý na lokálních `path` repositories.
-- [ ] `post-create-project-cmd` nespouští automatické migrace; explicitní bootstrap pro vydaný skeleton je zdokumentovaný (`composer run setup:create-project`).
+- [ ] `post-create-project-cmd` nespouští automatické migrace; explicitní bootstrap pro vydaný skeleton je zdokumentovaný (`composer run setup`).
 - [ ] Tagy `1.0.0` existují v `michalcabala/mipress-core`, `michalcabala/mipress-forms`, `michalcabala/mipress-social-feeds` a skeletonu.
 - [ ] Lokální smoke test adminu:
   - [ ] Přihlášení do admin panelu `/mpcp`.
@@ -55,26 +55,20 @@
 
 ## 3. Production deploy
 
-- [ ] Aktivovat maintenance mode (pokud je potřeba):
-  - [ ] `php artisan down --render="errors::503"`
 - [ ] Aktualizovat kód na release commit/tag.
-- [ ] Instalace backend závislostí:
-  - [ ] `composer install --no-dev --optimize-autoloader --no-interaction`
-- [ ] Instalace frontend závislostí + build:
-  - [ ] `npm ci`
-  - [ ] `npm run build`
-- [ ] Spustit migrace:
-  - [ ] `php artisan migrate --force --no-interaction`
-- [ ] Vymazat/obnovit cache:
+- [ ] Spustit kanonický deploy příkaz:
+  - [ ] `composer run deploy`
+- [ ] Ověřit, že deploy skript dokončil:
+  - [ ] bezpečnostní kontrolu `php artisan migrate --pretend`
+  - [ ] maintenance mode během migrací
+  - [ ] `storage:link`
+  - [ ] `php artisan mipress:publish-assets`
   - [ ] `php artisan optimize:clear`
   - [ ] `php artisan config:cache`
   - [ ] `php artisan route:cache`
   - [ ] `php artisan view:cache`
   - [ ] `php artisan filament:cache-components`
-- [ ] Restart queue workerů:
   - [ ] `php artisan queue:restart`
-- [ ] Deaktivovat maintenance mode:
-  - [ ] `php artisan up`
 
 ## 4. Post-release verifikace
 

@@ -7,17 +7,17 @@ declare(strict_types=1);
  *
  * Usage:
  *   php scripts/install-web.php
- *   php scripts/install-web.php --skip-composer-install
  *   php scripts/install-web.php --skip-build
  *   php scripts/install-web.php --skip-migrate
  *   php scripts/install-web.php --skip-seed
  *   php scripts/install-web.php --skip-smoke
+ *   php scripts/install-web.php --skip-composer-install
  */
 $arguments = array_slice($argv, 1);
 
 if (in_array('--help', $arguments, true) || in_array('-h', $arguments, true)) {
     echo "miPress installer\n";
-    echo "Usage: php scripts/install-web.php [--skip-composer-install] [--skip-build] [--skip-migrate] [--skip-seed] [--skip-smoke]\n";
+    echo "Usage: php scripts/install-web.php [--skip-build] [--skip-migrate] [--skip-seed] [--skip-smoke] [--skip-composer-install]\n";
     exit(0);
 }
 
@@ -58,7 +58,11 @@ $shouldGenerateApplicationKey = ! is_string($environmentFile)
     || preg_match('/^APP_KEY=.+$/m', $environmentFile) !== 1;
 
 if (! $skipComposerInstall) {
-    $run('composer install --no-interaction --prefer-dist --no-progress');
+    if (file_exists('vendor/autoload.php')) {
+        echo "Composer dependencies already installed, skipping composer install\n";
+    } else {
+        $run('composer install --no-interaction --prefer-dist --no-progress');
+    }
 } else {
     echo "Skipping composer install (--skip-composer-install)\n";
 }
@@ -89,6 +93,7 @@ if (! $skipSeed) {
 }
 
 $run(PHP_BINARY.' artisan storage:link --no-interaction --force');
+$run(PHP_BINARY.' artisan mipress:publish-assets --no-interaction');
 $run(PHP_BINARY.' artisan optimize:clear');
 
 if (! $skipSmoke) {

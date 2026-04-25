@@ -1,9 +1,9 @@
 # miPress
 
-miPress je modularni CMS postavene na Laravelu 13, Filamentu 5 a verejnych Composer baliccich.
-Root repozitar funguje jako skeleton aplikace; CMS kernel a moduly jsou publikovane jako samostatne Composer balicky a skeleton je sklada dohromady.
+miPress je modularni CMS postavene na Laravelu 13, Filamentu 5 a Composer baliccich.
+Root repozitar ma pro osobni projekty fungovat hlavne jako starter pro novy web; oddelene CMS balicky jsou implementacni detail, ne primarni onboarding krok.
 
-Aktualni priorita projektu je priprava prvniho ostreho release tak, aby slo zalozit novy web/projekt pres Composer s co nejtensim skeletonem a jasnou hranici mezi host app a CMS balicky.
+Pro nejrychlejsi create/deploy flow viz `QUICKSTART.md`.
 
 ## Stack
 
@@ -20,47 +20,27 @@ Aktualni priorita projektu je priprava prvniho ostreho release tak, aby slo zalo
 - `michalcabala/mipress-forms`: formularovy modul, submit flow a administrace odpovedi
 - `michalcabala/mipress-social-feeds`: social account/feed integrace a scheduled refresh
 
-## Instalace noveho projektu
+## Doporuceny flow pro osobni projekty
 
-Cilovy public install flow je:
-
-```bash
-composer create-project michalcabala/mipress muj-web
-cd muj-web
-composer run setup:create-project
-```
-
-Skeleton si zavislosti taha z verejnych GitHub repozitaru `michalcabala/mipress-core`,
-`michalcabala/mipress-forms` a `michalcabala/mipress-social-feeds`.
-
-## Lokalni instalace
-
-Zakladni instalace z checkoutu:
-
-```bash
-composer install
-cp .env.example .env
-php artisan key:generate
-npm ci
-npm run build
-php artisan migrate
-php artisan db:seed
-php artisan storage:link
-```
-
-Jednokrokovy installer pro cisty checkout:
+Preferovana cesta je zalozit novy web jako template nebo clone tohoto skeletonu, pripravit `.env` a spustit:
 
 ```bash
 composer run setup
 ```
 
-Installer provede Composer install, pripravi `.env`, vygeneruje `APP_KEY`, postavi frontend, spusti migrace a seedy, vytvori storage link, procisti cache a pusti smoke test.
+`composer run setup` je kanonicky installer pro novy web. Sam rozpozna, jestli uz Composer zavislosti existuji, a pak dokonci zbytek bootstrapu.
 
-Pro `composer create-project` flow je zamer jiny: create-project hook pouze pripravi `.env` a vypise dalsi instrukci, ale nespousti databazove zmeny automaticky. `APP_KEY` se vygeneruje az v explicitnim installeru po doplneni `.env`. Nasledovat ma:
+## Instalace noveho projektu
 
-```bash
-composer run setup:create-project
-```
+Minimalni setup pro cisty checkout:
+
+1. vytvor `.env` z `.env.example`,
+2. nastav databazi, `APP_URL` a volitelne bootstrap admin ucet,
+3. spust `composer run setup`.
+
+Installer provede Composer install jen pokud je potreba, pripravi `.env`, vygeneruje `APP_KEY`, postavi frontend, spusti migrace a seedy, vytvori `storage:link`, publikuje theme assety a procisti cache.
+
+Pokud budes pouzivat `composer create-project`, finish flow je stejny: po uprave `.env` spust zase `composer run setup`. `setup:create-project` zustava jen jako kompatibilni alias.
 
 Pokud se ma pri prvni instalaci vytvorit bootstrap admin, nastav v `.env`:
 
@@ -76,7 +56,19 @@ MIPRESS_ADMIN_PASSWORD=<secure-random>
 - Theme assety jsou verejne dostupne pouze z `assets/*`.
 - Produkcni deploy a release checklist jsou popsane v `DEPLOYMENT.md` a `RELEASE_CHECKLIST.md`.
 
-## Release smer
+## Deploy
+
+Kanonicky deploy prikaz pro osobni projekty je:
+
+```bash
+composer run deploy
+```
+
+Tento skript udela `composer install --no-dev`, buildne frontend pokud je pritomne `npm`, zkontroluje migrace pres `php artisan migrate --pretend`, prepne aplikaci do maintenance mode, spusti migrace, obnovi symlinky a theme assety, procisti cache, znovu vytvori produkcni cache a restartuje queue worker.
+
+`cpanel.yml` vola stejny deploy script, aby manualni i automaticky deploy mely stejnou sekvenci kroku.
+
+## Balicky a release model
 
 Release model je nyni ukotveny takto:
 
@@ -91,6 +83,6 @@ Aktualni stav release modelu:
 - release skeleton uz neni zavisly na lokalnich `path` repositories, protoze balicky resi pres verejne GitHub `git` zdroje bez zavislosti na GitHub API driveru,
 - create-project bootstrap uz neprovadi automaticke migrace a seedy bez vedomeho kroku installera.
 
-Zbyvajici externi krok mimo tento repozitar je registrace root skeletonu na Packagist, aby sel volat primo pres `composer create-project michalcabala/mipress` bez dalsich repository argumentu.
+Pro osobni projekty to neni blocker. Public `composer create-project`/Packagist je volitelny release smer navic, ne podminka bezneho pouziti.
 
 Aktualni backlog a refaktoring priority jsou v `ROADMAP_REFAKTORING.md`.
